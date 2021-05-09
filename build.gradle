@@ -22,26 +22,27 @@ buildscript {
 repositories {
 	mavenLocal()
 	mavenCentral()
-	maven {
+/*	maven {
 		url 'http://localhost:8082/nexus/content/repositories/releases/'
 	}
 	maven {
 		url 'http://localhost:8082/nexus/content/repositories/snapshots/'
 	}
+*/
 }
 
 apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'findbugs'
-apply plugin: 'pmd'
-apply plugin: 'jacoco'
-apply plugin: 'edu.sc.seis.launch4j'
+apply plugin: 'maven-publish'
+//apply plugin: 'findbugs'
+// apply plugin: 'pmd'
+//apply plugin: 'jacoco'
+//apply plugin: 'edu.sc.seis.launch4j'
 
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-findbugs {
+/*findbugs {
   ignoreFailures = true
   toolVersion = "3.0.1"
   sourceSets = [sourceSets.main]
@@ -51,7 +52,8 @@ findbugs {
 findbugsTest.onlyIf {
 	false
 }
-
+*/
+/*
 pmd {
   ignoreFailures = true
   sourceSets = [sourceSets.main]
@@ -61,8 +63,9 @@ pmd {
     "java-braces"
   ]
 }
+*/
 
-jacoco {
+/*jacoco {
 	toolVersion = "0.7.6.201602180812"
 }
 
@@ -73,7 +76,8 @@ jacocoTestReport {
         html.destination file("build/jacocoHtml")
     }
 }
-
+*/
+/*
 uploadArchives {
     repositories {
        mavenDeployer {
@@ -89,15 +93,16 @@ uploadArchives {
     	}
 	}
 }
-
+*/
 dependencies {
-	testCompile project(':specs')
-	// testCompile 'org.wuerthner.specs:specs:2.1.0'
+	// testCompile project(':specs')
+	testImplementation 'org.wuerthner.specs:specs:2.1.0'
 	
-	testCompile group: 'junit', name: 'junit', version: '4.+'
+	testImplementation group: 'junit', name: 'junit', version: '4.+'
+	testImplementation group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
 }
 
-task wrapper(type: Wrapper) {
+/*task wrapper(type: Wrapper) {
    gradleVersion = '3.3'
 }
-
+*/

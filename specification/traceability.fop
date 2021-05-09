@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format" font-family="Helvetica">
+<fo:layout-master-set>
+<fo:simple-page-master margin-bottom="2cm" margin-left="2cm" margin-right="2cm" margin-top="1cm" master-name="simple" page-height="29.7cm" page-width="21cm">
+<fo:region-body margin-bottom="0cm" margin-top="2cm"/>
+<fo:region-before extent="1.5cm"/>
+<fo:region-after extent="-1.5cm"/>
+</fo:simple-page-master>
+</fo:layout-master-set>
+<fo:page-sequence master-reference="simple">
+<fo:static-content flow-name="xsl-region-before">
+<fo:block font-size="10pt" font-weight="bold" line-height="12pt" text-align="left">Score 1.1.0</fo:block>
+<fo:block font-size="10pt" font-weight="bold" line-height="12pt" space-before.optimum="-12pt" text-align="end">Page <fo:page-number/> of <fo:page-number-citation ref-id="theEnd"/>
+</fo:block>
+<fo:block>
+<fo:leader color="#000080" leader-length="17cm" leader-pattern="rule" rule-thickness="0.5pt"/>
+</fo:block>
+</fo:static-content>
+<fo:static-content flow-name="xsl-region-after">
+<fo:block>
+<fo:leader color="#000080" leader-length="17cm" leader-pattern="rule" rule-thickness="0.5pt" space-after.optimum="2pt"/>
+</fo:block>
+<fo:block font-size="10pt" font-weight="bold" line-height="14pt" space-after.optimum="-14pt" text-align="left">Date: 09 May 2021</fo:block>
+<fo:block font-size="10pt" font-weight="bold" line-height="14pt" text-align="end">Page <fo:page-number/> of <fo:page-number-citation ref-id="theEnd"/>
+</fo:block>
+</fo:static-content>
+<fo:flow flow-name="xsl-region-body">
+<fo:block space-after="40pt">
+<fo:block font-size="20pt" font-weight="bold" line-height="28pt" space-after="5pt" text-align="center">Traceability Report for Project Score 1.1.0</fo:block>
+<fo:table border-collapse="separate" space-after="10pt" space-before="20pt">
+<fo:table-column column-width="55mm"/>
+<fo:table-column column-width="114mm"/>
+<fo:table-body>
+<fo:table-row>
+<fo:table-cell border="solid 0.1mm black" padding="3pt">
+<fo:block font-size="12pt">Author</fo:block>
+</fo:table-cell>
+<fo:table-cell border="solid 0.1mm black" padding="3pt">
+<fo:block font-size="12pt">Jan Würthner</fo:block>
+</fo:table-cell>
+</fo:table-row>
+<fo:table-row>
+<fo:table-cell border="solid 0.1mm black" padding="3pt">
+<fo:block font-size="12pt">Date</fo:block>
+</fo:table-cell>
+<fo:table-cell border="solid 0.1mm black" padding="3pt">
+<fo:block font-size="12pt">09 May 2021</fo:block>
+</fo:table-cell>
+</fo:table-row>
+</fo:table-body>
+</fo:table>
+<fo:block end-indent="0.5em" padding="1em" space-after="10pt" space-before="1em" start-indent="0.5em">
+<fo:block font-size="1.3em" font-weight="bold" keep-with-next.within-page="always" space-after="0.5em" space-before="0.5em">Table of Contents</fo:block>
+<fo:block font-size="1em" font-weight="bold" margin-left="0em" space-before="0.5em" text-align-last="justify">1. Project Definition<fo:leader leader-pattern="dots"/>
+<fo:page-number-citation ref-id="1. Project Definition"/>
+</fo:block>
+<fo:block font-size="1em" font-weight="bold" margin-left="0em" space-before="0.5em" text-align-last="justify">2. Scope<fo:leader leader-pattern="dots"/>
+<fo:page-number-citation ref-id="2. Scope"/>
+</fo:block>
+<fo:block font-size="1em" font-weight="bold" margin-left="0em" space-before="0.5em" text-align-last="justify">3. Model<fo:leader leader-pattern="dots"/>
+<fo:page-number-citation ref-id="3. Model"/>
+</fo:block>
+<fo:block font-size="1em" font-weight="bold" margin-left="0em" space-before="0.5em" text-align-last="justify">4. Use Cases<fo:leader leader-pattern="dots"/>
+<fo:page-number-citation ref-id="4. Use Cases"/>
+</fo:block>
+</fo:block>
+<fo:leader color="#808080" leader-length="17cm" leader-pattern="rule" rule-thickness="0.5pt"/>
+</fo:block>
+<fo:block font-size="14pt" font-weight="bold" id="1. Project Definition" line-height="28pt" space-before="20pt" text-align="left">1. Project Definition</fo:block>
+<fo:block font-size="10pt" line-height="12pt" space-after.optimum="10pt" space-before.optimum="4pt" text-align="left">This library converts music score, given in an abstract data tree-structre (made of arrangements, tracks, voices, events), into a music sheet with a set of coordinates. Based on this output, any simple drawing tool can be used to display a full music score.</fo:block>
+<fo:block font-size="14pt" font-weight="bold" id="2. Scope" line-height="28pt" space-before="20pt" text-align="left">2. Scope</fo:block>
+<fo:block font-size="10pt" line-height="12pt" space-after.optimum="10pt" space-before.optimum="4pt" text-align="left">The scope of this document is a description of system requirements in combination with the test cases and their traceability.</fo:block>
+<fo:block font-size="14pt" font-weight="bold" id="3. Model" line-height="28pt" space-before="20pt" text-align="left">3. Model</fo:block>
+<fo:block font-size="10pt" line-height="12pt" space-after.optimum="10pt" space-before.optimum="4pt" text-align="left">This chapter describes the data model</fo:block>
+<fo:table border-collapse="separate" space-after="10pt" space-before="10pt">
+<fo:table-column column-width="55mm"/>
+<fo:table-column column-width="114mm"/>
+<fo:table-header>
+<fo:table-row>
+<fo:table-cell>
+<fo:block background-color="#ddddff" border="solid 0.1mm black" line-height="28pt" text-align="center">Requirement</fo:block>
+</fo:table-cell>
+<fo:table-cell>
+<fo:block background-color="#ddddff" border="solid 0.1mm black" line-height="28pt" text-align="center">Testcase</fo:block>
+</fo:table-cell>
+</fo:table-row>
+</fo:table-header>
+<fo:table-body>
+<fo:table-row>
+<fo:table-cell border="solid 0.1mm black" padding="3pt">
+<fo:block font-size="9pt">
+<fo:inline color="#cc0000">RQ-001</fo:inline>
+<fo:inline>:  The metric element defines the metric structure of a bar.</fo:inline>
+</fo:block>
+</fo:table-cell>
+<fo:table-cell border="solid 0.1mm black" padding-left="3pt" padding-right="3pt">
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-001</fo:inline>
+<fo:inline>:  Create a two-level metric '2*2/4'. The 1st level submetrixes (amount 2) are of duration 1. The 2nd level submetrixes (amount 2) are of duration 0.5. The 3rd levelsingle events are of duration 0.25.</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-002</fo:inline>
+<fo:inline>:  Create a metric '3+1/4'. The 1st level submetrixes (amount 2) are of duration 1. The 2nd level are of duration 0.75 (amount 3) and 0.25 (amount 1).</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-003</fo:inline>
+<fo:inline>:  Create a two-level metric '3*3/4'. The 1st level submetrixes (amount 3) are of duration 2.25. The 2nd level submetrixes (amount 3) are of duration 0.75. The 3rd level single events are of duration 0.25.</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-004</fo:inline>
+<fo:inline>:  Create a two-level metric '4/4'. The 1st level submetrixes (amount 2) are of duration 1. The 2nd level submetrixes (amount 2) are of duration 0.5. The 3rd levelsingle events are of duration 0.25.</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-005</fo:inline>
+<fo:inline>:  Create a composite metric '3*2*3/16 + 1/8'. The 1st level submetrixes (amount 2) are of duration 1.25. The 2nd level (of 3*2*3/16) are of duration 1.125 (amount 3) The 3rd level are of duration 0.375, 4th level of duration 0.1875 and last level 0.0625. The 2nd level of the 1/8 metric is of duration 0.125.</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-006</fo:inline>
+<fo:inline>:  Test the depth level of the submatrixes for a metric '3*2*3/16+1/8'.</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-007</fo:inline>
+<fo:inline>:  Create a composite metric '5/4'. The 1st level submetrixes (amount 2) are of duration 1.25. The 2nd level submetrixes (amount 3 and 2) are of duration 0.75 and 0.5.</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-008</fo:inline>
+<fo:inline>:  Test invalid merics regarding the pattern given.</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-009</fo:inline>
+<fo:inline>:  Test the validity of metrics regarding the pattern: ^\s*(\d+)(?:\s*(\+|\*)\s*(\d+))*\s*/\s*(\d+)\s*(?:(\+|\-)\s*(\d+)(?:\s*(\+|\*)\s*(\d+))*\s*/\s*(\d+)\s*)*$</fo:inline>
+</fo:block>
+<fo:block font-size="9pt" padding="3pt">
+<fo:inline color="#00aa00">TC-010</fo:inline>
+<fo:inline>:  Create a two-level metric '2+2/4'. The 1st level submetrixes (amount 2) are of duration 1. The 2nd level submetrixes (amount 2) are of duration 0.5. The 3rd levelsingle events are of duration 0.25.</fo:inline>
+</fo:block>
+</fo:table-cell>
+</fo:table-row>
+</fo:table-body>
+</fo:table>
+<fo:block font-size="14pt" font-weight="bold" id="4. Use Cases" line-height="28pt" space-before="20pt" text-align="left">4. Use Cases</fo:block>
+<fo:block font-size="10pt" line-height="12pt" space-after.optimum="10pt" space-before.optimum="4pt" text-align="left">This chapter describes integration tests and use cases</fo:block>
+<fo:block id="theEnd"/>
+</fo:flow>
+</fo:page-sequence>
+</fo:root>

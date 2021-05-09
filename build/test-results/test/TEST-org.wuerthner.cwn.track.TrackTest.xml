@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.wuerthner.cwn.track.TrackTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2021-05-09T13:33:51" hostname="Kaventsmann" time="0.131">
+  <properties/>
+  <testcase name="testTimeSignatureTrackNextBar" classname="org.wuerthner.cwn.track.TrackTest" time="0.0"/>
+  <testcase name="testTimeSignatureException" classname="org.wuerthner.cwn.track.TrackTest" time="0.001"/>
+  <testcase name="testSimpleTimeSignatureTrack" classname="org.wuerthner.cwn.track.TrackTest" time="0.0"/>
+  <testcase name="testTimeSignature" classname="org.wuerthner.cwn.track.TrackTest" time="0.001"/>
+  <testcase name="testPosition" classname="org.wuerthner.cwn.track.TrackTest" time="0.0"/>
+  <testcase name="testNextBeat" classname="org.wuerthner.cwn.track.TrackTest" time="0.001"/>
+  <testcase name="testTimeSignatureTrackNextBar" classname="org.wuerthner.cwn.track.TrackTest" time="0.001"/>
+  <testcase name="testTimeSignatureException" classname="org.wuerthner.cwn.track.TrackTest" time="0.0"/>
+  <testcase name="testSimpleTimeSignatureTrack" classname="org.wuerthner.cwn.track.TrackTest" time="0.001"/>
+  <testcase name="testTimeSignature" classname="org.wuerthner.cwn.track.TrackTest" time="0.0"/>
+  <testcase name="testPosition" classname="org.wuerthner.cwn.track.TrackTest" time="0.001"/>
+  <testcase name="testNextBeat" classname="org.wuerthner.cwn.track.TrackTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,44 @@
+org/wuerthner/cwn/print/PrintTest.java
+ org.wuerthner.cwn.print.PrintTest
+org/wuerthner/cwn/metric/MetricTest.java
+ org.wuerthner.cwn.metric.MetricTest
+org/wuerthner/cwn/ScoreBuilderTest.java
+ org.wuerthner.cwn.ScoreBuilderTest
+org/wuerthner/cwn/score/NoteTest.java
+ org.wuerthner.cwn.score.NoteTest
+org/wuerthner/cwn/NoteTest.java
+ org.wuerthner.cwn.NoteTest
+org/wuerthner/cwn/score/TestScore.java
+ org.wuerthner.cwn.score.TestScore
+org/wuerthner/cwn/score/TestAccent.java
+ org.wuerthner.cwn.score.TestAccent
+org/wuerthner/cwn/testsuite/TestSuite.java
+ org.wuerthner.cwn.testsuite.TestSuite
+ org.wuerthner.cwn.testsuite.TestSuite$CloseReport
+ org.wuerthner.cwn.testsuite.TestSuite$OpenReport
+org/wuerthner/cwn/metric/MetricDurationTest.java
+ org.wuerthner.cwn.metric.MetricDurationTest
+org/wuerthner/cwn/score/TestScoreObject.java
+ org.wuerthner.cwn.score.TestScoreObject
+org/wuerthner/cwn/timesignature/TimeSignatureTest.java
+ org.wuerthner.cwn.timesignature.TimeSignatureTest
+org/wuerthner/cwn/testsuite/Spec.java
+ org.wuerthner.cwn.testsuite.Spec
+org/wuerthner/cwn/score/SignsTest.java
+ org.wuerthner.cwn.score.SignsTest
+org/wuerthner/cwn/score/RelativePositionAndDurationTest.java
+ org.wuerthner.cwn.score.RelativePositionAndDurationTest
+org/wuerthner/cwn/metric/LearningTests.java
+ org.wuerthner.cwn.metric.LearningTests
+org/wuerthner/cwn/track/TrackTest.java
+ org.wuerthner.cwn.track.TrackTest
+org/wuerthner/cwn/TriasTest.java
+ org.wuerthner.cwn.TriasTest
+org/wuerthner/cwn/timesignature/RatioTest.java
+ org.wuerthner.cwn.timesignature.RatioTest
+org/wuerthner/cwn/score/BarTest.java
+ org.wuerthner.cwn.score.BarTest
+org/wuerthner/cwn/score/ScoreTestSuite.java
+ org.wuerthner.cwn.score.ScoreTestSuite
+org/wuerthner/cwn/score/GroupTest.java
+ org.wuerthner.cwn.score.GroupTest

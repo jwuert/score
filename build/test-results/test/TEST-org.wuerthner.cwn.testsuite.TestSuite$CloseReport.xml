@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.wuerthner.cwn.testsuite.TestSuite$CloseReport" tests="2" skipped="0" failures="0" errors="0" timestamp="2021-05-09T13:33:50" hostname="Kaventsmann" time="0.794">
+  <properties/>
+  <testcase name="close" classname="org.wuerthner.cwn.testsuite.TestSuite$CloseReport" time="0.597"/>
+  <testcase name="close" classname="org.wuerthner.cwn.testsuite.TestSuite$CloseReport" time="0.12"/>
+  <system-out><![CDATA[PageSequence <no id> generated 1 pages.
+Generated 1 pages in total.
+PageSequence <no id> generated 2 pages.
+Generated 2 pages in total.
+]]></system-out>
+  <system-err><![CDATA[May 09, 2021 3:33:51 PM org.apache.fop.apps.FOUserAgent processEvent
+WARNING: The following feature isn't implemented by Apache FOP, yet: table-layout="auto" (on fo:table) (See position 29:77)
+May 09, 2021 3:33:51 PM org.apache.fop.apps.FOUserAgent processEvent
+INFO: Rendered page #1.
+May 09, 2021 3:33:51 PM org.apache.fop.apps.FOUserAgent processEvent
+WARNING: The following feature isn't implemented by Apache FOP, yet: table-layout="auto" (on fo:table) (See position 29:77)
+May 09, 2021 3:33:51 PM org.apache.fop.apps.FOUserAgent processEvent
+WARNING: The following feature isn't implemented by Apache FOP, yet: table-layout="auto" (on fo:table) (See position 74:77)
+May 09, 2021 3:33:51 PM org.apache.fop.apps.FOUserAgent processEvent
+INFO: Rendered page #1.
+May 09, 2021 3:33:51 PM org.apache.fop.apps.FOUserAgent processEvent
+INFO: Rendered page #2.
+]]></system-err>
+</testsuite>
