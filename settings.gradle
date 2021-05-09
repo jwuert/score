@@ -1,0 +1,3 @@
+rootProject.name="score"
+include   ':specs'
+project(':specs').projectDir = new File(settingsDir, '../specs')

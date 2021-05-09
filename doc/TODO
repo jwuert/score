@@ -1,0 +1,4 @@
+1. Vorzeichen (#/b), Versatz bei dicht plazierten Noten (z.B. f+g)
+2. Voice-abhängiger horizontaler Versatz: Voice 3+4 => +3 pixel, Voice 5+6 => +6 pixel
+3. Piano Staff einführen
+4. die Metrum Berechnung als double ändern in: Resolution * character (aller n'olen), z.B: wenn res=1/16th, und Triolen auftreten, dann barLength=16*3=48
