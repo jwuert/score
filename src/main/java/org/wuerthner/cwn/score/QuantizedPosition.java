@@ -22,6 +22,9 @@ public class QuantizedPosition {
 	public QuantizedPosition(ScoreBar scoreBar, long noteStartPosition, int resolutionInTicks) {
 		this.resolutionInTicks = resolutionInTicks;
 		long positionWithinBar = noteStartPosition - scoreBar.getStartPosition();
+		if (positionWithinBar<0) {
+			positionWithinBar = 0;
+		}
 		metricGeometry = getDurationType(scoreBar.getScoreParameter(), positionWithinBar, scoreBar.getTimeSignature().getMetric());
 		snappedPosition = metricGeometry.beatStartPosition + getSnappedPosition(metricGeometry.durationType, scoreBar.getScoreParameter(), positionWithinBar - metricGeometry.beatStartPosition);
 	}

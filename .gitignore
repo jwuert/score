@@ -1,3 +1,6 @@
 build/
 bin/
 .gradle/
+.idea/
+example.mid
+exampleout.mid

@@ -19,12 +19,14 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	private Iterator<ScoreBar>[] barIteratorArray;
 	private ScoreBar[] barArray;
 	private final int maxSystemNo;
+	private final List<CwnTrack> trackList;
 	
 	public ScoreBuilder(List<CwnTrack> trackList, ScoreParameter scoreParameter, ScoreLayout scoreLayout) {
 		this(trackList, scoreParameter, scoreLayout, 9999);
 	}
 	
 	public ScoreBuilder(List<CwnTrack> trackList, ScoreParameter scoreParameter, ScoreLayout scoreLayout, int maxSystemNo) {
+		this.trackList = trackList;
 		this.scoreLayout = scoreLayout;
 		this.maxSystemNo = maxSystemNo;
 		this.scoreParameter = scoreParameter;
@@ -136,28 +138,39 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		}
 		barIteratorArray = barIteratorList.toArray(new Iterator[] {});
 		int numberOfScores = barIteratorArray.length;
+
 		barArray = new ScoreBar[numberOfScores];
 		double currentX = scoreLayout.getBorder() + (isIndented ? scoreLayout.getSystemIndent() : 0); // ?? + geometry.firstIndent;
-		double lastX;
+		double sumBarDuration = 0;
+		int sumBarOffset = 0;
+		double lastX = 0;
 		int systemIndex = 0;
 		double maxX = scoreLayout.getWidth() - scoreLayout.getBorder();
 		ScoreSystem system = new ScoreSystem(totalSystem);
 		systemList.add(system);
+
 		for (int bar = 0; bar < numberOfBars; bar++) {
 			isIndented = systemIndex == 0 && scoreParameter.startPosition == 0;
 			incrementBar();
 			int minShortestValue = getMinShortestValue();
 			setShortestValue(minShortestValue);
-			double barWidth = barArray[0].getWidth(scoreLayout.getPixelPerTick(), (bar == 0));
+			double barDuration = barArray[0].getDurationAsPixel(scoreLayout.getPixelPerTick());
+			int barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), bar==0, bar==0);
+			double barWidth = barDuration+barOffset;
 			lastX = currentX;
 			currentX = currentX + barWidth;
 			if (currentX > maxX) {
-				barWidth = barArray[0].getWidth(scoreLayout.getPixelPerTick(), true);
-				double indent = isIndented ? scoreLayout.getSystemIndent() : 0;
-				double stretchFactor = (maxX - indent) * 1.0 / (lastX - indent);
+				double leftX = scoreLayout.getBorder() + (isIndented ? scoreLayout.getSystemIndent() : 0);
+				double stretchFactor = (maxX - leftX - sumBarOffset) / (lastX - leftX - sumBarOffset);
 				system.setStretchFactor(stretchFactor);
+
 				currentX = scoreLayout.getBorder();
-				lastX = currentX;
+				sumBarDuration = 0;
+				sumBarOffset = 0;
+
+				barDuration = barArray[0].getDurationAsPixel(scoreLayout.getPixelPerTick());
+				barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), true, bar==0);
+				barWidth = barDuration+barOffset;
 				currentX = currentX + barWidth;
 				systemIndex++;
 				if (systemIndex > maxSystemNo) {
@@ -169,6 +182,8 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			} else {
 				addBarsToSystem(system);
 			}
+			sumBarDuration += barDuration;
+			sumBarOffset += barOffset;
 			numberOfShownBars = bar + 1;
 		}
 	}
@@ -178,7 +193,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			try {
 				barArray[scoreIndex] = barIteratorArray[scoreIndex].next();
 			} catch (NoSuchElementException e) {
-				// add break at the end
+				// add rest at the end
 				barArray[scoreIndex] = new ScoreBar(barArray[scoreIndex]);
 			}
 		}
@@ -277,7 +292,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	
 	public Location findPosition(int x, int y, int resolutionInTicks) {
 		Location location = null;
-		int yPos = y - scoreLayout.getTitleHeight() - scoreLayout.getBorder() + 1;
+		int yPos = y - scoreLayout.getTitleHeight() - scoreLayout.getBorder() - scoreLayout.getSystemSpace();
 		if (yPos >= 0 && totalSystem != null) {
 			int numberOfStaffs = totalSystem.size();
 			int staffHeight = scoreLayout.getStaffHeight();
@@ -294,14 +309,6 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 				ScoreStaff staff = system.get(staffIndex);
 				location = staff.findPosition(x, y, xPos, scoreLayout.getPixelPerTick(), yWithinStaff, systemIndex, staffIndex, resolutionInTicks);
 			}
-			// System.out.println("system:staff: " + systemIndex + ":" + staffIndex + " y(staff): " + yWithinStaff);
-			
-			// if (systemIndex < systemList.size()) {
-			// int xPos = x - geometry.xOffset - geometry.firstIndent - 4;
-			// if (systemIndex == 0) {
-			// xPos = xPos - Geometry.SCORE_INDENT;
-			// }
-			// }
 		}
 		return location;
 	}
@@ -318,5 +325,9 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			index = staffIndex;
 		}
 		return index;
+	}
+
+	public List<CwnTrack> getTrackList() {
+		return trackList;
 	}
 }

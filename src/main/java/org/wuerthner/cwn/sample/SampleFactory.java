@@ -1,14 +1,6 @@
 package org.wuerthner.cwn.sample;
 
-import org.wuerthner.cwn.api.CwnAccent;
-import org.wuerthner.cwn.api.CwnBarEvent;
-import org.wuerthner.cwn.api.CwnClefEvent;
-import org.wuerthner.cwn.api.CwnFactory;
-import org.wuerthner.cwn.api.CwnKeyEvent;
-import org.wuerthner.cwn.api.CwnNoteEvent;
-import org.wuerthner.cwn.api.CwnTimeSignatureEvent;
-import org.wuerthner.cwn.api.CwnTrack;
-import org.wuerthner.cwn.api.TimeSignature;
+import org.wuerthner.cwn.api.*;
 
 public class SampleFactory implements CwnFactory {
 	
@@ -40,7 +32,12 @@ public class SampleFactory implements CwnFactory {
 	public CwnNoteEvent createNoteEvent(long position, long duration, int pitch, int shift, int velocity, int voice, String lyrics) {
 		return new SampleNoteEvent(position, duration, pitch, shift, velocity, voice, lyrics, false);
 	}
-	
+
+	@Override
+	public CwnTempoEvent createTempoEvent(long position, int tempo) {
+		return new SampleTempoEvent(position, tempo);
+	}
+
 	public CwnNoteEvent createNoteEvent(long position, long duration, int pitch, int shift, int velocity, int voice, String lyrics, boolean isUngrouped) {
 		return new SampleNoteEvent(position, duration, pitch, shift, velocity, voice, lyrics, isUngrouped);
 	}

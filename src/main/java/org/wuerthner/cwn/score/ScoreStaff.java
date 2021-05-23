@@ -75,32 +75,34 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 		ScoreBar matchedBar = null;
 		boolean barConfig = false;
 		long tPos = 0;
+		double barTickPerPixel = 0;
 		if (barList.size() > 0 && xPos >= 0) {// barList.get(0).getOffset(pixelPerTick)) {
 			// long staffStartPosition = barList.get(0).getStartPosition();
 			int barNumberPerStaff = 0;
 			for (ScoreBar bar : barList) {
-				int barWidth = bar.getWidth(pixelPerTick, (barNumberPerStaff == 0));
-				int barOffset = bar.getOffset(pixelPerTick, (barNumberPerStaff == 0));
-				double barTickPerPixel = bar.getDuration() * 1.0 / (bar.getWidth() * pixelPerTick);
-				// System.out.println(" ? " + xPos + " in (" + xBar + " - " + (barOffset + barWidth) + ")");
+				int barWidth = bar.getStretchedDurationAsPixel(pixelPerTick);
+				boolean firstBarInTotal = (barNumberPerStaff==0) && (systemIndex==0);
+				int barOffset = bar.getOffset(pixelPerTick, (barNumberPerStaff == 0), firstBarInTotal);
+				barTickPerPixel = bar.getDuration() * 1.0 / barWidth;
 				if (xPos >= xBar && xPos < xBar + barOffset) {
 					matchedBar = bar;
 					barConfig = true;
 					tPos = bar.getStartPosition();
 					break;
-				} else if (xPos >= xBar + barOffset && xPos < xBar + barWidth) {
+				} else if (xPos >= xBar + barOffset && xPos < xBar + barOffset + barWidth) {
 					matchedBar = bar;
 					barConfig = false;
 					tPos = bar.getStartPosition() + (int) ((xPos - (xBar + barOffset)) * barTickPerPixel);
-					// System.out.println("-> " + (xPos - (xBar + barOffset)) + " : " + ((xPos - (xBar + barOffset)) * barTickPerPixel));
 					break;
 				}
-				xBar += barWidth;
+				xBar += barWidth+barOffset;
 				barNumberPerStaff++;
 			}
 			if (matchedBar != null) {
+				tPos -= 0.5*resolutionInTicks; // because Quantization rounds up and down. We only want to round down!
 				QuantizedPosition qPos = new QuantizedPosition(matchedBar, tPos, resolutionInTicks);
 				long position = matchedBar.getStartPosition() + qPos.getSnappedPosition();
+				// int deltaX = (int)((qPos.getSnappedPosition()-tPos)*1.0/barTickPerPixel);
 				int clef = track.getClef(position).getClef();
 				int pitch = getPitch(yWithinStaff, clef);
 				location = new Location(matchedBar, position, pitch, staffIndex, systemIndex, barConfig, x, y, yWithinStaff);

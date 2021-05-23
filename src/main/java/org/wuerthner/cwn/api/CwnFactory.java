@@ -12,8 +12,11 @@ public interface CwnFactory {
 	public CwnNoteEvent createNoteEvent(long position, long duration, int pitch, int shift, int velocity, int voice);
 	
 	public CwnNoteEvent createNoteEvent(long position, long duration, int pitch, int shift, int velocity, int voice, String lyrics);
-	
+
+	public CwnTempoEvent createTempoEvent(long position, int tempo);
+
 	public CwnBarEvent createBarEvent(long position, String type);
 	
 	public CwnAccent createAccent(String name);
+
 }

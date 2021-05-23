@@ -12,7 +12,7 @@ public class Location {
 	public final int x;
 	public final int y;
 	public final int yRelative;
-	
+
 	public Location(ScoreBar scoreBar, long position, int pitch, int staffIndex, int systemIndex, boolean barConfig, int x, int y, int yRelative) {
 		this.scoreBar = scoreBar;
 		this.position = position;
@@ -35,6 +35,8 @@ public class Location {
 	}
 	
 	public String toString() {
-		return "Location: " + PositionTools.getTrias(scoreBar.getTrack(), position) + ", " + pitch + " [" + systemIndex + ":" + staffIndex + "]" + (barConfig ? " CONFIG" : "");
+		return "Location: " + PositionTools.getTrias(scoreBar.getTrack(), position) + ", "
+				+ pitch + "(" + Score.cpitch[pitch] + ")" + " [" + systemIndex + ":" + staffIndex + "]"
+				+ (barConfig ? " CONFIG" : "");
 	}
 }

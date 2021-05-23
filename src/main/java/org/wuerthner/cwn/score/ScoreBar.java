@@ -229,22 +229,30 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 	public boolean hasExplicitKey() {
 		return explicitKey;
 	}
-	
-	/**
-	 * @return the scaled width (tick based), accounting for userStretchFactor, stretchFactor (set by ScoreBuilder) and shortestValue
-	 */
-	public double getWidth() {
-		double scale = getHorizontalScale();
-		double barWidth = duration * scale;
-		return barWidth;
+
+//	public int getStretchedWidthAsPixel(double pixelPerTick, boolean firstBarInStaff, boolean firstBarInTotal) {
+//		int width = (int) (getDurationAsPixel(pixelPerTick) * stretchFactor + getOffset(pixelPerTick, firstBarInStaff, firstBarInTotal));
+//		return width;
+//	}
+
+	public int getStretchedDurationAsPixel(double pixelPerTick) {
+		return (int) (getDurationAsPixel(pixelPerTick) * stretchFactor);
 	}
-	
-	public int getOffset(double pixelPerTick, boolean firstBarInStaff) {
+
+	public double getDurationAsPixel(double pixelPerTick) {
+		double pulsesPerTick = scoreParameter.ppq * 1.0 / 960.0;
+		double userStretchFactor = Math.sqrt(scoreParameter.stretchFactor*0.25);
+		double factor = userStretchFactor * 160.0 *Math.sqrt(shortestValue*pulsesPerTick+200)/ (Math.max(scoreParameter.getResolutionInTicks(), shortestValue)*pulsesPerTick);
+		double width = (factor * duration * pulsesPerTick * pixelPerTick);
+		return width;
+	}
+
+	public int getOffset(double pixelPerTick, boolean firstBarInStaff, boolean firstBarInTotal) {
 		int offset = 0;
 		if (hasExplicitClef() || firstBarInStaff) {
 			offset += Score.CLEF_WIDTH;
 		}
-		if (hasExplicitTimeSignature() || firstBarInStaff) {
+		if (hasExplicitTimeSignature() || firstBarInTotal) {
 			offset += Score.TIMESIGNATURE_WIDTH;
 		}
 		if (hasExplicitKey() || firstBarInStaff) {
@@ -252,17 +260,6 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 		}
 		offset += 12;
 		return offset;
-	}
-	
-	public int getWidth(double pixelPerTick, boolean firstBarInStaff) {
-		return (int) (getWidth() * pixelPerTick + getOffset(pixelPerTick, firstBarInStaff));
-	}
-	
-	public double getHorizontalScale() {
-		double userStretchFactor = 1.1 - 0.1 * scoreParameter.getDisplayStretchFactor();
-		double factor = scoreParameter.ppq * 1.0 / 960.0;
-		double scale = duration * 1.0 / (Math.max(scoreParameter.getResolutionInTicks(), shortestValue) * factor * userStretchFactor * 21.0 / Math.sqrt(shortestValue * factor));
-		return scale * stretchFactor;
 	}
 	
 	public int getShortestValue() {

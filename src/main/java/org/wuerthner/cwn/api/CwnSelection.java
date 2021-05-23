@@ -24,4 +24,6 @@ public interface CwnSelection<T> {
 	public int getMouseStaff();
 	
 	public SelectionType getSelectionType();
+
+	public CwnPointer getPointer();
 }
