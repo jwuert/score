@@ -10,6 +10,8 @@ public interface CwnPointer {
     public int getPitch();
     public void setPitch(int pitch);
     public void setRegion(Region region);
+    public int getStaffIndex();
+    public void setStaffIndex(int index);
     default int getY(int clef) {
         int pitch = getPitch();
         int ypos = 0;

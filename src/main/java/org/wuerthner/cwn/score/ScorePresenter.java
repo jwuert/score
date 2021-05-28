@@ -167,7 +167,6 @@ public class ScorePresenter {
 				canvas.drawLine(xBarPosition + offset, yTop - layout.getSystemSpace(), xBarPosition + offset + Math.abs(bar.getKey()) * Score.KEY_WIDTH, yTop - layout.getSystemSpace(), "green");
 			}
 			int key = bar.getKey();
-			System.out.println("----------------------------- key: " + key);
 			int clef = bar.getClef();
 			boolean alternative = selection.contains(bar.getKeyEvent());
 			for (int i = 0; i < Math.abs(key); i++) {
@@ -190,6 +189,13 @@ public class ScorePresenter {
 		// reset offset:
 		offset = bar.getOffset(layout.getPixelPerTick(), firstBarInStaff, barIndex==0);
 
+		// Separator between CONFIG and SCORE region:
+//		canvas.drawDot(xBarPosition + offset - 3, (int) (yTop + 0.4 * layout.getLineHeight()));
+//		canvas.drawDot(xBarPosition + offset - 3, (int) (yTop + 1.4 * layout.getLineHeight()));
+//		canvas.drawDot(xBarPosition + offset - 3, (int) (yTop + 2.4 * layout.getLineHeight()));
+//		canvas.drawDot(xBarPosition + offset - 3, (int) (yTop + 3.4 * layout.getLineHeight()));
+//		canvas.drawDot(xBarPosition + offset - 3, (int) (yTop));
+//		canvas.drawDot(xBarPosition + offset - 3, (int) (yTop + 4*layout.getLineHeight() - 2));
 		//
 		// right border
 		//
@@ -262,13 +268,18 @@ public class ScorePresenter {
 		CwnPointer pointer = selection.getPointer();
 		final long pointerPosition = pointer.getPosition();
 		// System.out.println("### region: " + pointer.getRegion() + ", pp: " + pointerPosition + ", bStart: " + bar.getStartPosition() + ", offset:" + offset + ", " + xBarPosition);
-		if (pointer.getRegion() == CwnPointer.Region.SCORE && (bar.getStartPosition()) <= pointerPosition && pointerPosition < bar.getEndPosition()) {
+		if (pointer.getRegion() == CwnPointer.Region.SCORE
+				&& (bar.getStartPosition()) <= pointerPosition
+				&& pointerPosition < bar.getEndPosition()
+				&& staffIndex == pointer.getStaffIndex()) {
+			// NOTE
 			int relPosition = (int) ((pointerPosition - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration()) + 1;
 			int yBase = layout.getBorder() + layout.getTitleHeight()
 					+ (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight() + layout.getSystemSpace() + 1;
 			int yPos = yBase + pointer.getY(bar.getClef()) * 3 - 42;
 			canvas.drawImage("head1", xBarPosition + offset + relPosition, yPos, false);
 		} else if (pointer.getRegion() == CwnPointer.Region.CONFIG && (bar.getStartPosition()) <= pointerPosition && pointerPosition < bar.getEndPosition()) {
+			// CONFIG
 			canvas.drawRect(xBarPosition + 4, yTop + 2, xBarPosition + offset - 2, yTop + 4 * layout.getLineHeight() - 2 );
 		}
 

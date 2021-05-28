@@ -108,6 +108,10 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 				location = new Location(matchedBar, position, pitch, staffIndex, systemIndex, barConfig, x, y, yWithinStaff);
 			}
 		}
+		if (location==null) {
+			location = new Location(null, -1, -1, staffIndex, systemIndex, false, x, y, yWithinStaff);
+		}
+		System.out.println("* " + location);
 		return location;
 	}
 	

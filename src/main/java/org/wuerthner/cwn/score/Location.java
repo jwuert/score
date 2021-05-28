@@ -35,8 +35,8 @@ public class Location {
 	}
 	
 	public String toString() {
-		return "Location: " + PositionTools.getTrias(scoreBar.getTrack(), position) + ", "
-				+ pitch + "(" + Score.cpitch[pitch] + ")" + " [" + systemIndex + ":" + staffIndex + "]"
+		return "Location: " + (scoreBar==null?"-":PositionTools.getTrias(scoreBar.getTrack(), position)) + ", "
+				+ pitch + (pitch<0?"-":"(" + Score.cpitch[pitch] + ")") + " [" + systemIndex + ":" + staffIndex + "]"
 				+ (barConfig ? " CONFIG" : "");
 	}
 }
