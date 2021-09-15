@@ -10,6 +10,6 @@ public interface CwnBarEvent extends CwnEvent {
 	
 	public final static String[] TYPES = new String[] { STANDARD, DOUBLE, END, BEGIN_REPEAT, END_REPEAT, BEGIN_AND_END_REPEAT };
 	
-	public String getType();
+	public String getTypeString();
 	// public Metric getMetric();
 }

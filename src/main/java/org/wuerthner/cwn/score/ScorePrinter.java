@@ -254,11 +254,11 @@ public class ScorePrinter {
 			// @formatter:off
 			String barLine = (
 					barEvent == null ? "|" :
-					barEvent.getType().equals(CwnBarEvent.DOUBLE) ? "||" :
-					barEvent.getType().equals(CwnBarEvent.BEGIN_REPEAT) ? ".|:" :
-					barEvent.getType().equals(CwnBarEvent.END_REPEAT) ? ":|." :
-					barEvent.getType().equals(CwnBarEvent.BEGIN_AND_END_REPEAT) ? ":|.|:" :
-					barEvent.getType().equals(CwnBarEvent.END) ? "|." :
+					barEvent.getTypeString().equals(CwnBarEvent.DOUBLE) ? "||" :
+					barEvent.getTypeString().equals(CwnBarEvent.BEGIN_REPEAT) ? ".|:" :
+					barEvent.getTypeString().equals(CwnBarEvent.END_REPEAT) ? ":|." :
+					barEvent.getTypeString().equals(CwnBarEvent.BEGIN_AND_END_REPEAT) ? ":|.|:" :
+					barEvent.getTypeString().equals(CwnBarEvent.END) ? "|." :
 					"|");
 			// @formatter:on
 			//

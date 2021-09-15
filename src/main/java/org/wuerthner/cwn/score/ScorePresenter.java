@@ -60,7 +60,7 @@ public class ScorePresenter {
 				int barNumberPerStaff = 0;
 				for (ScoreBar bar : staff) {
 					int xWidth = bar.getStretchedDurationAsPixel(layout.getPixelPerTick());
-					drawBar(systemIndex, staffIndex, barIndex, bar, xBarPosition, xWidth, (barNumberPerStaff == 0), barIndex==0, yTop, yBottom);
+					drawBar(systemIndex, staffIndex, barIndex, bar, xBarPosition, xWidth, (barNumberPerStaff == 0), barIndex==0, yTop, yBottom, staff.getTrack());
 					xBarPosition += bar.getOffset(layout.getPixelPerTick(), (barNumberPerStaff == 0), barIndex==0);
 					int voiceIndex = 0;
 					for (ScoreVoice voice : bar) {
@@ -125,7 +125,7 @@ public class ScorePresenter {
 		}
 	}
 	
-	private void drawBar(int systemIndex, int staffIndex, int barIndex, ScoreBar bar, int xBarPosition, int xWidth, boolean firstBarInStaff, boolean firstBarInTotal, int ySystemTop, int ySystemBottom) {
+	private void drawBar(int systemIndex, int staffIndex, int barIndex, ScoreBar bar, int xBarPosition, int xWidth, boolean firstBarInStaff, boolean firstBarInTotal, int ySystemTop, int ySystemBottom, CwnTrack track) {
 		int yTop = layout.getBorder() + layout.getTitleHeight() + layout.getSystemSpace() + (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight();
 		if (staffIndex == 0 && firstBarInStaff) {
 			canvas.drawString("" + (barIndex + 1), "barNumber", xBarPosition, yTop - 4, "left");
@@ -206,14 +206,14 @@ public class ScorePresenter {
 		// handle barline
 		//
 		CwnBarEvent barline = bar.getBarEvent();
-		if (barline == null || barline.getType().equals(CwnBarEvent.STANDARD)) {
+		if (barline == null || barline.getTypeString().equals(CwnBarEvent.STANDARD)) {
 			// int x = xBarPosition + 6 + offset;
 			int x = xBarPosition + offset + xWidth + 2;
 			if (xBarPosition + offset + xWidth < xRight - 12) { // 34
 				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight());
 			}
 		} else {
-			String type = barline.getType();
+			String type = barline.getTypeString();
 			// int x = xBarPosition + 6 + offset;
 			int x = xBarPosition + offset + xWidth + 2;
 			
@@ -278,6 +278,10 @@ public class ScorePresenter {
 					+ (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight() + layout.getSystemSpace() + 1;
 			int yPos = yBase + pointer.getY(bar.getClef()) * 3 - 42;
 			canvas.drawImage("head1", xBarPosition + offset + relPosition, yPos, false);
+			// Position
+			Trias trias = PositionTools.getTrias(track, pointerPosition);
+			String pos = trias.toString();
+			canvas.drawString(pos, "barNumber", xBarPosition + offset + relPosition, yTop - layout.getSystemSpace(), "left");
 		} else if (pointer.getRegion() == CwnPointer.Region.CONFIG && (bar.getStartPosition()) <= pointerPosition && pointerPosition < bar.getEndPosition()) {
 			// CONFIG
 			canvas.drawRect(xBarPosition + 4, yTop + 2, xBarPosition + offset - 2, yTop + 4 * layout.getLineHeight() - 2 );

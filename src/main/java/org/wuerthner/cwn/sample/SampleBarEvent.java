@@ -23,7 +23,7 @@ public class SampleBarEvent implements CwnBarEvent, Comparable<CwnEvent> {
 	}
 	
 	@Override
-	public String getType() {
+	public String getTypeString() {
 		return type;
 	}
 	

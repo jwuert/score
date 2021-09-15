@@ -30,7 +30,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		this.scoreLayout = scoreLayout;
 		this.maxSystemNo = maxSystemNo;
 		this.scoreParameter = scoreParameter;
-		if (true) {
+		if (scoreParameter!=null && scoreParameter.markup) {
 			clearMarks(trackList);
 			checkParallels(trackList);
 		}
@@ -155,7 +155,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			int minShortestValue = getMinShortestValue();
 			setShortestValue(minShortestValue);
 			double barDuration = barArray[0].getDurationAsPixel(scoreLayout.getPixelPerTick());
-			int barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), bar==0, bar==0);
+			int barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), bar==0, scoreParameter.startPosition==0 && bar==0); // bar==0
 			double barWidth = barDuration+barOffset;
 			lastX = currentX;
 			currentX = currentX + barWidth;
@@ -275,7 +275,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	}
 	
 	public int getNumberOfTracks() {
-		return totalSystem.size();
+		return totalSystem==null ? 0 : totalSystem.size();
 	}
 	
 	@Override

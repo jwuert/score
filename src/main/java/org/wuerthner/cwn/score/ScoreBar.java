@@ -252,11 +252,11 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 		if (hasExplicitClef() || firstBarInStaff) {
 			offset += Score.CLEF_WIDTH;
 		}
-		if (hasExplicitTimeSignature() || firstBarInTotal) {
-			offset += Score.TIMESIGNATURE_WIDTH;
-		}
 		if (hasExplicitKey() || firstBarInStaff) {
 			offset += Math.abs(key) * Score.KEY_WIDTH + 2;
+		}
+		if (hasExplicitTimeSignature() || firstBarInTotal) {
+			offset += Score.TIMESIGNATURE_WIDTH;
 		}
 		offset += 12;
 		return offset;

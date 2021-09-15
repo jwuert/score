@@ -22,7 +22,7 @@ public class MidiWriter {
     }
 
     public void writer(OutputStream os, long startPosition, long endPosition) {
-        double tempoFactor = 1.0;
+        double tempoFactor = 2.0;
         double volumeWeight = 1.0;
 
         List<MidiTrack> midiTrackList = new ArrayList<>();

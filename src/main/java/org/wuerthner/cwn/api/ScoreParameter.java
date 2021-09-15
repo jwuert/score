@@ -15,15 +15,16 @@ public class ScoreParameter {
 	public final int metricLevel;
 	public final int stretchFactor;
 	public final List<DurationType> durationTypeList;
+	public final boolean markup;
 	
 	public ScoreParameter(long startPosition, long endPosition, int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags) {
 		this(startPosition, endPosition, ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
-				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }));
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }), false);
 		// Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED }));
 		
 	}
 	
-	public ScoreParameter(long startPosition, long endPosition, int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList) {
+	public ScoreParameter(long startPosition, long endPosition, int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList, boolean markup) {
 		this.startPosition = startPosition;
 		this.endPosition = endPosition;
 		this.ppq = ppq;
@@ -32,6 +33,7 @@ public class ScoreParameter {
 		this.stretchFactor = stretchFactor;
 		this.flags = flags;
 		this.durationTypeList = durationTypeList;
+		this.markup = markup;
 	}
 	
 	public int getResolutionInTicks() {

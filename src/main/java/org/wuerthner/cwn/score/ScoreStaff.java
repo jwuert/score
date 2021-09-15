@@ -81,7 +81,7 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 			int barNumberPerStaff = 0;
 			for (ScoreBar bar : barList) {
 				int barWidth = bar.getStretchedDurationAsPixel(pixelPerTick);
-				boolean firstBarInTotal = (barNumberPerStaff==0) && (systemIndex==0);
+				boolean firstBarInTotal = false; // was, but didn't work: && (barNumberPerStaff==0) && (systemIndex==0);
 				int barOffset = bar.getOffset(pixelPerTick, (barNumberPerStaff == 0), firstBarInTotal);
 				barTickPerPixel = bar.getDuration() * 1.0 / barWidth;
 				if (xPos >= xBar && xPos < xBar + barOffset) {
@@ -111,7 +111,6 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 		if (location==null) {
 			location = new Location(null, -1, -1, staffIndex, systemIndex, false, x, y, yWithinStaff);
 		}
-		System.out.println("* " + location);
 		return location;
 	}
 	
