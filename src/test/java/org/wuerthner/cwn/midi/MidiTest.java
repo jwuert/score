@@ -31,7 +31,7 @@ public class MidiTest {
         CwnNoteEvent noteEvent2 = factory.createNoteEvent(D8, D8, 80, 0, 90, 0);
         CwnNoteEvent noteEvent3 = factory.createNoteEvent(D2, D2, 82, 0, 90, 0);
         CwnNoteEvent noteEvent4 = factory.createNoteEvent(D2*2, D2*2, 94, 0, 90, 0);
-        ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0);
+        ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0, 0);
         CwnTrack track = factory.createTrack(PPQ);
         track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
         track.addEvent(factory.createKeyEvent(0, 0));

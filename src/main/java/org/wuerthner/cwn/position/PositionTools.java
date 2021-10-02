@@ -135,6 +135,11 @@ public class PositionTools {
 		Trias trias = getTrias(track, position);
 		return getPosition(track, trias.firstBeat());
 	}
+
+	public final static long previousBarFirstBeat(CwnTrack track, long position) {
+		Trias trias = getTrias(track, position);
+		return getPosition(track, new Trias(Math.max(0, trias.bar-1), 0, 0));
+	}
 	
 	public final static long nextBar(CwnTrack track, long position) {
 		Trias trias = getTrias(track, position);

@@ -7,7 +7,7 @@ import java.util.List;
 import org.wuerthner.cwn.score.Score;
 
 public class ScoreParameter {
-	public final long startPosition;
+	public final long startPosition = 0;
 	public final long endPosition;
 	public final int resolutionInTicks;
 	public final int ppq;
@@ -15,18 +15,20 @@ public class ScoreParameter {
 	public final int metricLevel;
 	public final int stretchFactor;
 	public final List<DurationType> durationTypeList;
-	public final boolean markup;
+	public boolean markup;
+	public int barOffset;
 	
-	public ScoreParameter(long startPosition, long endPosition, int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags) {
-		this(startPosition, endPosition, ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
-				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }), false);
+	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset) {
+		this(ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, barOffset);
 		// Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED }));
-		
 	}
 	
-	public ScoreParameter(long startPosition, long endPosition, int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList, boolean markup) {
-		this.startPosition = startPosition;
-		this.endPosition = endPosition;
+	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList,
+						  boolean markup, int barOffset) {
+		// this.startPosition = startPosition;
+		this.endPosition = ppq * 500 * 5; // 500 4/4 bars
 		this.ppq = ppq;
 		this.resolutionInTicks = resolutionInTicks;
 		this.metricLevel = metricLevel;
@@ -34,6 +36,7 @@ public class ScoreParameter {
 		this.flags = flags;
 		this.durationTypeList = durationTypeList;
 		this.markup = markup;
+		this.barOffset = barOffset;
 	}
 	
 	public int getResolutionInTicks() {
@@ -55,4 +58,8 @@ public class ScoreParameter {
 	public int getDisplayStretchFactor() {
 		return stretchFactor;
 	}
+
+	public int getBarOffset() { return barOffset; }
+
+	public void setBarOffset(int barOffset) { this.barOffset = barOffset; }
 }

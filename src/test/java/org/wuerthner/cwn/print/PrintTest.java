@@ -61,7 +61,7 @@ public class PrintTest {
 		trackList.add(track1);
 		ScorePrinter scorePrinter = new ScorePrinter();
 		int groupLevel = 2;
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * 4 * PPQ, PPQ, D32, groupLevel, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS);
+		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * 4 * PPQ, PPQ, D32, groupLevel, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
 		String lyString = scorePrinter.print(title, subtitle, composer, false, scoreParameter, trackList);
 		System.out.println(lyString);
 		String fileBase = Long.toString(System.nanoTime());

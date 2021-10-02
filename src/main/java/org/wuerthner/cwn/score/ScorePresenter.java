@@ -17,7 +17,7 @@ public class ScorePresenter {
 	private final ScoreLayout layout;
 	private final CwnSelection<CwnEvent> selection;
 	private boolean debug;
-	
+
 	private long firstPositionPartiallyOutOfDisplay;
 	private int firstBarCompletelyOutOfDisplay;
 	private int totalHeight;
@@ -40,6 +40,9 @@ public class ScorePresenter {
 		canvas.drawString(title, "title", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() - 30, "center");
 		canvas.drawString(subtitle, "subtitle", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() + 0, "center");
 		canvas.drawString(composer, "track", (int) (layout.getWidth() - 30), layout.getTitleHeight(), "right");
+		if (scoreBuilder.getScoreParameter().markup) {
+			canvas.drawString("markup", "barNumber", (int)(layout.getWidth() - 30), 30, "right");
+		}
 		int barIndex = barOffset;
 		firstPositionPartiallyOutOfDisplay = Long.MAX_VALUE;
 		firstBarCompletelyOutOfDisplay = 0;
@@ -60,8 +63,8 @@ public class ScorePresenter {
 				int barNumberPerStaff = 0;
 				for (ScoreBar bar : staff) {
 					int xWidth = bar.getStretchedDurationAsPixel(layout.getPixelPerTick());
-					drawBar(systemIndex, staffIndex, barIndex, bar, xBarPosition, xWidth, (barNumberPerStaff == 0), barIndex==0, yTop, yBottom, staff.getTrack());
-					xBarPosition += bar.getOffset(layout.getPixelPerTick(), (barNumberPerStaff == 0), barIndex==0);
+					drawBar(systemIndex, staffIndex, barIndex, bar, xBarPosition, xWidth, (barNumberPerStaff == 0), barIndex == 0, yTop, yBottom, staff.getTrack());
+					xBarPosition += bar.getOffset(layout.getPixelPerTick(), (barNumberPerStaff == 0), barIndex == 0);
 					int voiceIndex = 0;
 					for (ScoreVoice voice : bar) {
 						drawVoice(systemIndex, staffIndex, barIndex, voiceIndex, voice, bar.getTimeSignature().getMetric(), xBarPosition, xWidth);
@@ -705,7 +708,6 @@ public class ScorePresenter {
 	private void drawRest(ScoreRest rest, int xPosition, int yBase) {
 		int base = rest.getDurationBase();
 		int dots = rest.getNumberOfDots();
-		
 		canvas.drawImage("rest" + base, xPosition + 1, yBase, false);
 		for (int i = 0; i < dots; i++) {
 			canvas.drawDot(xPosition + 13 + i * 4, yBase + 8);
@@ -749,7 +751,7 @@ public class ScorePresenter {
 				}
 			}
 			if (beamGroupSize == 1) {
-				int xShift = (chord.hasShiftedNotes() ? (int) Score.NOTE_HEAD_WIDTH : 0);
+				int xShift = (chord.hasShiftedNotes() && chord.getStemDirection() < 0? (int) Score.NOTE_HEAD_WIDTH : 0);
 				drawStem(xPosition + xShift, yNoteBottom, yNoteTop, chord);
 			}
 		} else {

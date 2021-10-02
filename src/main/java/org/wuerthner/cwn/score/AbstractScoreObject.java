@@ -92,6 +92,9 @@ public abstract class AbstractScoreObject implements ScoreObject {
 	public abstract boolean isChord();
 	
 	public abstract boolean isNote();
+
+	@Override
+	public boolean isSplit() { return false; }
 	
 	@Override
 	public int getNumberOfDots() {

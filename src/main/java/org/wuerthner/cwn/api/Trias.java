@@ -47,4 +47,17 @@ public class Trias {
 	public String toString() {
 		return (bar + 1) + "." + (beat + 1) + "." + tick;
 	}
+
+	public String toFormattedString() {
+		return makeString(""+(bar+1), 3) + "." + makeString(""+(beat+1), 2) + "." + makeString(""+tick, 4);
+	}
+
+	private final String makeString(String n, int len) {
+		StringBuffer buf = new StringBuffer();
+		int l = n.length();
+		for (int i=len; i>=l; i--) buf.append(" ");
+		buf.append(n);
+		return buf.toString();
+	}
+
 }

@@ -34,6 +34,8 @@ public interface ScoreObject extends Comparable<ScoreObject> {
 	public boolean isChord();
 	
 	public boolean isNote();
+
+	public boolean isSplit();
 	
 	public int getStemDirection();
 	

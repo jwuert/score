@@ -90,7 +90,7 @@ public class ScoreTestSuite {
 		long startPosition = 0;
 		long endPosition = PositionTools.getPosition(cwnTrack, new Trias(size, 0, 0));
 		List<DurationType> durationTypeList = DurationType.getDurationTypeList(character);
-		ScoreParameter scoreParameter = new ScoreParameter(startPosition, endPosition, PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, durationTypeList);
+		ScoreParameter scoreParameter = new ScoreParameter(startPosition, endPosition, PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, durationTypeList, false, 0);
 		return scoreParameter;
 	}
 	
@@ -201,7 +201,7 @@ public class ScoreTestSuite {
 	private ScoreBuilder initBuilder() {
 		List<CwnTrack> trackList = new ArrayList<>();
 		trackList.add(cwnTrack);
-		ScoreBuilder scoreBuilder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout(), 1);
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		return scoreBuilder;
 	}
 	

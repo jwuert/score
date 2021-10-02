@@ -10,10 +10,10 @@ import org.wuerthner.cwn.api.ScoreParameter;
 public class ScoreSystem implements Iterable<ScoreStaff> {
 	private final List<ScoreStaff> staffList = new ArrayList<>();
 	
-	public ScoreSystem(ScoreSystem totalSystem) {
+	public ScoreSystem(ScoreParameter scoreParameter, ScoreSystem totalSystem) {
 		int numberOfStaffs = totalSystem.size();
 		for (int i = 0; i < numberOfStaffs; i++) {
-			staffList.add(new ScoreStaff(totalSystem.get(i).getTrack()));
+			staffList.add(new ScoreStaff(scoreParameter, totalSystem.get(i).getTrack()));
 		}
 	}
 	
@@ -23,7 +23,15 @@ public class ScoreSystem implements Iterable<ScoreStaff> {
 			staffList.add(staff);
 		}
 	}
-	
+
+	public void update(ScoreParameter scoreParameter, ScoreUpdate update) {
+		for (ScoreStaff staff : staffList) {
+			if (update.contains(staff.getTrack())) {
+				staff.update(scoreParameter, update);
+			}
+		}
+	}
+
 	@Override
 	public Iterator<ScoreStaff> iterator() {
 		return staffList.iterator();

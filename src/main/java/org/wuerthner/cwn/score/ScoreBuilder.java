@@ -5,45 +5,59 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.wuerthner.cwn.api.CwnNoteEvent;
-import org.wuerthner.cwn.api.CwnTrack;
-import org.wuerthner.cwn.api.ScoreLayout;
-import org.wuerthner.cwn.api.ScoreParameter;
+import org.wuerthner.cwn.api.*;
+import org.wuerthner.cwn.position.PositionTools;
 
 public class ScoreBuilder implements Iterable<ScoreSystem> {
 	private final List<ScoreSystem> systemList = new ArrayList<>();
-	private final ScoreParameter scoreParameter;
+	private ScoreParameter scoreParameter;
 	private final ScoreLayout scoreLayout;
 	private ScoreSystem totalSystem;
 	private int numberOfShownBars = 0;
 	private Iterator<ScoreBar>[] barIteratorArray;
 	private ScoreBar[] barArray;
-	private final int maxSystemNo;
-	private final List<CwnTrack> trackList;
-	
-	public ScoreBuilder(List<CwnTrack> trackList, ScoreParameter scoreParameter, ScoreLayout scoreLayout) {
-		this(trackList, scoreParameter, scoreLayout, 9999);
+	private int maxSystemNo;
+	private CwnContainer container;
+
+	public ScoreBuilder(CwnContainer container, ScoreParameter scoreParameter, ScoreLayout scoreLayout) {
+		this(container, scoreParameter, scoreLayout, 9999);
 	}
 	
-	public ScoreBuilder(List<CwnTrack> trackList, ScoreParameter scoreParameter, ScoreLayout scoreLayout, int maxSystemNo) {
-		this.trackList = trackList;
+	public ScoreBuilder(CwnContainer container, ScoreParameter scoreParameter, ScoreLayout scoreLayout, int maxSystemNo) {
+		this.container = container;
 		this.scoreLayout = scoreLayout;
 		this.maxSystemNo = maxSystemNo;
 		this.scoreParameter = scoreParameter;
-		if (scoreParameter!=null && scoreParameter.markup) {
-			clearMarks(trackList);
-			checkParallels(trackList);
+		if (!container.isEmpty()) {
+			update(new ScoreUpdate(ScoreUpdate.Type.REBUILD));
 		}
-		if (!trackList.isEmpty()) {
-			totalSystem = new ScoreSystem(trackList, scoreParameter);
+	}
+
+	public void update(ScoreUpdate update) {
+		System.out.println("SB Update: " + update);
+		List<CwnTrack> trackList = container.getTrackList();
+		// if (!update.redraw()) System.out.println("ScoreBuilder.update: " + update + " - # of tracks: " + trackList.size());
+		if (!update.redraw() && !trackList.isEmpty()) {
+			clearMarks(trackList);
+			if (scoreParameter.markup) {
+				checkParallels(trackList);
+			}
+			if (update.full()) {
+				// scoreParameter.endPosition = container.findLastPosition() + scoreParameter.ppq*4*3;
+				totalSystem = new ScoreSystem(trackList, scoreParameter);
+			} else if (update.rebuild()) {
+				totalSystem.update(scoreParameter, update);
+			}
 			if (maxSystemNo == 1) {
+				systemList.clear();
 				systemList.add(totalSystem);
 			} else {
+				systemList.clear();
 				splitSystems(trackList);
 			}
 		}
 	}
-	
+
 	private void clearMarks(List<CwnTrack> trackList) {
 		int numberOfTracks = trackList.size();
 		for (int trackNo = 0; trackNo < numberOfTracks; trackNo++) {
@@ -126,15 +140,18 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	
 	@SuppressWarnings("unchecked")
 	private void splitSystems(List<CwnTrack> trackList) {
-		boolean isIndented = scoreParameter.startPosition == 0;
+		// boolean isIndented = scoreParameter.startPosition == 0;
+		long startPosition = PositionTools.getPosition(trackList.get(0), new Trias(scoreParameter.barOffset, 0, 0));
+		long endPosition = container.findLastPosition();
+		boolean isIndented = scoreParameter.barOffset == 0;
 		int numberOfBars = 0;
 		for (ScoreStaff staff : totalSystem) {
 			numberOfBars = Math.max(numberOfBars, staff.size());
 		}
-		numberOfBars += 12;
+		// numberOfBars += 12; // 12;
 		List<Iterator<ScoreBar>> barIteratorList = new ArrayList<Iterator<ScoreBar>>();
-		for (ScoreStaff score : totalSystem) {
-			barIteratorList.add(score.iterator());
+		for (ScoreStaff scoreStaff : totalSystem) {
+			barIteratorList.add(scoreStaff.getBarListWithOffset().iterator());
 		}
 		barIteratorArray = barIteratorList.toArray(new Iterator[] {});
 		int numberOfScores = barIteratorArray.length;
@@ -146,16 +163,19 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		double lastX = 0;
 		int systemIndex = 0;
 		double maxX = scoreLayout.getWidth() - scoreLayout.getBorder();
-		ScoreSystem system = new ScoreSystem(totalSystem);
+		ScoreSystem system = new ScoreSystem(scoreParameter, totalSystem);
 		systemList.add(system);
 
 		for (int bar = 0; bar < numberOfBars; bar++) {
-			isIndented = systemIndex == 0 && scoreParameter.startPosition == 0;
+			// isIndented = systemIndex == 0 && scoreParameter.startPosition == 0;
+			isIndented = systemIndex == 0 && scoreParameter.barOffset == 0;
 			incrementBar();
+			// if (barArray[0].getStartPosition() > endPosition) break;
 			int minShortestValue = getMinShortestValue();
 			setShortestValue(minShortestValue);
 			double barDuration = barArray[0].getDurationAsPixel(scoreLayout.getPixelPerTick());
-			int barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), bar==0, scoreParameter.startPosition==0 && bar==0); // bar==0
+			// int barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), bar==0, scoreParameter.startPosition==0 && bar==0); // bar==0
+			int barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), bar==0, startPosition==0 && bar==0); // bar==0
 			double barWidth = barDuration+barOffset;
 			lastX = currentX;
 			currentX = currentX + barWidth;
@@ -176,7 +196,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 				if (systemIndex > maxSystemNo) {
 					break;
 				}
-				system = new ScoreSystem(totalSystem);
+				system = new ScoreSystem(scoreParameter, totalSystem);
 				addBarsToSystem(system);
 				systemList.add(system);
 			} else {
@@ -277,7 +297,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	public int getNumberOfTracks() {
 		return totalSystem==null ? 0 : totalSystem.size();
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -290,7 +310,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		return builder.toString();
 	}
 	
-	public Location findPosition(int x, int y, int resolutionInTicks) {
+	public Location findPosition(int x, int y, int resolutionInTicks, long startPosition) {
 		Location location = null;
 		int yPos = y - scoreLayout.getTitleHeight() - scoreLayout.getBorder() - scoreLayout.getSystemSpace();
 		if (yPos >= 0 && totalSystem != null) {
@@ -302,8 +322,9 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			int yWithinSystem = (int) (yPos % systemHeight);
 			int staffIndex = (int) (yWithinSystem / staffHeight);
 			int yWithinStaff = (int) (yWithinSystem % staffHeight) - scoreLayout.lyricsSpace();
-			
-			int xPos = x - (scoreLayout.getBorder() + (systemIndex == 0 && scoreParameter.startPosition == 0 ? scoreLayout.getSystemIndent() : 0));
+
+			// int xPos = x - (scoreLayout.getBorder() + (systemIndex == 0 && scoreParameter.startPosition == 0 ? scoreLayout.getSystemIndent() : 0));
+			int xPos = x - (scoreLayout.getBorder() + (systemIndex == 0 && startPosition == 0 ? scoreLayout.getSystemIndent() : 0));
 			if (systemIndex >= 0 && systemIndex < systemList.size()) {
 				ScoreSystem system = systemList.get(systemIndex);
 				ScoreStaff staff = system.get(staffIndex);
@@ -328,6 +349,18 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	}
 
 	public List<CwnTrack> getTrackList() {
-		return trackList;
+		return container.getTrackList();
+	}
+
+	public ScoreParameter getScoreParameter() { return scoreParameter; }
+
+	public ScoreSystem getSystem(int i) { return systemList.get(i); }
+
+	public void setContainer(CwnContainer container) {
+		this.container = container;
+	}
+
+	public void setNumberOfSystems(int numberOfSystems) {
+		this.maxSystemNo = numberOfSystems;
 	}
 }

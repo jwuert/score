@@ -1,6 +1,7 @@
 package org.wuerthner.cwn.score;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -292,7 +293,7 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 			builder.append(sep);
 			builder.append(scoreVoice.toString());
 		}
-		return "ScoreBar={start='" + PositionTools.getTrias(cwnTrack, start) + "', duration=" + duration + ", shortestValue=" + shortestValue + ", stretchFactor=" + stretchFactor + "\n" + "  scoreVoiceList=["
+		return "ScoreBar={start='" + PositionTools.getTrias(cwnTrack, start) + "', overlap=" + startsWithOverlap() + ", duration=" + duration + ", shortestValue=" + shortestValue + ", stretchFactor=" + stretchFactor + "\n" + "  scoreVoiceList=["
 				+ builder.toString() + "]}";
 	}
 	
@@ -319,5 +320,17 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 	
 	public void addBar(CwnBarEvent event) {
 		this.barEvent = event;
+	}
+
+    public ScoreVoice getVoice(int i) {
+		return scoreVoiceList.get(i);
+    }
+
+    public boolean startsWithOverlap() {
+		long count = scoreVoiceList
+				.stream()
+				.flatMap(voice -> voice.getScoreObjectSet().stream().filter(obj -> obj.getStartPosition() == voice.getStartPosition()))
+				.filter(obj -> obj.isSplit()).count();
+		return count > 0;
 	}
 }

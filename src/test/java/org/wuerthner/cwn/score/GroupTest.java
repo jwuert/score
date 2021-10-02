@@ -57,8 +57,8 @@ public class GroupTest {
 		track.addEvent(factory.createNoteEvent(PositionTools.getPosition(track, "2.3:2T"), D4T, 83, 0, 0, 0));
 		
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS); // 4 bars
-		ScoreBuilder scoreBuilder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout());
+		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		System.out.println(ts1.getMetric().getFlatDurationList(0));
 		System.out.println(ts1.getMetric().getFlatDurationList(1));
 		System.out.println(ts1.getMetric().getFlatDurationList(2));

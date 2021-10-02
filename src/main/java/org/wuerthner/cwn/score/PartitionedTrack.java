@@ -21,18 +21,70 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 	public PartitionedTrack(CwnTrack track, ScoreParameter scoreParameter) {
 		this.track = track;
 		this.scoreParameter = scoreParameter;
-		partition(scoreParameter);
-		fill();
 	}
-	
-	private final void partition(ScoreParameter scoreParameter) {
-		currentBar = new ScoreBar(scoreParameter.startPosition, track, scoreParameter);
-		// for (CwnNoteEvent noteEvent : track.getList(CwnNoteEvent.class)) {
+
+	public void run() {
+		partition(barList, scoreParameter.startPosition, scoreParameter.endPosition);
+		fill(barList, scoreParameter.endPosition);
+	}
+
+	public void update(ScoreUpdate update) {
+		long start = update.getStart();
+		long end = update.getEnd();
+		// System.out.println(" --- " + start + "-" + end + " ---");
+		ScoreBar startBar = null;
+		for (ScoreBar bar : barList) {
+			if (bar.getStartPosition() <= start && start < bar.getEndPosition()) {
+				startBar = bar;
+				break;
+			}
+		}
+		if (startBar == null) {
+			System.err.println("Error, StartBar not found!");
+		} else {
+			startBar = rewindIfOverlap(startBar);
+			start = startBar.getStartPosition();
+			List<ScoreBar> newList = new ArrayList<>();
+			System.out.println(" --- " + start + "-" + end + " ---");
+			partition(newList, start, end);
+			fill(newList, end);
+			List<String> debugBarList = new ArrayList<>();
+			int index = barList.indexOf(startBar);
+			// Now exchange bars in barList:
+			// System.out.println("update " + newList.size() + " bars, starting at " + index);
+			for (int i=0; i<newList.size(); i++) {
+				// System.out.println("### replace bar: " + barList.get(index+i).getStartPosition() + ", by: " + newList.get(i).getStartPosition());
+				if (barList.size()<=index+i) {
+					barList.add(newList.get(i));
+					debugBarList.add("+" + barList.size());
+				} else {
+					barList.set(index + i, newList.get(i));
+					debugBarList.add("~" + (index+i));
+				}
+			}
+			System.out.println(" [staff] update bar(s): " + debugBarList);
+		}
+	}
+
+	private ScoreBar rewindIfOverlap(ScoreBar scoreBar) {
+		ScoreBar bar = scoreBar;
+		while (bar.startsWithOverlap()) {
+			int i = barList.indexOf(bar);
+			if (i<0) throw new RuntimeException("PartinionedTrack: bar not found in barList!");
+			if (i>0) {
+				bar = barList.get(i-1);
+			}
+		}
+		return bar;
+	}
+
+	private final void partition(List<ScoreBar> barList, long startPosition, long endPosition) {
+		currentBar = new ScoreBar(startPosition, track, scoreParameter);
+		boolean stopped = false;
 		for (CwnEvent event : track.getList(CwnEvent.class)) {
-			
-			if (event.getPosition() >= scoreParameter.startPosition) {
+			if (event.getPosition() >= startPosition) {
 				while (event.getPosition() >= currentBar.getEndPosition()) {
-					incrementBar();
+					incrementBar(barList);
 				}
 				long eventStart = event.getPosition();
 				
@@ -48,7 +100,7 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 					while (eventEnd > currentBar.getEndPosition()) {
 						splitDuration = currentBar.getEndPosition() - eventStart;
 						currentBar.addNote(noteEvent, eventStart, splitDuration);
-						incrementBar();
+						incrementBar(barList);
 						// handle remainder:
 						eventStart = track.nextBar(eventStart);
 						remainingNoteDuration = remainingNoteDuration - splitDuration;
@@ -72,29 +124,31 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 					currentBar.addSymbol((CwnSymbolEvent) event);
 				}
 			}
-			if (event.getPosition() > scoreParameter.endPosition) {
+			if (event.getPosition() > endPosition) {
+				stopped = true;
 				break;
 			}
 		}
-		incrementBar();
+		if (!stopped) {
+			incrementBar(barList);
+		}
 	}
 	
-	private void incrementBar() {
+	private void incrementBar(List<ScoreBar> list) {
 		currentBar.fillWithRests();
-		barList.add(currentBar);
+		list.add(currentBar);
 		currentBar.group();
 		currentBar = new ScoreBar(currentBar.getEndPosition(), track, scoreParameter);
 	}
 	
-	private void fill() {
-		ScoreBar bar = getLastBar();
-		
-		while (bar.getEndPosition() < scoreParameter.endPosition) {
+	private void fill(List<ScoreBar> list, long endPosition) {
+		ScoreBar bar = getLastBar(list);
+		while (bar.getEndPosition() < endPosition) {
 			bar = new ScoreBar(bar.getEndPosition(), track, scoreParameter);
 			bar.fillWithRests();
-			barList.add(bar);
+			list.add(bar);
+			// break; // TODO: decide...
 		}
-		
 	}
 	
 	@Override
@@ -106,7 +160,7 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 		return barList;
 	}
 	
-	public ScoreBar getLastBar() {
-		return barList.get(barList.size() - 1);
+	public ScoreBar getLastBar(List<ScoreBar> list) {
+		return list.get(list.size() - 1);
 	}
 }

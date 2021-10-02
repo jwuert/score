@@ -34,7 +34,7 @@ public class NoteTest {
 		CwnNoteEvent noteEvent1 = factory.createNoteEvent(0, D8, 78, 0, 0, 0);
 		CwnNoteEvent noteEvent2 = factory.createNoteEvent(D8, D8, 80, 0, 0, 0);
 		CwnNoteEvent noteEvent3 = factory.createNoteEvent(D2, D2, 82, 0, 0, 0);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0, 0);
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -61,8 +61,8 @@ public class NoteTest {
 		track.addEvent(factory.createNoteEvent(PositionTools.getPosition(track, "1.1:8"), D4, 78, 0, 0, 0));
 		track.addEvent(factory.createNoteEvent(PositionTools.getPosition(track, "1.1:8+16"), D16, 78, 0, 0, 0));
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS); // 4 bars
-		ScoreBuilder scoreBuilder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout(), 1);
+		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
 		ScoreVoice voice = barIterator.next().iterator().next();
 		// output(voice);

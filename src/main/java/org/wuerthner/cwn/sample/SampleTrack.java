@@ -53,6 +53,8 @@ public class SampleTrack implements CwnTrack {
 	public void addEvent(CwnEvent event) {
 		cwnEventList.add(event);
 	}
+
+	public void removeEvent(CwnEvent event) { cwnEventList.remove(event); }
 	
 	@Override
 	public String toString() {

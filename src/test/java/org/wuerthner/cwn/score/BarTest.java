@@ -40,8 +40,8 @@ public class BarTest {
 		track.addEvent(factory.createNoteEvent(4 * D4 + D4, D4, 78, 0, 0, 1));
 		trackList.add(track);
 		
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ * 4, PPQ, D1 / 32, 1, 4, Score.NONE); // 4 bars
-		ScoreBuilder scoreBuilder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout());
+		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ * 4, PPQ, D1 / 32, 1, 4, Score.NONE, 0); // 4 bars
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
 				for (ScoreBar bar : staff) {
@@ -81,8 +81,8 @@ public class BarTest {
 		// track.addEvent(factory.createNoteEvent(D4 + 2 * D8T, D8T, 78, 0, 0, 0));
 		trackList.add(track);
 		
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 32, 1, 4, Score.SPLIT_RESTS); // 1 bar
-		ScoreBuilder scoreBuilder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout());
+		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 32, 1, 4, Score.SPLIT_RESTS, 0); // 1 bar
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
 				for (ScoreBar bar : staff) {
@@ -101,7 +101,7 @@ public class BarTest {
 		int GROUP_LEVEL = 1;
 		int STRETCH_FACTOR = 4;
 		int flags = 0;
-		ScoreParameter scoreParameter = new ScoreParameter(0, 1 * PPQ * 4, PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags);
+		ScoreParameter scoreParameter = new ScoreParameter(0, 1 * PPQ * 4, PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, 0);
 		Metric metric = MetricTools.createRegularMetrics("4/4+3/8");
 		metric = MetricTools.cloneMetrics(metric, 5, DurationType.TRIPLET);
 		System.out.println("Metric: " + metric + "; res as ticks: " + scoreParameter.getResolutionInTicks());

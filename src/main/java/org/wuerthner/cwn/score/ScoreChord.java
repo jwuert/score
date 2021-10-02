@@ -108,7 +108,10 @@ public class ScoreChord extends AbstractScoreObject {
 	public double getAveragePitch() {
 		return scoreNoteSet.stream().mapToInt(ScoreNote::getPitch).average().orElse(0.0);
 	}
-	
+
+	@Override
+	public boolean isSplit() { return scoreNoteSet.stream().filter(ScoreNote::isSplit).count()>0; }
+
 	@Override
 	public int getStemDirection() {
 		ScoreNote first = scoreNoteSet.first();

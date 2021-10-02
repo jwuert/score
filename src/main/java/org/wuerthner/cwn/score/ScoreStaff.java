@@ -9,20 +9,26 @@ import org.wuerthner.cwn.api.ScoreParameter;
 
 public class ScoreStaff implements Iterable<ScoreBar> {
 	// private final ScoreParameter scoreParameter;
+	private final PartitionedTrack partitionedTrack;
 	private final List<ScoreBar> barList;
 	private final CwnTrack track;
-	
-	public ScoreStaff(CwnTrack track) {
+	private ScoreParameter scoreParameter;
+
+	public ScoreStaff(ScoreParameter scoreParameter, CwnTrack track) {
 		barList = new ArrayList<>();
 		this.track = track;
+		partitionedTrack = null;
+		this.scoreParameter = scoreParameter;
 	}
-	
+
 	public ScoreStaff(CwnTrack track, ScoreParameter scoreParameter) {
 		// this.scoreParameter = scoreParameter;
 		// System.out.println("==================");
 		// track.getList(CwnNoteEvent.class).stream().forEach(System.out::println);
-		PartitionedTrack partitionedTrack = new PartitionedTrack(track, scoreParameter);
+		partitionedTrack = new PartitionedTrack(track, scoreParameter);
+		partitionedTrack.run();
 		this.track = track;
+		this.scoreParameter = scoreParameter;
 		// try {
 		// Trias start = PositionTools.getTrias(track, scoreParameter.startPosition);
 		// Trias end = PositionTools.getTrias(track, scoreParameter.endPosition);
@@ -35,14 +41,42 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 		// currentBar = new Bar(currentPosition, masterInformationProvider, clef, ++barCount);
 		barList = partitionedTrack.getBarList();
 	}
-	
+
+	public void update(ScoreParameter scoreParameter, ScoreUpdate update) {
+		this.scoreParameter = scoreParameter;
+		if (update.full()) {
+			partitionedTrack.run();
+			barList.clear();
+			barList.addAll(partitionedTrack.getBarList());
+		} else {
+			partitionedTrack.update(update);
+		}
+	}
+
 	public CwnTrack getTrack() {
 		return track;
 	}
-	
+
 	@Override
 	public Iterator<ScoreBar> iterator() {
 		return barList.iterator();
+	}
+
+	public List<ScoreBar> getBarListWithOffset() {
+		List<ScoreBar> offsetList = null;
+		if (scoreParameter!=null) {
+			int offset = scoreParameter.getBarOffset();
+			int lastEntry = barList.size();
+			if (offset<lastEntry) {
+				offsetList = new ArrayList<>(barList.subList(offset, lastEntry)); // TODO: no new ArrayList<>()
+			} else {
+				System.err.println("ScoreBar range: " + offset + " - " + lastEntry + " is invalid!");
+				offsetList = new ArrayList<>();
+			}
+		} else {
+			System.err.println("scoreParameter is null!");
+		}
+		return offsetList;
 	}
 	
 	public int size() {
@@ -79,7 +113,11 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 		if (barList.size() > 0 && xPos >= 0) {// barList.get(0).getOffset(pixelPerTick)) {
 			// long staffStartPosition = barList.get(0).getStartPosition();
 			int barNumberPerStaff = 0;
-			for (ScoreBar bar : barList) {
+			// for (ScoreBar bar : barList) {
+			int barOffsetStart = (scoreParameter!=null ? scoreParameter.getBarOffset() : 0);
+			barOffsetStart = 0;
+			for (int b=barOffsetStart; b<barList.size(); b++) {
+				ScoreBar bar = barList.get(b);
 				int barWidth = bar.getStretchedDurationAsPixel(pixelPerTick);
 				boolean firstBarInTotal = false; // was, but didn't work: && (barNumberPerStaff==0) && (systemIndex==0);
 				int barOffset = bar.getOffset(pixelPerTick, (barNumberPerStaff == 0), firstBarInTotal);
@@ -126,6 +164,13 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 			index = 44;
 		}
 		return Score.freqTab[index];
-		
+	}
+
+	public ScoreBar getBar(int i) {
+		return barList.get(i);
+	}
+
+	public int getBarListSize() {
+		return barList.size();
 	}
 }

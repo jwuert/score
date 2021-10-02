@@ -14,6 +14,8 @@ import org.wuerthner.cwn.sample.SampleFactory;
 import org.wuerthner.cwn.sample.SampleScoreLayout;
 import org.wuerthner.cwn.score.ScoreBuilder;
 import org.wuerthner.cwn.score.ScoreChord;
+import org.wuerthner.cwn.score.ScoreUpdate;
+import org.wuerthner.cwn.score.TrackContainer;
 import org.wuerthner.cwn.timesignature.SimpleTimeSignature;
 
 public class NoteTest {
@@ -28,7 +30,7 @@ public class NoteTest {
 		// res: 8=8th, 16=16th, etc
 		// resolutionInTicks = PPQ*4/res = D4/res
 		CwnFactory factory = new SampleFactory();
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0, 0);
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -41,7 +43,7 @@ public class NoteTest {
 		track.addEvent(factory.createNoteEvent(0, D8, 68, 0, 0, 0));
 		List<CwnTrack> trackList = new ArrayList<>();
 		trackList.add(track);
-		ScoreBuilder builder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout(), 1);
+		ScoreBuilder builder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		System.out.println(builder);
 		ScoreChord chord = (ScoreChord) builder.iterator().next().iterator().next().iterator().next().iterator().next().iterator().next();
 		assertTrue(chord.getMinimumNote().getPitch() == 62);
@@ -51,7 +53,7 @@ public class NoteTest {
 	@Test
 	public void testAmbiguous() {
 		CwnFactory factory = new SampleFactory();
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0, 0);
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -60,12 +62,12 @@ public class NoteTest {
 		track.addEvent(factory.createNoteEvent(0, D8, 71, 0, 0, 0));
 		List<CwnTrack> trackList = new ArrayList<>();
 		trackList.add(track);
-		ScoreBuilder builder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout(), 1);
+		ScoreBuilder builder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		ScoreChord chord = (ScoreChord) builder.iterator().next().iterator().next().iterator().next().iterator().next().iterator().next();
 		assertTrue(!chord.hasAmbiguousDuration());
 		
 		track.addEvent(factory.createNoteEvent(0, D4, 72, 0, 0, 0));
-		builder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout(), 1);
+		builder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		chord = (ScoreChord) builder.iterator().next().iterator().next().iterator().next().iterator().next().iterator().next();
 		assertTrue(chord.hasAmbiguousDuration());
 	}

@@ -46,7 +46,7 @@ public class SampleScoreLayout implements ScoreLayout {
 	
 	@Override
 	public int getWidth() {
-		return 400;
+		return 8000;
 	}
 	
 	@Override

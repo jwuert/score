@@ -36,8 +36,8 @@ public class RelativePositionAndDurationTest {
 		// track.addEvent(factory.createNoteEvent(D8T, D8T, 78, 0, 0, 0));
 		// track.addEvent(factory.createNoteEvent(2 * D8T, D8T, 78, 0, 0, 0));
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, D4 / 16, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS); // 4 bars
-		ScoreBuilder scoreBuilder = new ScoreBuilder(trackList, scoreParameter, new SampleScoreLayout());
+		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, D4 / 16, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
 				for (ScoreBar bar : staff) {
@@ -62,7 +62,7 @@ public class RelativePositionAndDurationTest {
 		track.addEvent(cwnNoteEvent);
 		trackList.add(track);
 		int resolutionInTicks = D4 / 8;
-		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, resolutionInTicks, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS); // 4 bars
+		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, resolutionInTicks, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
 		long barStartPosition = PositionTools.getPosition(track, new Trias("3.1.0"));
 		ScoreBar scoreBar = new ScoreBar(barStartPosition, track, scoreParameter);
 		QuantizedPosition positionInBar = new QuantizedPosition(scoreBar, cwnNoteEvent.getPosition(), ts1.getMetric());
