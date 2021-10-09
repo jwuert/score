@@ -51,19 +51,19 @@ public class ScorePresenter {
 		for (ScoreSystem system : scoreBuilder) {
 			boolean indent = (systemIndex == 0 && barOffset == 0);
 			int staffIndex = 0;
-			int xBarPosition = layout.getBorder() + (indent ? layout.getSystemIndent() : 0);
+			double xBarPosition = layout.getBorder() + (indent ? layout.getSystemIndent() : 0);
 			int yTop = layout.getBorder() + layout.getTitleHeight() + layout.getSystemSpace() + (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight();
 			int yBottom = yTop + (system.size() - 1) * layout.getStaffHeight() + layout.getLineHeight() * 4;
-			canvas.drawLine(xBarPosition - 1, yTop, xBarPosition - 1, yBottom);
-			canvas.drawLine(xBarPosition, yTop, xBarPosition, yBottom);
+			canvas.drawLine((int) xBarPosition - 1, yTop, (int) xBarPosition - 1, yBottom);
+			canvas.drawLine((int) xBarPosition, yTop, (int) xBarPosition, yBottom);
 
 			for (ScoreStaff staff : system) {
 				drawStaff(systemIndex, indent, staffIndex, staff);
 				xBarPosition = layout.getBorder() + (indent ? layout.getSystemIndent() : 0);
 				int barNumberPerStaff = 0;
 				for (ScoreBar bar : staff) {
-					int xWidth = bar.getStretchedDurationAsPixel(layout.getPixelPerTick());
-					drawBar(systemIndex, staffIndex, barIndex, bar, xBarPosition, xWidth, (barNumberPerStaff == 0), barIndex == 0, yTop, yBottom, staff.getTrack());
+					double xWidth = bar.getStretchedDurationAsPixel(layout.getPixelPerTick());
+					drawBar(systemIndex, staffIndex, barIndex, bar, (int)xBarPosition, (int) xWidth, (barNumberPerStaff == 0), barIndex == 0, yTop, yBottom, staff.getTrack());
 					xBarPosition += bar.getOffset(layout.getPixelPerTick(), (barNumberPerStaff == 0), barIndex == 0);
 					int voiceIndex = 0;
 					for (ScoreVoice voice : bar) {
@@ -519,7 +519,11 @@ public class ScorePresenter {
 				canvas.drawLine(xPositionCenterRight, yPositionCenterRight, xPositionLast, yPositionLast);
 				canvas.drawLine(xPositionFirst, yPositionFirst, xPositionFirst, yPositionFirst + stemDirection * 2);
 				canvas.drawLine(xPositionLast, yPositionLast, xPositionLast, yPositionLast + stemDirection * 2);
-				canvas.drawString("" + (layout.hasFullTupletPresentation() ? characterGroup.getFullCharacter() : characterGroup.getCharacter()), "nole", xPositionCenter, yPositionCenter - stemDirection * 4, "center");
+				canvas.drawString("" + (layout.hasFullTupletPresentation() ? characterGroup.getFullCharacter() : characterGroup.getCharacter()),
+						"nole",
+						xPositionCenter,
+						yPositionCenter + 4 /*- stemDirection * 4*/,
+						"center");
 			}
 		}
 		for (ScoreGroup masterGroup : voice.getGroups()) {

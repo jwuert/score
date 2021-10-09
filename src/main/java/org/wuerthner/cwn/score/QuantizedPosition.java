@@ -22,11 +22,13 @@ public class QuantizedPosition {
 	public QuantizedPosition(ScoreBar scoreBar, long noteStartPosition, int resolutionInTicks) {
 		this.resolutionInTicks = resolutionInTicks;
 		long positionWithinBar = noteStartPosition - scoreBar.getStartPosition();
-		if (positionWithinBar<0) {
+		if (positionWithinBar < 0) {
 			positionWithinBar = 0;
 		}
 		metricGeometry = getDurationType(scoreBar.getScoreParameter(), positionWithinBar, scoreBar.getTimeSignature().getMetric());
+		//System.out.println("metricGeometry: " + metricGeometry.beatStartPosition + ", " + metricGeometry.beat + ", " + metricGeometry.durationType);
 		snappedPosition = metricGeometry.beatStartPosition + getSnappedPosition(metricGeometry.durationType, scoreBar.getScoreParameter(), positionWithinBar - metricGeometry.beatStartPosition);
+		//System.out.println("  pos: " + snappedPosition);
 	}
 	
 	private MetricGeometry getDurationType(ScoreParameter scoreParameter, long relativePosition, final Metric metric) {

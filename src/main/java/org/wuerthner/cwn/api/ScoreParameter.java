@@ -12,8 +12,8 @@ public class ScoreParameter {
 	public final int resolutionInTicks;
 	public final int ppq;
 	public final int flags;
-	public final int metricLevel;
-	public final int stretchFactor;
+	public int metricLevel;
+	public int stretchFactor;
 	public final List<DurationType> durationTypeList;
 	public boolean markup;
 	public int barOffset;
@@ -28,7 +28,7 @@ public class ScoreParameter {
 	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList,
 						  boolean markup, int barOffset) {
 		// this.startPosition = startPosition;
-		this.endPosition = ppq * 500 * 5; // 500 4/4 bars
+		this.endPosition = ppq * 200 * 4; // 500 4/4 bars
 		this.ppq = ppq;
 		this.resolutionInTicks = resolutionInTicks;
 		this.metricLevel = metricLevel;
@@ -59,7 +59,46 @@ public class ScoreParameter {
 		return stretchFactor;
 	}
 
+	public void setDisplayStretchFactor(int stretchFactor) { this.stretchFactor = stretchFactor; }
+
+	public int getMetricLevel() { return metricLevel; }
+
+	public void setMetricLevel(int metricLevel) { this.metricLevel = metricLevel; }
+
 	public int getBarOffset() { return barOffset; }
 
 	public void setBarOffset(int barOffset) { this.barOffset = barOffset; }
+
+	public void setTuplet(boolean t2, boolean t3, boolean t4, boolean t5, boolean t6) {
+		if (t2 && !durationTypeList.contains(DurationType.DUPLET)) {
+			durationTypeList.add(DurationType.DUPLET);
+		} else if (!t2 && durationTypeList.contains(DurationType.DUPLET)) {
+			durationTypeList.remove(DurationType.DUPLET);
+		}
+		if (t3 && !durationTypeList.contains(DurationType.TRIPLET)) {
+			durationTypeList.add(DurationType.TRIPLET);
+		} else if (!t3 && durationTypeList.contains(DurationType.TRIPLET)) {
+			durationTypeList.remove(DurationType.TRIPLET);
+		}
+		if (t4 && !durationTypeList.contains(DurationType.QUADRUPLET)) {
+			durationTypeList.add(DurationType.QUADRUPLET);
+		} else if (!t4 && durationTypeList.contains(DurationType.QUADRUPLET)) {
+			durationTypeList.remove(DurationType.QUADRUPLET);
+		}
+		if (t5 && !durationTypeList.contains(DurationType.QUINTUPLET)) {
+			durationTypeList.add(DurationType.QUINTUPLET);
+		} else if (!t5 && durationTypeList.contains(DurationType.QUINTUPLET)) {
+			durationTypeList.remove(DurationType.QUINTUPLET);
+		}
+		if (t6 && !durationTypeList.contains(DurationType.SEXTUPLET)) {
+			durationTypeList.add(DurationType.SEXTUPLET);
+		} else if (!t6 && durationTypeList.contains(DurationType.SEXTUPLET)) {
+			durationTypeList.remove(DurationType.SEXTUPLET);
+		}
+//		if (t7 && !durationTypeList.contains(DurationType.SEPTUPLET)) {
+//			durationTypeList.add(DurationType.SEPTUPLET);
+//		} else if (!t7 && durationTypeList.contains(DurationType.SEPTUPLET)) {
+//			durationTypeList.remove(DurationType.SEPTUPLET);
+//		}
+	}
 }

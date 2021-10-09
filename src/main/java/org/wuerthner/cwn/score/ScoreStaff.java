@@ -118,7 +118,7 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 			barOffsetStart = 0;
 			for (int b=barOffsetStart; b<barList.size(); b++) {
 				ScoreBar bar = barList.get(b);
-				int barWidth = bar.getStretchedDurationAsPixel(pixelPerTick);
+				double barWidth = bar.getStretchedDurationAsPixel(pixelPerTick);
 				boolean firstBarInTotal = false; // was, but didn't work: && (barNumberPerStaff==0) && (systemIndex==0);
 				int barOffset = bar.getOffset(pixelPerTick, (barNumberPerStaff == 0), firstBarInTotal);
 				barTickPerPixel = bar.getDuration() * 1.0 / barWidth;

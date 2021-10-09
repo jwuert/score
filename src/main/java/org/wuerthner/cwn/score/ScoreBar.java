@@ -236,8 +236,8 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 //		return width;
 //	}
 
-	public int getStretchedDurationAsPixel(double pixelPerTick) {
-		return (int) (getDurationAsPixel(pixelPerTick) * stretchFactor);
+	public double getStretchedDurationAsPixel(double pixelPerTick) {
+		return getDurationAsPixel(pixelPerTick) * stretchFactor;
 	}
 
 	public double getDurationAsPixel(double pixelPerTick) {

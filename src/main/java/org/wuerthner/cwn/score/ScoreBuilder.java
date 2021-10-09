@@ -34,7 +34,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	}
 
 	public void update(ScoreUpdate update) {
-		System.out.println("SB Update: " + update);
+		System.out.println("SB Update: " + update + ", " + scoreParameter.getSupportedDurationTypes());
 		List<CwnTrack> trackList = container.getTrackList();
 		// if (!update.redraw()) System.out.println("ScoreBuilder.update: " + update + " - # of tracks: " + trackList.size());
 		if (!update.redraw() && !trackList.isEmpty()) {
@@ -140,7 +140,6 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	
 	@SuppressWarnings("unchecked")
 	private void splitSystems(List<CwnTrack> trackList) {
-		// boolean isIndented = scoreParameter.startPosition == 0;
 		long startPosition = PositionTools.getPosition(trackList.get(0), new Trias(scoreParameter.barOffset, 0, 0));
 		long endPosition = container.findLastPosition();
 		boolean isIndented = scoreParameter.barOffset == 0;
@@ -165,7 +164,6 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		double maxX = scoreLayout.getWidth() - scoreLayout.getBorder();
 		ScoreSystem system = new ScoreSystem(scoreParameter, totalSystem);
 		systemList.add(system);
-
 		for (int bar = 0; bar < numberOfBars; bar++) {
 			// isIndented = systemIndex == 0 && scoreParameter.startPosition == 0;
 			isIndented = systemIndex == 0 && scoreParameter.barOffset == 0;
@@ -181,15 +179,15 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			currentX = currentX + barWidth;
 			if (currentX > maxX) {
 				double leftX = scoreLayout.getBorder() + (isIndented ? scoreLayout.getSystemIndent() : 0);
-				double stretchFactor = (maxX - leftX - sumBarOffset) / (lastX - leftX - sumBarOffset);
+				// double stretchFactor = (maxX - leftX - sumBarOffset) / (lastX - leftX - sumBarOffset);
+				double stretchFactor = (maxX - leftX - sumBarOffset) / sumBarDuration;
 				system.setStretchFactor(stretchFactor);
-
 				currentX = scoreLayout.getBorder();
 				sumBarDuration = 0;
 				sumBarOffset = 0;
 
 				barDuration = barArray[0].getDurationAsPixel(scoreLayout.getPixelPerTick());
-				barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), true, bar==0);
+				barOffset = barArray[0].getOffset(scoreLayout.getPixelPerTick(), true, false);
 				barWidth = barDuration+barOffset;
 				currentX = currentX + barWidth;
 				systemIndex++;
@@ -242,49 +240,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	public int getNumberOfShownBars() {
 		return numberOfShownBars;
 	}
-	/*
-	 * @formatter:off
-	 
-	public MousePosition findPosition(int x, int y) {
-		currentMousePosition = null;
-		int yPos = y - Geometry.TITLE_HEIGHT - Geometry.BORDER;
-		if (yPos >= 0) {
-			int systemIndex = (int) (yPos / geometry.systemHeight);
-			if (systemIndex < systemList.size()) {
-				int xPos = x - geometry.xOffset - geometry.firstIndent - 4;
-				if (systemIndex == 0) {
-					xPos = xPos - Geometry.SCORE_INDENT;
-				}
-				// if (xPos > 0) {
-				int yWithinSystem = (int) (yPos % geometry.systemHeight);
-				int scoreIndex = (int) (yWithinSystem / geometry.scoreHeight);
-				int yWithinScore = (int) ((yWithinSystem % geometry.scoreHeight) / geometry.zoomFactor);
-				System sys = systemList.get(systemIndex);
-				long thePos = getThePosition(Math.max(0, xPos), sys);
-				if (thePos >= 0 && xPos > -20) {
-					currentMousePosition = new MousePosition(thePos, yWithinScore - 1, barArray[scoreIndex].getClef(), scoreIndex);
-				} else {
-					currentMousePosition = new MousePosition(-1, yWithinScore - 1, barArray[scoreIndex].getClef(), scoreIndex);
-				}
-				// }
-			}
-		}
-		return currentMousePosition;
-	}
-	
-	private long getThePosition(int xPos, System sys) {
-		long thePos;
-		thePos = sys.findPosition((int) (xPos / geometry.pixelPerTick));
-		int ppq = masterInformationProvider.getTicksPerQuarter();
-		if (thePos < 0 && thePos >= -ppq) {
-			thePos = 0;
-		}
-		return thePos;
-	}
-	
- 	* @formatter:on
-	*/
-	
+
 	@Override
 	public Iterator<ScoreSystem> iterator() {
 		return systemList.iterator();
@@ -333,6 +289,44 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		}
 		return location;
 	}
+
+	public Coordinates findCoordinates(long position, int staffIndex) {
+		int resultX = -1;
+		int systemIndex = 0;
+		int yPosition = 0;
+		boolean fbis = false;
+		boolean fbit = false;
+		for (ScoreSystem system : systemList) {
+			int x = 0;
+			ScoreStaff staff = system.get(staffIndex);
+			for (int b=0; b<staff.getBarListSize(); b++) {
+				ScoreBar bar = staff.getBar(b);
+				Metric metric = bar.getTimeSignature().getMetric();
+				double barWidthInPixel = bar.getStretchedDurationAsPixel(scoreLayout.getPixelPerTick());
+				fbis = b==0;
+				fbit = fbis && scoreParameter.getBarOffset()==0 && systemIndex==0;
+				x += bar.getOffset(scoreLayout.getPixelPerTick(), fbis, fbit);
+				if (position >= bar.getStartPosition() && position < bar.getEndPosition()) {
+					int positionInBar = (int) (position - bar.getStartPosition());
+					double relPositionInBar = positionInBar *1.0/ bar.getDuration();
+					System.out.println(" positionInBar: " + positionInBar + ", relPos: " + relPositionInBar);
+					resultX = x + (int)(barWidthInPixel*relPositionInBar);
+					break;
+				}
+				x += barWidthInPixel;
+			}
+			if (resultX >= 0) {
+				break;
+			}
+			systemIndex++;
+		}
+		boolean indent = scoreParameter.getBarOffset()==0 && systemIndex==0;
+		int xPosition = scoreLayout.getBorder() + (indent ? scoreLayout.getSystemIndent() : 0);
+		xPosition += resultX - 10;
+		int yTop = scoreLayout.getBorder() + scoreLayout.getTitleHeight() + (staffIndex + systemIndex * getNumberOfTracks()) * scoreLayout.getStaffHeight();
+		yPosition = yTop + scoreLayout.getStaffHeight()-4;
+		return new Coordinates(xPosition, yPosition);
+	}
 	
 	public int findTrackIndex(int y) {
 		int yPos = y - scoreLayout.getTitleHeight() - scoreLayout.getBorder();
@@ -362,5 +356,14 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 
 	public void setNumberOfSystems(int numberOfSystems) {
 		this.maxSystemNo = numberOfSystems;
+	}
+
+	public class Coordinates {
+		public final int X;
+		public final int Y;
+		public Coordinates(int x, int y) {
+			this.X = x;
+			this.Y = y;
+		}
 	}
 }
