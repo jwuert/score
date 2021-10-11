@@ -3,15 +3,12 @@ package org.wuerthner.cwn.score;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Test;
-import org.wuerthner.cwn.api.CwnFactory;
-import org.wuerthner.cwn.api.CwnNoteEvent;
-import org.wuerthner.cwn.api.CwnTimeSignatureEvent;
-import org.wuerthner.cwn.api.CwnTrack;
-import org.wuerthner.cwn.api.ScoreParameter;
+import org.wuerthner.cwn.api.*;
 import org.wuerthner.cwn.position.PositionTools;
 import org.wuerthner.cwn.sample.SampleFactory;
 import org.wuerthner.cwn.sample.SampleScoreLayout;
@@ -34,7 +31,9 @@ public class NoteTest {
 		CwnNoteEvent noteEvent1 = factory.createNoteEvent(0, D8, 78, 0, 0, 0);
 		CwnNoteEvent noteEvent2 = factory.createNoteEvent(D8, D8, 80, 0, 0, 0);
 		CwnNoteEvent noteEvent3 = factory.createNoteEvent(D2, D2, 82, 0, 0, 0);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 8, 1,4, 0,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0);
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -61,7 +60,9 @@ public class NoteTest {
 		track.addEvent(factory.createNoteEvent(PositionTools.getPosition(track, "1.1:8"), D4, 78, 0, 0, 0));
 		track.addEvent(factory.createNoteEvent(PositionTools.getPosition(track, "1.1:8+16"), D16, 78, 0, 0, 0));
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1,4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
 		ScoreVoice voice = barIterator.next().iterator().next();

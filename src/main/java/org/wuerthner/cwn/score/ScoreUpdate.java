@@ -103,9 +103,7 @@ public class ScoreUpdate {
     public ScoreUpdate extendRangeByOneBar() {
         if (!restrictedTrackList.isEmpty()) {
             this.start = PositionTools.previousBarFirstBeat(restrictedTrackList.get(0), start);
-            System.out.println("old: " + end);
             this.end = PositionTools.nextBar(restrictedTrackList.get(0), end);
-            System.out.println("  n: " + end);
         }
         return this;
     }

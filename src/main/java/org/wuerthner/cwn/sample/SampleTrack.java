@@ -33,7 +33,27 @@ public class SampleTrack implements CwnTrack {
 	public String getName() {
 		return name;
 	}
-	
+
+	@Override
+	public boolean getMute() {
+		return false;
+	}
+
+	@Override
+	public int getChannel() {
+		return 0;
+	}
+
+	@Override
+	public int getInstrument() {
+		return 0;
+	}
+
+	@Override
+	public int getVolume() {
+		return 8;
+	}
+
 	@Override
 	public <T extends CwnEvent> List<T> getList(Class<T> eventClass) {
 		return cwnEventList.stream().filter(event -> eventClass.isAssignableFrom(event.getClass())).map(event -> eventClass.cast(event)).collect(Collectors.toList());

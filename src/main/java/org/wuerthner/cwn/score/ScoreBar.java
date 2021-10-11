@@ -27,6 +27,7 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 	private final List<CwnTempoEvent> tempoList = new ArrayList<>();
 	private final List<CwnSymbolEvent> symbolList = new ArrayList<>();
 	private final int key;
+	private final int previousKey;
 	private final int clef;
 	private final int[] signs = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 	private final boolean multiVoiceBar;
@@ -56,6 +57,11 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 		this.key = keyEvent.getKey();
 		this.explicitKey = (keyEvent.getPosition() == start);
 		this.keyEvent = explicitKey ? keyEvent : null;
+		if (this.explicitKey && start>0) {
+			this.previousKey = cwnTrack.getKey(start-1).getKey();
+		} else {
+			this.previousKey = key;
+		}
 		
 		//
 		CwnClefEvent clefEvent = cwnTrack.getClef(start);
@@ -86,6 +92,7 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 		this.explicitTimeSignature = false;
 		this.timeSignatureEvent = null;
 		this.key = previousBar.key;
+		this.previousKey = previousBar.previousKey;
 		this.explicitKey = false;
 		this.keyEvent = null;
 		this.clef = previousBar.clef;
@@ -218,6 +225,10 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 	public int getKey() {
 		return key;
 	}
+
+	public int getPreviousKey() {
+		return previousKey;
+	}
 	
 	public boolean hasExplicitTimeSignature() {
 		return explicitTimeSignature;
@@ -255,6 +266,10 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 		}
 		if (hasExplicitKey() || firstBarInStaff) {
 			offset += Math.abs(key) * Score.KEY_WIDTH + 2;
+			if (hasExplicitKey()) {
+				int keysToBeRemoved = getSignsToBeRemoved();
+				offset += Math.abs(keysToBeRemoved) * Score.KEY_WIDTH + 2;
+			}
 		}
 		if (hasExplicitTimeSignature() || firstBarInTotal) {
 			offset += Score.TIMESIGNATURE_WIDTH;
@@ -262,7 +277,19 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 		offset += 12;
 		return offset;
 	}
-	
+
+	public int getSignsToBeRemoved() {
+		// MIN(0,prevKey – MIN(0, key))
+		// MAX(0,prevKey – MAX(0, key))
+		// numberOfSignsToBeRemoved < 0 => b's have to be removed
+		// numberOfSignsToBeRemoved > 0 => #'s have to be removed
+		int numberOfSignsToBeRemoved
+				= (previousKey<0 ? Math.min(0, previousKey - Math.min(0, key))
+				: previousKey>0 ? Math.max(0, previousKey - Math.max(0, key))
+				: 0);
+		return numberOfSignsToBeRemoved;
+	}
+
 	public int getShortestValue() {
 		return shortestValue;
 	}

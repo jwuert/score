@@ -45,15 +45,12 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 			startBar = rewindIfOverlap(startBar);
 			start = startBar.getStartPosition();
 			List<ScoreBar> newList = new ArrayList<>();
-			System.out.println(" --- " + start + "-" + end + " ---");
 			partition(newList, start, end);
 			fill(newList, end);
 			List<String> debugBarList = new ArrayList<>();
 			int index = barList.indexOf(startBar);
 			// Now exchange bars in barList:
-			// System.out.println("update " + newList.size() + " bars, starting at " + index);
 			for (int i=0; i<newList.size(); i++) {
-				// System.out.println("### replace bar: " + barList.get(index+i).getStartPosition() + ", by: " + newList.get(i).getStartPosition());
 				if (barList.size()<=index+i) {
 					barList.add(newList.get(i));
 					debugBarList.add("+" + barList.size());
@@ -146,6 +143,7 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 		while (bar.getEndPosition() < endPosition) {
 			bar = new ScoreBar(bar.getEndPosition(), track, scoreParameter);
 			bar.fillWithRests();
+			bar.group();
 			list.add(bar);
 			// break; // TODO: decide...
 		}

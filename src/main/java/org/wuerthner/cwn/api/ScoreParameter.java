@@ -9,7 +9,7 @@ import org.wuerthner.cwn.score.Score;
 public class ScoreParameter {
 	public final long startPosition = 0;
 	public final long endPosition;
-	public final int resolutionInTicks;
+	public int resolutionInTicks;
 	public final int ppq;
 	public final int flags;
 	public int metricLevel;
@@ -18,7 +18,7 @@ public class ScoreParameter {
 	public boolean markup;
 	public int barOffset;
 	
-	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset) {
+	private ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset) {
 		this(ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
 				false, barOffset);
@@ -28,7 +28,7 @@ public class ScoreParameter {
 	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList,
 						  boolean markup, int barOffset) {
 		// this.startPosition = startPosition;
-		this.endPosition = ppq * 200 * 4; // 500 4/4 bars
+		this.endPosition = ppq * 500 * 4; // 500 4/4 bars
 		this.ppq = ppq;
 		this.resolutionInTicks = resolutionInTicks;
 		this.metricLevel = metricLevel;
@@ -38,11 +38,7 @@ public class ScoreParameter {
 		this.markup = markup;
 		this.barOffset = barOffset;
 	}
-	
-	public int getResolutionInTicks() {
-		return resolutionInTicks;
-	}
-	
+
 	public boolean allowDottedRests() {
 		return (flags & Score.ALLOW_DOTTED_RESTS) != 0;
 	}
@@ -64,6 +60,10 @@ public class ScoreParameter {
 	public int getMetricLevel() { return metricLevel; }
 
 	public void setMetricLevel(int metricLevel) { this.metricLevel = metricLevel; }
+
+	public int getResolutionInTicks() { return resolutionInTicks; }
+
+	public void setResolutionInTicks(int resolutionInTicks) { this.resolutionInTicks = resolutionInTicks; }
 
 	public int getBarOffset() { return barOffset; }
 

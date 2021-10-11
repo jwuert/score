@@ -3,13 +3,11 @@ package org.wuerthner.cwn;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.wuerthner.cwn.api.CwnEvent;
-import org.wuerthner.cwn.api.CwnFactory;
-import org.wuerthner.cwn.api.CwnTrack;
-import org.wuerthner.cwn.api.ScoreParameter;
+import org.wuerthner.cwn.api.*;
 import org.wuerthner.cwn.sample.SampleFactory;
 import org.wuerthner.cwn.sample.SampleScoreLayout;
 import org.wuerthner.cwn.score.ScoreBuilder;
@@ -30,7 +28,9 @@ public class NoteTest {
 		// res: 8=8th, 16=16th, etc
 		// resolutionInTicks = PPQ*4/res = D4/res
 		CwnFactory factory = new SampleFactory();
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 8, 1,4, 0,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4, 0, 0);
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -53,7 +53,9 @@ public class NoteTest {
 	@Test
 	public void testAmbiguous() {
 		CwnFactory factory = new SampleFactory();
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * PPQ, PPQ, D1 / 8, 1, 4, 0, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 8, 1,4, 0,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4, 0, 0);
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));

@@ -3,10 +3,7 @@ package org.wuerthner.cwn;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.junit.Ignore;
@@ -42,7 +39,9 @@ public class ScoreBuilderTest {
 		// track.addEvent(factory.createNoteEvent(D8T, D8T, 78, 0, 0, 0));
 		// track.addEvent(factory.createNoteEvent(2 * D8T, D8T, 78, 0, 0, 0));
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 2 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.SPLIT_RESTS, 0); // 4 bars
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1,4, Score.SPLIT_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -75,7 +74,9 @@ public class ScoreBuilderTest {
 		// track.addEvent(noteEvent2);
 		// track.addEvent(noteEvent3);
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 2 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.NONE, 0); // 4 bars
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1, 4, Score.NONE,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -100,7 +101,9 @@ public class ScoreBuilderTest {
 		track.addEvent(noteEvent1);
 		track.addEvent(noteEvent2);
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 3 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.SPLIT_RESTS, 0); // 4 bars
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1,4, Score.SPLIT_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false,0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -126,7 +129,9 @@ public class ScoreBuilderTest {
 		track.addEvent(noteEvent1);
 		track.addEvent(noteEvent2);
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 3 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1, 4, Score.ALLOW_DOTTED_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4 bars - allow dotted rests
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
 		ScoreBar bar;
@@ -201,7 +206,9 @@ public class ScoreBuilderTest {
 		// bar 3
 		track.addEvent(factory.createNoteEvent(2*D1+D2, D4, 87, 0, 0, 0));
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 0, PPQ, D1 / 16, 1, 4, Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1, 4, Score.ALLOW_DOTTED_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4 bars - allow dotted rests
 		System.out.println("sp1: " + scoreParameter.getBarOffset() + ", " + scoreParameter.startPosition + "-" + scoreParameter.endPosition);
 		TrackContainer container = new TrackContainer(trackList, 0);
 		ScoreBuilder scoreBuilder = new ScoreBuilder(container, scoreParameter, new SampleScoreLayout(), 1);

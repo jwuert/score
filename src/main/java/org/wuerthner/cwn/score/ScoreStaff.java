@@ -22,9 +22,6 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 	}
 
 	public ScoreStaff(CwnTrack track, ScoreParameter scoreParameter) {
-		// this.scoreParameter = scoreParameter;
-		// System.out.println("==================");
-		// track.getList(CwnNoteEvent.class).stream().forEach(System.out::println);
 		partitionedTrack = new PartitionedTrack(track, scoreParameter);
 		partitionedTrack.run();
 		this.track = track;

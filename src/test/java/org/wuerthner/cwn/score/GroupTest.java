@@ -1,15 +1,13 @@
 package org.wuerthner.cwn.score;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.wuerthner.cwn.api.CwnFactory;
-import org.wuerthner.cwn.api.CwnTimeSignatureEvent;
-import org.wuerthner.cwn.api.CwnTrack;
-import org.wuerthner.cwn.api.ScoreParameter;
+import org.wuerthner.cwn.api.*;
 import org.wuerthner.cwn.position.PositionTools;
 import org.wuerthner.cwn.sample.SampleFactory;
 import org.wuerthner.cwn.sample.SampleScoreLayout;
@@ -57,7 +55,9 @@ public class GroupTest {
 		track.addEvent(factory.createNoteEvent(PositionTools.getPosition(track, "2.3:2T"), D4T, 83, 0, 0, 0));
 		
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(0, 5 * PPQ * 4, PPQ, D1 / 16, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1,4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		System.out.println(ts1.getMetric().getFlatDurationList(0));
 		System.out.println(ts1.getMetric().getFlatDurationList(1));

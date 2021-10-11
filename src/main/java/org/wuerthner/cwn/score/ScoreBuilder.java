@@ -34,7 +34,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	}
 
 	public void update(ScoreUpdate update) {
-		System.out.println("SB Update: " + update + ", " + scoreParameter.getSupportedDurationTypes());
+		// System.out.println("SB Update: " + update + ", " + scoreParameter.getSupportedDurationTypes());
 		List<CwnTrack> trackList = container.getTrackList();
 		// if (!update.redraw()) System.out.println("ScoreBuilder.update: " + update + " - # of tracks: " + trackList.size());
 		if (!update.redraw() && !trackList.isEmpty()) {
@@ -147,7 +147,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		for (ScoreStaff staff : totalSystem) {
 			numberOfBars = Math.max(numberOfBars, staff.size());
 		}
-		// numberOfBars += 12; // 12;
+		numberOfBars += 12; // 12;
 		List<Iterator<ScoreBar>> barIteratorList = new ArrayList<Iterator<ScoreBar>>();
 		for (ScoreStaff scoreStaff : totalSystem) {
 			barIteratorList.add(scoreStaff.getBarListWithOffset().iterator());
@@ -309,7 +309,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 				if (position >= bar.getStartPosition() && position < bar.getEndPosition()) {
 					int positionInBar = (int) (position - bar.getStartPosition());
 					double relPositionInBar = positionInBar *1.0/ bar.getDuration();
-					System.out.println(" positionInBar: " + positionInBar + ", relPos: " + relPositionInBar);
+					// System.out.println(" positionInBar: " + positionInBar + ", relPos: " + relPositionInBar);
 					resultX = x + (int)(barWidthInPixel*relPositionInBar);
 					break;
 				}

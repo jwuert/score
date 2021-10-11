@@ -2,18 +2,19 @@ package org.wuerthner.cwn.track;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Test;
-import org.wuerthner.cwn.api.CwnEvent;
-import org.wuerthner.cwn.api.CwnFactory;
-import org.wuerthner.cwn.api.CwnTimeSignatureEvent;
-import org.wuerthner.cwn.api.CwnTrack;
-import org.wuerthner.cwn.api.TimeSignature;
-import org.wuerthner.cwn.api.Trias;
+import org.wuerthner.cwn.api.*;
 import org.wuerthner.cwn.api.exception.TimeSignatureException;
 import org.wuerthner.cwn.position.PositionTools;
 import org.wuerthner.cwn.sample.SampleFactory;
+import org.wuerthner.cwn.sample.SampleScoreLayout;
+import org.wuerthner.cwn.score.ScoreBuilder;
+import org.wuerthner.cwn.score.TrackContainer;
 import org.wuerthner.cwn.timesignature.SimpleTimeSignature;
 
 public class TrackTest {
@@ -378,5 +379,25 @@ public class TrackTest {
 		assert (PositionTools.getPosition(cwnTrack, "1.2:16") == (int) (1.25 * cwnTrack.getPPQ()));
 		assert (PositionTools.getPosition(cwnTrack, "1.2:8+16") == (int) (1.75 * cwnTrack.getPPQ()));
 		assert (PositionTools.getPosition(cwnTrack, "1.2:8T") == (int) (cwnTrack.getPPQ() + cwnTrack.getPPQ() / 3));
+	}
+
+	@Test
+	public void testEmptyBars() {
+		CwnFactory factory = new SampleFactory();
+		TimeSignature timeSignature = new SimpleTimeSignature("4/4");
+		CwnTrack cwnTrack = factory.createTrack(384);
+		List<CwnTrack> trackList = new ArrayList<>();
+		CwnTrack track = factory.createTrack(PPQ);
+		track.addEvent(factory.createTimeSignatureEvent(0, timeSignature));
+		track.addEvent(factory.createClefEvent(0, 0));
+		track.addEvent(factory.createKeyEvent(0, 0));
+		// track.addEvent(factory.createNoteEvent(D2 * 2 + D2 + D4 + D8T, D8T, 78, 0, 0, 0));
+		trackList.add(track);
+
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, 960 / 16, 1, 1, 1,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); // 4 bars
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
+
 	}
 }

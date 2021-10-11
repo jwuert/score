@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
 import org.wuerthner.cwn.api.CwnTrack;
+import org.wuerthner.cwn.api.DurationType;
 import org.wuerthner.cwn.api.ScoreParameter;
 import org.wuerthner.cwn.api.TimeSignature;
 import org.wuerthner.cwn.sample.SampleFactory;
@@ -61,7 +63,9 @@ public class PrintTest {
 		trackList.add(track1);
 		ScorePrinter scorePrinter = new ScorePrinter();
 		int groupLevel = 2;
-		ScoreParameter scoreParameter = new ScoreParameter(0, 4 * 4 * PPQ, PPQ, D32, groupLevel, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D32, groupLevel, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				false, 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
 		String lyString = scorePrinter.print(title, subtitle, composer, false, scoreParameter, trackList);
 		System.out.println(lyString);
 		String fileBase = Long.toString(System.nanoTime());
