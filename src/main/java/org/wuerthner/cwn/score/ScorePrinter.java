@@ -55,7 +55,7 @@ public class ScorePrinter {
 	private List<CwnSymbolEvent> symbolsBowToClose;
 	private List<CwnSymbolEvent> symbolsXCrescendoToClose;
 	
-	public String print(String documentName, String subtitleName, String composerName, boolean autoBeamPrint, ScoreParameter scoreParameter, List<CwnTrack> trackList) {
+	public String print(String documentName, String subtitleName, String composerName, boolean autoBeamPrint, ScoreParameter scoreParameter, List<CwnTrack> trackList, long endPosition) {
 		this.trackList = trackList;
 		this.symbols = new ArrayList<CwnSymbolEvent>();
 		this.symbolsBowToClose = new ArrayList<CwnSymbolEvent>();
@@ -142,7 +142,7 @@ public class ScorePrinter {
 			// TRACK NAME
 			//
 			_lilypond_code.append("        \\set Staff.instrumentName = \"" + tName + "\"" + EOL);
-			appendNotes(staff, flag, scoreParameter.ppq);
+			appendNotes(staff, flag, scoreParameter.ppq, endPosition);
 			_lilypond_code.append("      } \\new Lyrics \\lyricsto \"" + flag + "\" { " + _lyrics.toString() + " } >>" + EOL);
 			_lilypond_code.append("    }" + EOL);
 			i++;
@@ -167,14 +167,14 @@ public class ScorePrinter {
 			
 			if (S != null) {
 				_lyrics = new StringBuffer();
-				appendNotes(S, S.getTrack().getName() + "-S", scoreParameter.ppq);
+				appendNotes(S, S.getTrack().getName() + "-S", scoreParameter.ppq, endPosition);
 				lyr_S = _lyrics.toString();
 			}
 			_lilypond_code.append("        } }" + EOL);
 			_lilypond_code.append("        \\context Voice = \"altos\" { \\voiceTwo {" + EOL);
 			if (A != null) {
 				_lyrics = new StringBuffer();
-				appendNotes(A, A.getTrack().getName() + "-A", scoreParameter.ppq);
+				appendNotes(A, A.getTrack().getName() + "-A", scoreParameter.ppq, endPosition);
 				lyr_A = _lyrics.toString();
 			}
 			_lilypond_code.append("        } }" + EOL);
@@ -185,14 +185,14 @@ public class ScorePrinter {
 			_lilypond_code.append("        \\context Voice = \"tenors\" { \\voiceOne {" + EOL);
 			if (T != null) {
 				_lyrics = new StringBuffer();
-				appendNotes(T, T.getTrack().getName() + "-T", scoreParameter.ppq);
+				appendNotes(T, T.getTrack().getName() + "-T", scoreParameter.ppq, endPosition);
 				lyr_T = _lyrics.toString();
 			}
 			_lilypond_code.append("        } }" + EOL);
 			_lilypond_code.append("        \\context Voice = \"basses\" { \\voiceTwo {" + EOL);
 			if (B != null) {
 				_lyrics = new StringBuffer();
-				appendNotes(B, B.getTrack().getName() + "-B", scoreParameter.ppq);
+				appendNotes(B, B.getTrack().getName() + "-B", scoreParameter.ppq, endPosition);
 				lyr_B = _lyrics.toString();
 			}
 			_lilypond_code.append("        } }" + EOL);
@@ -212,12 +212,15 @@ public class ScorePrinter {
 		return _lilypond_code.toString();
 	}
 	
-	private void appendNotes(ScoreStaff staff, String flag, int ppq) {
+	private void appendNotes(ScoreStaff staff, String flag, int ppq, long endPosition) {
 		int clef = -99;
 		int key = -99;
 		String met0 = "-99";
 		String met1 = "-99";
 		for (ScoreBar bar : staff) {
+			if (bar.getStartPosition() > endPosition) {
+				break;
+			}
 			//
 			// BAR
 			//
