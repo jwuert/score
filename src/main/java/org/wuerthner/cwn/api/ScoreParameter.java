@@ -10,13 +10,14 @@ public class ScoreParameter {
 	public final long startPosition = 0;
 	public final long endPosition;
 	public int resolutionInTicks;
-	public final int ppq;
+	public int ppq;
 	public final int flags;
 	public int metricLevel;
 	public int stretchFactor;
 	public final List<DurationType> durationTypeList;
 	public boolean markup;
 	public int barOffset;
+	public String filename;
 	
 	private ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset) {
 		this(ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
@@ -68,6 +69,14 @@ public class ScoreParameter {
 	public int getBarOffset() { return barOffset; }
 
 	public void setBarOffset(int barOffset) { this.barOffset = barOffset; }
+
+	public int getPPQ() { return ppq; }
+
+	public void setPPQ(int ppq) { this.ppq = ppq; }
+
+	public String getFilename() { return filename; }
+
+	public void setFilename(String filename) { this.filename = filename; }
 
 	public void setTuplet(boolean t2, boolean t3, boolean t4, boolean t5, boolean t6) {
 		if (t2 && !durationTypeList.contains(DurationType.DUPLET)) {

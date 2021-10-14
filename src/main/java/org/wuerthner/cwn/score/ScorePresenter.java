@@ -41,6 +41,9 @@ public class ScorePresenter {
 		canvas.drawString(title, "title", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() - 30, "center");
 		canvas.drawString(subtitle, "subtitle", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() + 0, "center");
 		canvas.drawString(composer, "track", (int) (layout.getWidth() - 30), layout.getTitleHeight(), "right");
+		if (scoreBuilder.getScoreParameter().getFilename() != null) {
+			canvas.drawString(scoreBuilder.getScoreParameter().getFilename(), "barNumber", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 20, "right");
+		}
 		if (scoreBuilder.getScoreParameter().markup) {
 			canvas.drawString("markup", "barNumber", (int)(layout.getWidth() - 30), 30, "right");
 		}
@@ -538,6 +541,7 @@ public class ScorePresenter {
 			ScoreObject firstObject = scoreObjectSet.first();
 			ScoreObject lastObject = scoreObjectSet.last();
 			ScoreObject firstNoteOrChord = scoreObjectSet.stream().filter(so -> !so.isRest()).findFirst().orElse(null);
+			if (firstNoteOrChord==null) break;
 			int stemDirection = voice.getStemDirection() != 0 ? voice.getStemDirection() : firstNoteOrChord.getStemDirection();
 			int beamDirection = getBeamDirection(scoreObjectSet);
 			int xPositionFirst = getXPosition(firstObject, xBarPosition, xWidth, stemDirection, 0);
