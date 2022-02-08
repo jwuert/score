@@ -65,8 +65,8 @@ public class PrintTest {
 		int groupLevel = 2;
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D32, groupLevel, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				false, 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
-		String lyString = scorePrinter.print(title, subtitle, composer, false, scoreParameter, trackList);
+				new ArrayList<>(), 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
+		String lyString = scorePrinter.print(title, subtitle, composer, false, scoreParameter, trackList, scoreParameter.endPosition);
 		System.out.println(lyString);
 		String fileBase = Long.toString(System.nanoTime());
 		try {

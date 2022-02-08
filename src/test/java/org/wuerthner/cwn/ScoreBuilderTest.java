@@ -41,7 +41,7 @@ public class ScoreBuilderTest {
 		trackList.add(track);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1,4, Score.SPLIT_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				false, 0); // 4 bars
+				new ArrayList<>(), 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -76,7 +76,7 @@ public class ScoreBuilderTest {
 		trackList.add(track);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1, 4, Score.NONE,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				false, 0); // 4 bars
+				new ArrayList<>(), 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -103,7 +103,7 @@ public class ScoreBuilderTest {
 		trackList.add(track);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1,4, Score.SPLIT_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				false,0); // 4 bars
+				new ArrayList<>(),0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -131,7 +131,7 @@ public class ScoreBuilderTest {
 		trackList.add(track);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1, 4, Score.ALLOW_DOTTED_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				false, 0); // 4 bars - allow dotted rests
+				new ArrayList<>(), 0); // 4 bars - allow dotted rests
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
 		ScoreBar bar;
@@ -208,7 +208,7 @@ public class ScoreBuilderTest {
 		trackList.add(track);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1, 4, Score.ALLOW_DOTTED_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				false, 0); // 4 bars - allow dotted rests
+				new ArrayList<>(), 0); // 4 bars - allow dotted rests
 		System.out.println("sp1: " + scoreParameter.getBarOffset() + ", " + scoreParameter.startPosition + "-" + scoreParameter.endPosition);
 		TrackContainer container = new TrackContainer(trackList, 0);
 		ScoreBuilder scoreBuilder = new ScoreBuilder(container, scoreParameter, new SampleScoreLayout(), 1);
@@ -219,7 +219,7 @@ public class ScoreBuilderTest {
 		ScoreSystem system = scoreBuilder.getSystem(0);
 		ScoreStaff staff = system.get(0);
 		int barListSize = staff.getBarListSize();
-		assertEquals(500, barListSize );
+		assertEquals(12, barListSize );
 
 		// bar 1
 		ScoreBar origBar1 = staff.getBar(0);
@@ -416,6 +416,8 @@ public class ScoreBuilderTest {
 			}
 		}
 		public void drawDot(int d, int yBase) {
+		}
+		public void drawDot(int d, int yBase, int color) {
 		}
 		public void drawLine(int x1, int y1, int x2, int y2, String color) {
 		}

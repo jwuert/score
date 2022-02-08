@@ -9,6 +9,7 @@ import org.wuerthner.cwn.score.ScoreNote;
 import org.wuerthner.cwn.timesignature.SimpleTimeSignature;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class MidiTest {
         CwnNoteEvent noteEvent4 = factory.createNoteEvent(D2*2, D2*2, 94, 0, 90, 0);
         ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 8, 1,4,0,
                 Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-                false,
+                new ArrayList<>(),
                 4);
         CwnTrack track = factory.createTrack(PPQ);
         track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));

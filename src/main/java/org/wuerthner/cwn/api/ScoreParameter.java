@@ -1,8 +1,6 @@
 package org.wuerthner.cwn.api;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.wuerthner.cwn.score.Score;
 
@@ -15,21 +13,22 @@ public class ScoreParameter {
 	public int metricLevel;
 	public int stretchFactor;
 	public final List<DurationType> durationTypeList;
-	public boolean markup;
+	public List<Markup> markup;
+	public Map<Long,List<String>> intervalMap = new HashMap<>();
 	public int barOffset;
 	public String filename;
 	
 	private ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset) {
 		this(ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				false, barOffset);
+				new ArrayList<>(), barOffset);
 		// Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED }));
 	}
 	
 	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList,
-						  boolean markup, int barOffset) {
+						  List<Markup> markup, int barOffset) {
 		// this.startPosition = startPosition;
-		this.endPosition = ppq * 500 * 4; // 500 4/4 bars
+		this.endPosition = ppq * 1500 * 4; // 500 4/4 bars
 		this.ppq = ppq;
 		this.resolutionInTicks = resolutionInTicks;
 		this.metricLevel = metricLevel;

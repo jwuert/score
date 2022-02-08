@@ -32,6 +32,8 @@ public interface CwnTrack {
 	public int getInstrument();
 
 	public int getVolume();
+
+	public List<? extends CwnEvent> getEvents();
 	
 	public Trias nextBar(Trias trias);
 	
@@ -46,4 +48,8 @@ public interface CwnTrack {
 	public CwnKeyEvent getKey(long from);
 	
 	public CwnClefEvent getClef(long from);
+
+	public CwnNoteEvent getHighestNote();
+
+	public CwnNoteEvent getLowestNote();
 }

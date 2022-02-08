@@ -6,10 +6,12 @@ public interface ScoreCanvas {
 	public void drawLine(int x1, int y1, int x2, int y2);
 	
 	public void drawString(String string, String fontName, int x, int y, String align);
-	
+
 	public void drawImage(String string, int x, int y, boolean alternative);
-	
+
 	public void drawDot(int d, int yBase);
+
+	public void drawDot(int d, int yBase, int color);
 	
 	public void drawLine(int x1, int y1, int x2, int y2, String color);
 	

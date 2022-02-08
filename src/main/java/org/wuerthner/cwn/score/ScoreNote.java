@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.wuerthner.cwn.api.CwnNoteEvent;
 import org.wuerthner.cwn.api.CwnTrack;
+import org.wuerthner.cwn.api.DurationType;
 import org.wuerthner.cwn.position.PositionTools;
 
 public class ScoreNote extends AbstractScoreObject {
@@ -29,7 +30,7 @@ public class ScoreNote extends AbstractScoreObject {
 	
 	// Constructor for reduced duration!
 	public ScoreNote(ScoreNote originalNote, ScoreBar scoreBar, long newDuration) {
-		super(scoreBar, originalNote.getStartPosition(), newDuration);
+		super(scoreBar, originalNote.getStartPosition(), newDuration, DurationType.REGULAR);
 		this.cwnNoteEvent = originalNote.cwnNoteEvent;
 		this.isSplitNote = originalNote.isSplitNote;
 		this.stemDirection = originalNote.stemDirection;
@@ -41,7 +42,7 @@ public class ScoreNote extends AbstractScoreObject {
 	
 	// Constructor for tests without CwnNoteEvent!
 	ScoreNote(ScoreBar scoreBar, long start, long duration) {
-		super(scoreBar, start, duration);
+		super(scoreBar, start, duration, DurationType.REGULAR);
 		this.cwnNoteEvent = Optional.empty();
 		this.isSplitNote = cwnNoteEvent.map(ne -> ne.getDuration() > duration).orElse(false);
 		this.clef = scoreBar.getClef();
@@ -53,7 +54,7 @@ public class ScoreNote extends AbstractScoreObject {
 	
 	// Constructor for tests
 	ScoreNote(ScoreBar scoreBar, CwnNoteEvent cwnNoteEvent) {
-		super(scoreBar, cwnNoteEvent.getPosition(), cwnNoteEvent.getDuration());
+		super(scoreBar, cwnNoteEvent.getPosition(), cwnNoteEvent.getDuration(), DurationType.REGULAR);
 		this.cwnNoteEvent = Optional.of(cwnNoteEvent);
 		this.isSplitNote = false;
 		this.clef = scoreBar.getClef();

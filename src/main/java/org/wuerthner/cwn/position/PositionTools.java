@@ -140,12 +140,17 @@ public class PositionTools {
 		Trias trias = getTrias(track, position);
 		return getPosition(track, new Trias(Math.max(0, trias.bar-1), 0, 0));
 	}
-	
+
 	public final static long nextBar(CwnTrack track, long position) {
 		Trias trias = getTrias(track, position);
 		return getPosition(track, trias.nextBar());
 	}
-	
+
+	public final static long nextBars(CwnTrack track, long position, int n) {
+		Trias trias = getTrias(track, position);
+		return getPosition(track, trias.nextBars(n));
+	}
+
 	public final static int getBeat(Metric metric, long relativePosition, ScoreParameter scoreParameter) {
 		final List<Metric> metricList = metric.getFlatMetricList();
 		long currentPosition = 0;

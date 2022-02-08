@@ -1,16 +1,12 @@
 package org.wuerthner.cwn.sample;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.wuerthner.cwn.api.CwnClefEvent;
-import org.wuerthner.cwn.api.CwnEvent;
-import org.wuerthner.cwn.api.CwnKeyEvent;
-import org.wuerthner.cwn.api.CwnTimeSignatureEvent;
-import org.wuerthner.cwn.api.CwnTrack;
-import org.wuerthner.cwn.api.Trias;
+import org.wuerthner.cwn.api.*;
 import org.wuerthner.cwn.api.exception.TimeSignatureException;
 import org.wuerthner.cwn.position.PositionTools;
 
@@ -52,6 +48,11 @@ public class SampleTrack implements CwnTrack {
 	@Override
 	public int getVolume() {
 		return 8;
+	}
+
+	@Override
+	public List<? extends CwnEvent> getEvents() {
+		return new ArrayList<>(cwnEventList);
 	}
 
 	@Override
@@ -119,5 +120,17 @@ public class SampleTrack implements CwnTrack {
 			throw new RuntimeException("Track must contain a clef!");
 		}
 		return clefEvent;
+	}
+
+	@Override
+	public CwnNoteEvent getHighestNote() {
+		return (CwnNoteEvent) cwnEventList.stream().filter(ev -> ev instanceof CwnNoteEvent)
+				.max((ev1, ev2) -> Integer.compare(((CwnNoteEvent)ev1).getPitch(), ((CwnNoteEvent)ev2).getPitch())).orElse(null);
+	}
+
+	@Override
+	public CwnNoteEvent getLowestNote() {
+		return (CwnNoteEvent) cwnEventList.stream().filter(ev -> ev instanceof CwnNoteEvent)
+				.min((ev1, ev2) -> Integer.compare(((CwnNoteEvent)ev1).getPitch(), ((CwnNoteEvent)ev2).getPitch())).orElse(null);
 	}
 }

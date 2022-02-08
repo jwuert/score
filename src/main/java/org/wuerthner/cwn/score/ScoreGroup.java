@@ -38,7 +38,6 @@ public class ScoreGroup implements Comparable<ScoreGroup> {
 		this.metric = metric;
 		this.scoreBar = scoreBar;
 		this.depth = depth;
-		
 		int groupLevel2 = 2;
 		// the division of each duration by the factor is due to the fact the the duration-list does not necessarily add up to 1, e.g. for 5/4, this is 5*0.25 = 1.25,
 		// while the relative positions within 0 and 1 are needed!
@@ -83,6 +82,7 @@ public class ScoreGroup implements Comparable<ScoreGroup> {
 	}
 	
 	public void addToGroupLevel1(ScoreObject scoreObject) {
+		// System.out.println("ATGL1 " + scoreObject.getStartPosition() + ", " + scoreObject.getDuration() + ": " + scoreBar.getStartPosition() + " - " + (currentGroup==null ? "-" : currentGroup.masterGroupStart + "/" + currentGroup.relativeStart));
 		double relativeObjectStart = scoreObject.getRelativePosition();
 		if (scoreObject.groupable()) {
 			if (currentGroup == null) {
@@ -99,6 +99,7 @@ public class ScoreGroup implements Comparable<ScoreGroup> {
 	}
 	
 	public void addToGroupLevel2(ScoreObject scoreObject) {
+		// System.out.println("ATGL2 " + scoreObject.getStartPosition() + ", " + scoreObject.getDuration() + ": " + scoreBar.getStartPosition() + " - " + (currentGroup==null ? "-" : currentGroup.masterGroupStart + "/" + currentGroup.relativeStart));
 		double relativeObjectStart = scoreObject.getRelativePosition();
 		// System.out.println("g: " + relativeObjectStart + "-" + masterGroupStart + ":" + (relativeObjectStart - masterGroupStart) + " : " + cumulativeDurationList);
 		if (isOnBeat(relativeObjectStart - masterGroupStart)) {

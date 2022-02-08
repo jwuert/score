@@ -1,5 +1,7 @@
 package org.wuerthner.cwn.api;
 
+import java.util.Arrays;
+
 public interface CwnSymbolEvent extends CwnEvent {
 	
 	public final static String SYMBOL_PPP = "PPP";
@@ -28,16 +30,6 @@ public interface CwnSymbolEvent extends CwnEvent {
 	public final static String SYMBOL_LABEL2 = "Label2";
 	public final static String SYMBOL_LABEL3 = "Label3";
 	
-	// public final static String SYMBOL_BAR1 = "Bar1";
-	// public final static String SYMBOL_BAR2 = "Bar2";
-	// public final static String SYMBOL_BAR3 = "Bar3";
-	// public final static String SYMBOL_BAR4 = "Bar4";
-	// public final static String SYMBOL_BAR5 = "Bar5";
-	// public final static String SYMBOL_BAR6 = "Bar6";
-	// public final static String SYMBOL_BAR7 = "Bar7";
-	// public final static String SYMBOL_BAR8 = "Bar8";
-	// public final static String SYMBOL_BAR9 = "Bar9";
-	
 	public final static String[] SYMBOLS = new String[] { SYMBOL_8VA, SYMBOL_15VA, SYMBOL_CASE1, SYMBOL_CASE2, SYMBOL_CRESCENDO, SYMBOL_DECRESCENDO, SYMBOL_BOWUP, SYMBOL_BOWDOWN, SYMBOL_PPP, SYMBOL_PP, SYMBOL_P,
 			SYMBOL_MP, SYMBOL_FP, SYMBOL_MF, SYMBOL_F, SYMBOL_FF, SYMBOL_FFF, SYMBOL_SFF, SYMBOL_SF, SYMBOL_SFZ };
 	
@@ -60,4 +52,8 @@ public interface CwnSymbolEvent extends CwnEvent {
 	public boolean isOctave();
 	
 	public boolean isCase();
+
+	public static int indexOf(String name) {
+		return Arrays.asList(SYMBOLS).indexOf(name);
+	}
 }

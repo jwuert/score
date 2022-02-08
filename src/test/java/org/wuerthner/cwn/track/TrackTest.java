@@ -396,7 +396,7 @@ public class TrackTest {
 
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, 960 / 16, 1, 1, 1,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				false, 0); // 4 bars
+				new ArrayList<>(), 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 
 	}

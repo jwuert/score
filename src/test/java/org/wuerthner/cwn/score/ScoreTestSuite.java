@@ -90,7 +90,7 @@ public class ScoreTestSuite {
 		long startPosition = 0;
 		long endPosition = PositionTools.getPosition(cwnTrack, new Trias(size, 0, 0));
 		List<DurationType> durationTypeList = DurationType.getDurationTypeList(character);
-		ScoreParameter scoreParameter = new ScoreParameter(PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, durationTypeList, false, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, durationTypeList, new ArrayList<>(), 0);
 		return scoreParameter;
 	}
 	
@@ -221,6 +221,7 @@ public class ScoreTestSuite {
 	}
 	
 	private List<String> deviations(int barNo, ScoreBar firstBar, ScoreBar secondBar) {
+		// System.out.println("-> " + barNo); System.out.println(" > " + firstBar); System.out.println(" > " + secondBar);
 		List<String> deviationList = new ArrayList<>();
 		if (firstBar.size() != secondBar.size()) {
 			deviationList.add("bar " + (barNo + 1) + " number of voices differ (calculated|expected): " + firstBar.size() + "|" + secondBar.size());
@@ -244,7 +245,7 @@ public class ScoreTestSuite {
 			if (firstVoice.size() != secondVoice.size()) {
 				deviationList.add("bar: " + (barNo + 1) + ", voice: " + (voiceNo + 1) + " sizes differ (calculated|expected): " + firstVoice.size() + "|" + secondVoice.size());
 			} else {
-				Iterator<ScoreObject> secondIterator = secondVoice.iterator();
+				Iterator<ScoreObject> secondIterator = secondVoice.getScoreObjectSet().iterator();
 				for (ScoreObject firstObject : firstVoice) {
 					ScoreObject secondObject = secondIterator.next();
 					if (firstObject.getStartPosition() != secondObject.getStartPosition()) {

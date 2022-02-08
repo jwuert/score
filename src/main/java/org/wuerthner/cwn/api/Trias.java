@@ -4,6 +4,7 @@ import org.wuerthner.cwn.api.exception.InvalidPositionException;
 
 public class Trias {
 	public final static String PATTERN = "^\\s*\\d+\\s*\\.\\s*\\d+\\s*\\.\\s*\\d+\\s*$";
+	public final static String BAR_PATTERN = "^\\s*\\d+\\s*$";
 	public final int bar;
 	public final int beat;
 	public final int tick;
@@ -26,6 +27,11 @@ public class Trias {
 			} else if (beat < 0) {
 				throw new InvalidPositionException("Invalid beat: " + beat);
 			}
+		} else if (position.matches(BAR_PATTERN)) {
+			int number = Integer.valueOf(position.trim()) - 1;
+			bar = (number < 0 ? 0 : number);
+			beat = 0;
+			tick = 0;
 		} else {
 			throw new InvalidPositionException("Malformed position: " + position);
 		}
@@ -34,11 +40,15 @@ public class Trias {
 	public Trias firstBeat() {
 		return new Trias(bar, 0, 0);
 	}
-	
+
 	public Trias nextBar() {
 		return new Trias(bar + 1, 0, 0);
 	}
-	
+
+	public Trias nextBars(int n) {
+		return new Trias(bar + n, 0, 0);
+	}
+
 	public Trias nextBeat() {
 		return new Trias(bar, beat + 1, 0);
 	}
@@ -49,7 +59,7 @@ public class Trias {
 	}
 
 	public String toFormattedString() {
-		return makeString(""+(bar+1), 3) + "." + makeString(""+(beat+1), 2) + "." + makeString(""+tick, 4);
+		return makeString(""+(bar+1), 2) + "." + makeString(""+(beat+1), 2) + "." + makeString(""+tick, 4);
 	}
 
 	private final String makeString(String n, int len) {

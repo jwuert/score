@@ -1,0 +1,5 @@
+package org.wuerthner.cwn.api;
+
+public enum Markup {
+    AMBITUS, ATTRIBUTES, PARALLELS, INTERVALS, CROSSINGS, LYRICS, NOTE_ATTRIBUTES, COLOR_VOICES
+}

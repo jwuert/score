@@ -1,8 +1,8 @@
 package org.wuerthner.cwn.score;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -44,8 +44,27 @@ public class ScorePresenter {
 		if (scoreBuilder.getScoreParameter().getFilename() != null) {
 			canvas.drawString(scoreBuilder.getScoreParameter().getFilename(), "barNumber", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 20, "right");
 		}
-		if (scoreBuilder.getScoreParameter().markup) {
-			canvas.drawString("markup", "barNumber", (int)(layout.getWidth() - 30), 30, "right");
+		if (scoreBuilder.getScoreParameter().markup.contains(Markup.NOTE_ATTRIBUTES)) {
+			if (selection.hasSingleSelection()) {
+				CwnEvent event = selection.getSingleSelection();
+				CwnTrack track = scoreBuilder.getTrackList().get(0);
+				Trias trias = PositionTools.getTrias(track, event.getPosition());
+				String position = trias.toFormattedString();
+				String duration = ""+event.getDuration();
+				String pitch = event instanceof CwnNoteEvent ?
+						Score.getCPitch(((CwnNoteEvent) event).getPitch(), ((CwnNoteEvent) event).getEnharmonicShift())
+						: "";
+				String voice = event instanceof CwnNoteEvent ? ""+(((CwnNoteEvent) event).getVoice()+1) : "";
+				int attrX = (int) (layout.getWidth() - 72);
+				canvas.drawString("position:", "barNumber", attrX, 20, "right");
+				canvas.drawString("duration:", "barNumber", attrX, 32, "right");
+				canvas.drawString("pitch:", "barNumber", attrX, 44, "right");
+				canvas.drawString("voice:", "barNumber", attrX, 56, "right");
+				canvas.drawString(position, "barNumber", attrX+6, 20, "left");
+				canvas.drawString(duration, "barNumber", attrX+6, 32, "left");
+				canvas.drawString(pitch, "barNumber", attrX+6, 44, "left");
+				canvas.drawString(voice, "barNumber", attrX+6, 56, "left");
+			}
 		}
 		int barIndex = barOffset;
 		firstPositionPartiallyOutOfDisplay = Long.MAX_VALUE;
@@ -113,10 +132,11 @@ public class ScorePresenter {
 		int x1 = layout.getBorder() + (indent ? layout.getSystemIndent() : 0);
 		int x2 = layout.getWidth() - layout.getBorder();
 		int yTop = layout.getBorder() + layout.getTitleHeight() + layout.getSystemSpace() + (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight();
+		// System.out.println("!! " + scoreBuilder.getTrackList().size() + " ? " + staffIndex);
 		boolean mute = scoreBuilder.getTrackList().get(staffIndex).getMute();
 		if (staff != null && staff.getTrack() != null && indent) {
-			canvas.drawString((mute?"[":"") + staff.getTrack().getName() + (mute?"]":""), "track", x1 - 10, (int) (yTop + layout.getLineHeight() * 3), "right");
-			if (scoreBuilder.getScoreParameter().markup) {
+			canvas.drawString(staff.getTrack().getName() , (mute ? "trackMuted" : "track"), x1 - 10, (int) (yTop + layout.getLineHeight() * 3), "right");
+			if (scoreBuilder.getScoreParameter().markup.contains(Markup.ATTRIBUTES)) {
 				int channel = scoreBuilder.getTrackList().get(staffIndex).getChannel();
 				int instrument = scoreBuilder.getTrackList().get(staffIndex).getInstrument();
 				int volume = scoreBuilder.getTrackList().get(staffIndex).getVolume();
@@ -128,6 +148,22 @@ public class ScorePresenter {
 						"nole", x1-10, yTop + layout.getLineHeight()*3 + 12, "right");
 				canvas.drawString(instrumentSelection + " ",
 						"nole", x1-10, yTop + layout.getLineHeight()*3 - 20, "right");
+			}
+			if (scoreBuilder.getScoreParameter().markup.contains(Markup.AMBITUS)) {
+				ScoreBar bar = staff.getBar(0);
+				QuantizedPosition qp = new QuantizedPosition(bar, 0, 1);
+				QuantizedDuration qd = new QuantizedDuration(scoreBuilder.getScoreParameter(), 0);
+				CwnNoteEvent highest = scoreBuilder.getTrackList().get(staffIndex).getHighestNote();
+				CwnNoteEvent lowest = scoreBuilder.getTrackList().get(staffIndex).getLowestNote();
+				if (highest!=null && lowest != null) {
+					ScoreNote hNote = new ScoreNote(bar, highest, qp, qd, 0, false);
+					ScoreNote lNote = new ScoreNote(bar, lowest, qp, qd, 0, false);
+					int yAmbitusLow = yTop + lNote.getY() * 3 - 40;
+					int yAmbitusHigh = yTop + hNote.getY() * 3 - 40;
+					canvas.drawLine(x1 +3, yAmbitusLow, x1 +3, yAmbitusHigh+2, "blue");
+					canvas.drawDot(x1 +2, yAmbitusHigh);
+					canvas.drawDot(x1 +2, yAmbitusLow);
+				}
 			}
 		}
 		for (int i = 0; i < 5; i++) {
@@ -319,7 +355,7 @@ public class ScorePresenter {
 				&& pointerPosition < bar.getEndPosition()
 				&& staffIndex == pointer.getStaffIndex()) {
 			// NOTE
-			int relPosition = (int) ((pointerPosition - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration()) + 1;
+			int relPosition = (int) ((pointerPosition - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration()) + 2;
 			int yBase = layout.getBorder() + layout.getTitleHeight()
 					+ (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight() + layout.getSystemSpace() + 1;
 			int yPos = yBase + pointer.getY(bar.getClef()) * 3 - 42;
@@ -460,16 +496,18 @@ public class ScorePresenter {
 				//
 				int xoffset = 4;
 				int yoffset = 10;
+				int yAdd = 15;
 				int delta = event.getParameter();
-				canvas.drawArc(xBarPosition + offset + xStart + xoffset, y, xBarPosition + offset + xEnd + xoffset, y - delta, 1, yoffset, alternative);
+				canvas.drawArc(xBarPosition + offset + xStart + xoffset, y+yAdd, xBarPosition + offset + xEnd + xoffset, y +yAdd - delta, 1, yoffset, alternative);
 			} else if (event.isBowDown()) {
 				//
 				// Bowdown
 				//
 				int xoffset = 4;
 				int yoffset = -10;
+				int yAdd = 15;
 				int delta = event.getParameter();
-				canvas.drawArc(xBarPosition + offset + xStart + xoffset, y, xBarPosition + offset + xEnd + xoffset, y - delta, -1, yoffset, alternative);
+				canvas.drawArc(xBarPosition + offset + xStart + xoffset, y-yAdd, xBarPosition + offset + xEnd + xoffset, y -yAdd - delta, -1, yoffset, alternative);
 			} else if (event.isOctave()) {
 				canvas.drawImage(event.getSymbolName(), xBarPosition + offset + xStart, y - 5, alternative);
 				canvas.drawLine(xBarPosition + offset + xStart + 16, y, xBarPosition + offset + xEnd, y, alternative);
@@ -479,6 +517,25 @@ public class ScorePresenter {
 			} else {
 				y += layout.getStaffHeight() - 10;
 				canvas.drawImage(event.getSymbolName(), xBarPosition + offset + xStart, y, alternative);
+			}
+		}
+		//
+		// Intervals
+		//
+		Map<Long, List<String>> intervalMap = scoreBuilder.getScoreParameter().intervalMap;
+		if (!intervalMap.isEmpty() && staffIndex==0) {
+			for (long pos = bar.getStartPosition(); pos < bar.getEndPosition(); pos = pos + scoreBuilder.getScoreParameter().resolutionInTicks) {
+				List<String> markList = intervalMap.get(pos);
+				if (markList != null) {
+					int relPosition = (int) ((pos - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration()) + 2;
+					int len = markList.size();
+					for (int i=0; i<len; i++) {
+						canvas.drawString(markList.get(i),
+								"markup", xBarPosition + offset + relPosition,
+								ySystemBottom + (int) (0.4 * layout.getStaffHeight() - i*8),
+								"left");
+					}
+				}
 			}
 		}
 	}
@@ -610,6 +667,7 @@ public class ScorePresenter {
 							drawRest((ScoreRest) scoreObject, xPosition, yBase - voice.getVoiceLocation() * 6);
 						} else if (scoreObject.isChord()) {
 							drawChord((ScoreChord) scoreObject, xPosition, yBase, beamGroupSize, xWidth);
+							drawMarks(xPosition, yTop, (ScoreChord) scoreObject);
 						} else {
 							throw new RuntimeException("unexpected scoreObject type: " + scoreObject);
 						}
@@ -767,7 +825,7 @@ public class ScorePresenter {
 		boolean hasEndTie = false;
 		int accentPosition = (chord.getStemDirection() > 0 ? Integer.MAX_VALUE : 0);
 		List<CwnAccent> accentList = new ArrayList<>();
-		
+
 		if (chord.size() > 1) {
 			int yNoteBottom = yBase + chord.getMinimumNote().getY() * 3 - 42;
 			int yNoteTop = yBase + chord.getMaximumNote().getY() * 3 - 42;
@@ -828,7 +886,9 @@ public class ScorePresenter {
 		}
 		int vCenter = (int) ((layout.getLineHeight() * 4) + (layout.getSystemSpace()));
 		if (!hasEndTie) {
-			canvas.drawString(lyrics, "lyrics", xPosition, yBase + vCenter + 4, "center");
+			if (scoreBuilder.getScoreParameter().markup.contains(Markup.LYRICS) && !"".equals(lyrics)) {
+				canvas.drawString(lyrics, "lyrics", xPosition, yBase + vCenter + 4, "center");
+			}
 			if (layout.showVelocity()) {
 				canvas.drawLine(xPosition + 3, yBase + vCenter + 4, xPosition + 3, yBase + vCenter + 4 - (int) (velocity * (15.0 / 127.0)));
 				canvas.drawLine(xPosition + 4, yBase + vCenter + 4, xPosition + 4, yBase + vCenter + 4 - (int) (velocity * (15.0 / 127.0)));
@@ -844,7 +904,14 @@ public class ScorePresenter {
 		}
 		// canvas.drawLine(xPosition, yBase + vCenter, xPosition + 20, yBase + vCenter);
 	}
-	
+
+	private void drawMarks(int xPosition, int yBase, ScoreChord chord) {
+		int count = 0;
+		for (String mark : chord.getMarkList()) {
+			canvas.drawString(mark, "lyrics", xPosition, yBase + count++ * 12, "left");
+		}
+	}
+
 	private void drawArc(ScoreNote note, int xPosition, int yNote, double xWidth, boolean alternative) {
 		// int x = xPosition + 7;
 		// int y = yNote + 3 + note.getStemDirection() * 6;
@@ -880,20 +947,15 @@ public class ScorePresenter {
 		int sign = note.getSign();
 		String name = "head" + base;
 		boolean alternative = selection.contains(note.getCwnNoteEvent());
-		// canvas.drawImage(name, xPosition + 2, yPosition);
 		canvas.drawImage(name, xPosition + 2, yPosition, alternative);
-		// if (selection.contains(note.getCwnNoteEvent())) {
-		// canvas.drawRect(xPosition, yPosition - 1, 9, 7);
-		// }
+		if (scoreBuilder.getScoreParameter().markup.contains(Markup.COLOR_VOICES)) {
+			canvas.drawDot(xPosition + 2, yPosition, note.getVoice());
+		}
 		if (sign != 0) {
 			canvas.drawImage("sign" + sign, xPosition - 8, yPosition - 9, false);
 		}
 		for (int i = 0; i < dots; i++) {
 			canvas.drawDot(xPosition + 12 + i * 4, yPosition);
-		}
-		String marks = note.getCwnNoteEvent().getMarks();
-		if (!marks.equals("")) {
-			canvas.drawString(marks, "lyrics", xPosition, yPosition - 20, "right");
 		}
 	}
 	
@@ -909,6 +971,7 @@ public class ScorePresenter {
 			xPosition += 2;
 			yPositionTop += 2;
 			yPositionBottom += 2;
+
 			canvas.drawLine(xPosition, yPositionTop, xPosition, yPositionBottom + -1 * Score.STEM_LENGTH * stemDirection);
 			// flags
 			int numberOfFlags = scoreObject.getNumberOfFlags();

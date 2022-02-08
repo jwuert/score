@@ -1,12 +1,13 @@
 package org.wuerthner.cwn.score;
 
 import org.wuerthner.cwn.api.CwnTrack;
+import org.wuerthner.cwn.api.DurationType;
 import org.wuerthner.cwn.position.PositionTools;
 
 public class ScoreRest extends AbstractScoreObject {
 	
 	public ScoreRest(ScoreBar scoreBar, long startPosition, long duration) {
-		super(scoreBar, startPosition, duration);
+		super(scoreBar, startPosition, duration, DurationType.REGULAR);
 	}
 	
 	public ScoreRest(ScoreBar scoreBar, QuantizedPosition quantizedPosition, QuantizedDuration quantizedDuration) {

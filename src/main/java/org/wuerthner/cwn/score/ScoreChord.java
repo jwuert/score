@@ -2,8 +2,10 @@ package org.wuerthner.cwn.score;
 
 import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.wuerthner.cwn.api.CwnTrack;
+import org.wuerthner.cwn.api.DurationType;
 
 public class ScoreChord extends AbstractScoreObject {
 	
@@ -13,7 +15,7 @@ public class ScoreChord extends AbstractScoreObject {
 	private final boolean hasShiftedNotes;
 	
 	public ScoreChord(ScoreBar scoreBar, List<ScoreObject> scoreObjects) {
-		super(scoreBar, scoreObjects.get(0).getStartPosition(), getShortestDuration(scoreObjects));
+		super(scoreBar, scoreObjects.get(0).getStartPosition(), getShortestDuration(scoreObjects), getShortestDurationType(scoreObjects));
 		boolean ambiguousDuration = false;
 		for (ScoreObject scoreObject : scoreObjects) {
 			scoreNoteSet.add((ScoreNote) scoreObject);
@@ -25,7 +27,7 @@ public class ScoreChord extends AbstractScoreObject {
 		this.scoreBar = scoreBar;
 		hasShiftedNotes = handleHorizontalShift();
 	}
-	
+
 	private static long getShortestDuration(List<ScoreObject> scoreObjects) {
 		long shortestDuration = Long.MAX_VALUE;
 		for (ScoreObject scoreObject : scoreObjects) {
@@ -33,7 +35,18 @@ public class ScoreChord extends AbstractScoreObject {
 		}
 		return shortestDuration;
 	}
-	
+
+	private static DurationType getShortestDurationType(List<ScoreObject> scoreObjects) {
+		long shortestDuration = Long.MAX_VALUE;
+		ScoreObject obj = null;
+		for (ScoreObject scoreObject : scoreObjects) {
+			long dur = scoreObject.getDuration();
+			if (dur<shortestDuration) { obj = scoreObject; }
+			shortestDuration = Math.min(shortestDuration, dur);
+		}
+		return obj.getDurationType();
+	}
+
 	public TreeSet<ScoreNote> getObjectSet() {
 		return scoreNoteSet;
 	}
@@ -153,5 +166,9 @@ public class ScoreChord extends AbstractScoreObject {
 	
 	public boolean hasShiftedNotes() {
 		return hasShiftedNotes;
+	}
+
+	public List<String> getMarkList() {
+		return scoreNoteSet.stream().flatMap(note -> note.getCwnNoteEvent().getMarkList().stream()).collect(Collectors.toList());
 	}
 }

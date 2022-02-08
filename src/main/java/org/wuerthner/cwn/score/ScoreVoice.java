@@ -19,6 +19,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	private final ScoreBar scoreBar;
 	private final Metric metric;
 	private final TreeSet<ScoreObject> scoreObjectSet = new TreeSet<>();
+	private final TreeSet<ScoreObject> scoreChordSet = new TreeSet<>();
 	private final TreeSet<ScoreGroup> scoreGroupSet = new TreeSet<>();
 	private final TreeSet<CharacterGroup> characterGroupSet = new TreeSet<>();
 	private final int stemDirection; // -1=down, 0=auto, 1=up
@@ -55,7 +56,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	}
 	
 	public void addNote(CwnNoteEvent cwnNoteEvent, long noteStartPosition, long noteDuration) {
-		
+		// System.out.println(" SV.addNote: " + noteStartPosition + " [" + noteDuration + "]");
 		QuantizedPosition position = new QuantizedPosition(scoreBar, noteStartPosition, metric);
 		QuantizedDuration duration = new QuantizedDuration(scoreBar.getScoreParameter(), noteDuration, position.getType());
 		boolean isUngrouped = cwnNoteEvent.isUngrouped();
@@ -63,6 +64,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 			ScoreObject previousObject = scoreObjectSet.last();
 			// check duration of previous note:
 			long newPosition = position.getSnappedPosition() + scoreBar.getStartPosition();
+			// System.out.println("  at pos: " + newPosition);
 			if (newPosition > previousObject.getStartPosition() && newPosition < previousObject.getEndPosition()) {
 				if (ScoreNote.class.isAssignableFrom(previousObject.getClass())) {
 					// todo: configurable: show orig length or adjusted length?
@@ -72,6 +74,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 						// This assures that a note (duration) always ends before the next note begins!
 						scoreObjectSet.remove(previousObject);
 						ScoreNote newPreviousNote = new ScoreNote((ScoreNote) previousObject, scoreBar, newPosition - previousObject.getStartPosition());
+						// System.out.println("  prev: " + previousObject + " ex by " + newPreviousNote);
 						add(newPreviousNote);
 					}
 				} else {
@@ -95,6 +98,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 		}
 		ScoreNote scoreNote = new ScoreNote(scoreBar, cwnNoteEvent, position, duration, stemDirection, isUngrouped);
 		scoreBar.handleSign(scoreNote);
+		// System.out.println("  ADD FINALLY: " + scoreNote);
 		add(scoreNote);
 		long cutoff = noteDuration - duration.getSnappedDuration();
 		if (0.5 * scoreParameter.getResolutionInTicks() < cutoff) {
@@ -126,7 +130,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	
 	@Override
 	public Iterator<ScoreObject> iterator() {
-		return scoreObjectSet.iterator();
+		return scoreChordSet.iterator();
 	}
 	
 	public TreeSet<ScoreObject> getScoreObjectSet() {
@@ -138,20 +142,22 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	}
 	
 	public void group() {
+		//System.out.println("-- GROUP --");
 		makeChords();
+		//System.out.println("-- " + scoreObjectSet.size() + " + " + scoreChordSet.size());
 		groupForBeams();
 		groupForDurationCharacter();
 	}
 	
 	private void makeChords() {
 		Map<Long, List<ScoreObject>> collection = scoreObjectSet.stream().collect(Collectors.groupingBy(n -> n.getStartPosition()));
-		scoreObjectSet.clear();
+		scoreChordSet.clear();
 		for (Map.Entry<Long, List<ScoreObject>> entry : collection.entrySet()) {
 			List<ScoreObject> scoreObjectList = entry.getValue();
 			if (scoreObjectList.size() == 1 && scoreObjectList.get(0).isRest()) {
-				scoreObjectSet.add(scoreObjectList.get(0));
+				scoreChordSet.add(scoreObjectList.get(0));
 			} else {
-				scoreObjectSet.add(new ScoreChord(scoreBar, scoreObjectList));
+				scoreChordSet.add(new ScoreChord(scoreBar, scoreObjectList));
 			}
 		}
 		// scoreObjectSet.stream().forEach(System.out::println);
@@ -180,11 +186,13 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 		int range1 = 0;
 		
 		// double recentAveragePitch = 0;
+		// System.out.println("--------------------------------------------------------");
 		for (ScoreObject scoreObject : this) {
 			// System.out.println(" " + scoreObject);
 			if (flatDurationList1.contains(scoreObject.getRelativePosition())) {
 				range1++;
 				group1 = new ScoreGroup(flatDurationList1.get(range1 - 1), flatMetricList1.get(range1 - 1), scoreBar);
+				// System.out.println(" * new group " + group1.getRelativeStartPosition() + " *");
 				scoreGroupSet.add(group1);
 			}
 			if (group1 != null) {

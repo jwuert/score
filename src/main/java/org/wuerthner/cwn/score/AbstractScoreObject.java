@@ -13,10 +13,10 @@ public abstract class AbstractScoreObject implements ScoreObject {
 	
 	protected final int ppq;
 	
-	public AbstractScoreObject(ScoreBar scoreBar, long startPosition, long duration) {
+	public AbstractScoreObject(ScoreBar scoreBar, long startPosition, long duration, DurationType durationType) {
 		this.startPosition = startPosition;
 		this.duration = duration;
-		this.durationType = DurationType.REGULAR;
+		this.durationType = durationType; // DurationType.REGULAR;
 		this.relativeStartPosition = (startPosition - scoreBar.getStartPosition()) * 1.0 / scoreBar.getDuration();
 		this.relativeDuration = duration * 1.0 / scoreBar.getDuration();
 		this.ppq = scoreBar.getScoreParameter().ppq;

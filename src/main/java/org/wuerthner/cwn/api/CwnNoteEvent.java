@@ -43,4 +43,6 @@ public interface CwnNoteEvent extends CwnEvent {
 	public void clearMark();
 	
 	public String getMarks();
+
+	public List<String> getMarkList();
 }

@@ -150,4 +150,9 @@ public class SampleNoteEvent implements CwnNoteEvent, Comparable<CwnEvent> {
 	public String getMarks() {
 		return markList.stream().collect(Collectors.joining(", "));
 	}
+
+	@Override
+	public List<String> getMarkList() {
+		return markList;
+	}
 }
