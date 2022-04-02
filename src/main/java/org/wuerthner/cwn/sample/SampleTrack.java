@@ -133,4 +133,9 @@ public class SampleTrack implements CwnTrack {
 		return (CwnNoteEvent) cwnEventList.stream().filter(ev -> ev instanceof CwnNoteEvent)
 				.min((ev1, ev2) -> Integer.compare(((CwnNoteEvent)ev1).getPitch(), ((CwnNoteEvent)ev2).getPitch())).orElse(null);
 	}
+
+	@Override
+	public boolean getPiano() {
+		return false;
+	}
 }

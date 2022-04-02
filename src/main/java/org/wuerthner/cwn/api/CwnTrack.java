@@ -52,4 +52,6 @@ public interface CwnTrack {
 	public CwnNoteEvent getHighestNote();
 
 	public CwnNoteEvent getLowestNote();
+
+	public boolean getPiano();
 }

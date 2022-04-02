@@ -18,6 +18,7 @@ public class ScorePresenter {
 	private final ScoreLayout layout;
 	private final CwnSelection<CwnEvent> selection;
 	private boolean debug;
+	private int pianoStaffNo;
 
 	private long firstPositionPartiallyOutOfDisplay;
 	private int firstBarCompletelyOutOfDisplay;
@@ -66,6 +67,7 @@ public class ScorePresenter {
 				canvas.drawString(voice, "barNumber", attrX+6, 56, "left");
 			}
 		}
+		pianoStaffNo = 0;
 		int barIndex = barOffset;
 		firstPositionPartiallyOutOfDisplay = Long.MAX_VALUE;
 		firstBarCompletelyOutOfDisplay = 0;
@@ -134,8 +136,39 @@ public class ScorePresenter {
 		int yTop = layout.getBorder() + layout.getTitleHeight() + layout.getSystemSpace() + (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight();
 		// System.out.println("!! " + scoreBuilder.getTrackList().size() + " ? " + staffIndex);
 		boolean mute = scoreBuilder.getTrackList().get(staffIndex).getMute();
+
+		if (staff.getTrack().getPiano()) {
+			// PIANO STAFF
+			pianoStaffNo++;
+			if (pianoStaffNo == 1) {
+				int y1 = yTop;
+				int y2 = yTop + layout.getStaffHeight() - layout.getSystemSpace();
+				canvas.drawLine(x1 - 8, y1 + 3, x1 - 8, y2 -2, 2);
+				canvas.drawLine(x1 - 11, y2, x1 - 8, y2 - 1, 2);
+				canvas.drawLine(x1 - 8, y1 + 2, x1 - 4, y1, 2);
+			} else if (pianoStaffNo == 2){
+				int y1 = yTop - layout.getSystemSpace();
+				int y2 = yTop + 4 * layout.getLineHeight();
+				canvas.drawLine(x1 - 8, y1 + 2, x1 - 8, y2-3, 2);
+				canvas.drawLine(x1 - 11, y1, x1 - 8, y1 + 1, 2);
+				canvas.drawLine(x1 - 8, y2 - 2, x1 - 4, y2, 2);
+			}
+		}
+
 		if (staff != null && staff.getTrack() != null && indent) {
-			canvas.drawString(staff.getTrack().getName() , (mute ? "trackMuted" : "track"), x1 - 10, (int) (yTop + layout.getLineHeight() * 3), "right");
+			if (staff.getTrack().getPiano()) {
+				// PIANO
+				if (pianoStaffNo == 1) {
+					canvas.drawString(staff.getTrack().getName(), (mute ? "trackMuted" : "track"),
+							x1 - 15,
+							(int) (yTop + layout.getStaffHeight() - 3 * layout.getLineHeight()),
+							"right");
+				}
+			} else {
+				// NORMAL STAFF
+				canvas.drawString(staff.getTrack().getName() , (mute ? "trackMuted" : "track"), x1 - 10, (int) (yTop + layout.getLineHeight() * 3), "right");
+			}
+
 			if (scoreBuilder.getScoreParameter().markup.contains(Markup.ATTRIBUTES)) {
 				int channel = scoreBuilder.getTrackList().get(staffIndex).getChannel();
 				int instrument = scoreBuilder.getTrackList().get(staffIndex).getInstrument();
@@ -180,8 +213,8 @@ public class ScorePresenter {
 		// track selected?
 		//
 		if (this.selection.hasStaffSelected(staffIndex)) {
-			canvas.drawLine(x1 - 5, yTop, x1 - 5, yTop + 4 * layout.getLineHeight(), "red");
-			canvas.drawLine(x1 - 3, yTop, x1 - 3, yTop + 4 * layout.getLineHeight(), "red");
+			canvas.drawLine(x1 - 5, yTop + 2, x1 - 5, yTop + 4 * layout.getLineHeight() - 2, "red");
+			canvas.drawLine(x1 - 3, yTop + 1, x1 - 3, yTop + 4 * layout.getLineHeight() - 1, "red");
 		}
 	}
 	
@@ -664,7 +697,7 @@ public class ScorePresenter {
 						// int xPosition = (int) (xBarPosition + scoreObject.getRelativePosition() * xWidth);
 						int xPosition = getXPosition(scoreObject, xBarPosition, xWidth, 0, 0) - 2;
 						if (scoreObject.isRest()) {
-							drawRest((ScoreRest) scoreObject, xPosition, yBase - voice.getVoiceLocation() * 6);
+							drawRest((ScoreRest) scoreObject, xPosition, yBase - voice.getVoiceLocation() * 6, xWidth);
 						} else if (scoreObject.isChord()) {
 							drawChord((ScoreChord) scoreObject, xPosition, yBase, beamGroupSize, xWidth);
 							drawMarks(xPosition, yTop, (ScoreChord) scoreObject);
@@ -810,12 +843,17 @@ public class ScorePresenter {
 		}
 	}
 	
-	private void drawRest(ScoreRest rest, int xPosition, int yBase) {
+	private void drawRest(ScoreRest rest, int xPosition, int yBase, double xWidth) {
 		int base = rest.getDurationBase();
 		int dots = rest.getNumberOfDots();
-		canvas.drawImage("rest" + base, xPosition + 1, yBase, false);
+		int centerRest = 0;
+		if (base <= 4) {
+			// for whole, half and quarter rest:
+			centerRest = (int) (0.27 * rest.getRelativeDuration()*xWidth);
+		}
+		canvas.drawImage("rest" + base, xPosition + 1 + centerRest, yBase, false);
 		for (int i = 0; i < dots; i++) {
-			canvas.drawDot(xPosition + 13 + i * 4, yBase + 8);
+			canvas.drawDot(xPosition + centerRest + 13 + i * 4, yBase + 8);
 		}
 	}
 	
