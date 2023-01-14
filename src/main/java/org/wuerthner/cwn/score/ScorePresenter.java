@@ -52,19 +52,29 @@ public class ScorePresenter {
 				Trias trias = PositionTools.getTrias(track, event.getPosition());
 				String position = trias.toFormattedString();
 				String duration = ""+event.getDuration();
-				String pitch = event instanceof CwnNoteEvent ?
-						Score.getCPitch(((CwnNoteEvent) event).getPitch(), ((CwnNoteEvent) event).getEnharmonicShift())
-						: "";
-				String voice = event instanceof CwnNoteEvent ? ""+(((CwnNoteEvent) event).getVoice()+1) : "";
 				int attrX = (int) (layout.getWidth() - 72);
 				canvas.drawString("position:", "barNumber", attrX, 20, "right");
 				canvas.drawString("duration:", "barNumber", attrX, 32, "right");
-				canvas.drawString("pitch:", "barNumber", attrX, 44, "right");
-				canvas.drawString("voice:", "barNumber", attrX, 56, "right");
 				canvas.drawString(position, "barNumber", attrX+6, 20, "left");
 				canvas.drawString(duration, "barNumber", attrX+6, 32, "left");
-				canvas.drawString(pitch, "barNumber", attrX+6, 44, "left");
-				canvas.drawString(voice, "barNumber", attrX+6, 56, "left");
+				if (event instanceof CwnNoteEvent) {
+					String pitch = Score.getCPitch(((CwnNoteEvent) event).getPitch(), ((CwnNoteEvent) event).getEnharmonicShift());
+					String voice = event instanceof CwnNoteEvent ? ""+(((CwnNoteEvent) event).getVoice()+1) : "";
+					canvas.drawString("pitch:", "barNumber", attrX, 44, "right");
+					canvas.drawString("voice:", "barNumber", attrX, 56, "right");
+					canvas.drawString(pitch, "barNumber", attrX+6, 44, "left");
+					canvas.drawString(voice, "barNumber", attrX+6, 56, "left");
+				} else if (event instanceof CwnSymbolEvent) {
+					String type = ((CwnSymbolEvent) event).getSymbolName();
+					String parameter = ""+((CwnSymbolEvent) event).getParameter();
+					String offset = ""+((CwnSymbolEvent) event).getParameter();
+					canvas.drawString("type:", "barNumber", attrX, 44, "right");
+					canvas.drawString("parameter:", "barNumber", attrX, 56, "right");
+					canvas.drawString("offset:", "barNumber", attrX, 68, "right");
+					canvas.drawString(type, "barNumber", attrX+6, 44, "left");
+					canvas.drawString(parameter, "barNumber", attrX+6, 56, "left");
+					canvas.drawString(offset, "barNumber", attrX+6, 68, "left");
+				}
 			}
 		}
 		pianoStaffNo = 0;
@@ -145,13 +155,19 @@ public class ScorePresenter {
 				int y2 = yTop + layout.getStaffHeight() - layout.getSystemSpace();
 				canvas.drawLine(x1 - 8, y1 + 3, x1 - 8, y2 -2, 2);
 				canvas.drawLine(x1 - 11, y2, x1 - 8, y2 - 1, 2);
-				canvas.drawLine(x1 - 8, y1 + 2, x1 - 4, y1, 2);
+				canvas.drawLine(x1 - 9, y1 + 4, x1 - 4, y1, 2);
+				canvas.drawLine(x1 - 10, y1 + 5, x1 - 10, y2 - 25, 2);
+				canvas.drawLine(x1 - 10, y2 - 25, x1 - 7, y2 - 10, 2);
+				canvas.drawLine(x1 - 7, y2 - 10, x1 - 7, y2 - 4, 2);
 			} else if (pianoStaffNo == 2){
 				int y1 = yTop - layout.getSystemSpace();
 				int y2 = yTop + 4 * layout.getLineHeight();
 				canvas.drawLine(x1 - 8, y1 + 2, x1 - 8, y2-3, 2);
 				canvas.drawLine(x1 - 11, y1, x1 - 8, y1 + 1, 2);
-				canvas.drawLine(x1 - 8, y2 - 2, x1 - 4, y2, 2);
+				canvas.drawLine(x1 - 9, y2 - 4, x1 - 4, y2, 2);
+				canvas.drawLine(x1 - 10, y2 - 5, x1 - 10, y1 + 25, 2);
+				canvas.drawLine(x1 - 10, y1 + 25, x1 - 7, y1 + 10, 2);
+				canvas.drawLine(x1 - 7, y1 + 10, x1 - 7, y1 + 4, 2);
 			}
 		}
 
@@ -328,38 +344,39 @@ public class ScorePresenter {
 				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight());
 			}
 		} else {
+			boolean alternative = selection.contains(barline);
 			String type = barline.getTypeString();
 			// int x = xBarPosition + 6 + offset;
 			int x = xBarPosition + offset + xWidth + 2;
 			
 			if (type.equals(CwnBarEvent.DOUBLE)) {
-				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x + 2, yTop, x + 2, yTop + 4 * layout.getLineHeight());
+				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x + 2, yTop, x + 2, yTop + 4 * layout.getLineHeight(), alternative);
 			} else if (type.equals(CwnBarEvent.BEGIN_REPEAT)) {
-				canvas.drawLine(x - 3, yTop, x - 3, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x - 2, yTop, x - 2, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight());
+				canvas.drawLine(x - 3, yTop, x - 3, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x - 2, yTop, x - 2, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight(), alternative);
 				canvas.drawDot(x + 1, (int) (yTop + 1.4 * layout.getLineHeight()));
 				canvas.drawDot(x + 1, (int) (yTop + 2.4 * layout.getLineHeight()));
 			} else if (type.equals(CwnBarEvent.END_REPEAT)) {
-				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x + 2, yTop, x + 2, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x + 3, yTop, x + 3, yTop + 4 * layout.getLineHeight());
+				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x + 2, yTop, x + 2, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x + 3, yTop, x + 3, yTop + 4 * layout.getLineHeight(), alternative);
 				canvas.drawDot(x - 4, (int) (yTop + 1.4 * layout.getLineHeight()));
 				canvas.drawDot(x - 4, (int) (yTop + 2.4 * layout.getLineHeight()));
 			} else if (type.equals(CwnBarEvent.BEGIN_AND_END_REPEAT)) {
-				canvas.drawLine(x - 3, yTop, x - 3, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x - 1, yTop, x - 1, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x + 2, yTop, x + 2, yTop + 4 * layout.getLineHeight());
+				canvas.drawLine(x - 3, yTop, x - 3, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x - 1, yTop, x - 1, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x + 2, yTop, x + 2, yTop + 4 * layout.getLineHeight(), alternative);
 				canvas.drawDot(x - 7, (int) (yTop + 1.4 * layout.getLineHeight()));
 				canvas.drawDot(x - 7, (int) (yTop + 2.4 * layout.getLineHeight()));
 				canvas.drawDot(x + 3, (int) (yTop + 1.4 * layout.getLineHeight()));
 				canvas.drawDot(x + 3, (int) (yTop + 2.4 * layout.getLineHeight()));
 			} else if (type.equals(CwnBarEvent.END)) {
-				canvas.drawLine(x - 2, yTop, x - 2, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight());
-				canvas.drawLine(x + 1, yTop, x + 1, yTop + 4 * layout.getLineHeight());
+				canvas.drawLine(x - 2, yTop, x - 2, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight(), alternative);
+				canvas.drawLine(x + 1, yTop, x + 1, yTop + 4 * layout.getLineHeight(), alternative);
 			}
 		}
 		
@@ -373,7 +390,7 @@ public class ScorePresenter {
 				int x = xBarPosition + (xStart == 0 ? 0 : offset + xStart);
 				int y = yTop - layout.getSystemSpace();
 				boolean alternative = selection.contains(event);
-				canvas.drawString(event.getLabel(), alternative ? "selection" : "lyrics", x, y, "left");
+				canvas.drawString(event.getLabel(), "lyrics", x, y, "left"); // TODO: alternative color
 			}
 		}
 
@@ -538,7 +555,7 @@ public class ScorePresenter {
 				//
 				int xoffset = 4;
 				int yoffset = -10;
-				int yAdd = 15;
+				int yAdd = -30 - layout.getLineHeight()*5;
 				int delta = event.getParameter();
 				canvas.drawArc(xBarPosition + offset + xStart + xoffset, y-yAdd, xBarPosition + offset + xEnd + xoffset, y -yAdd - delta, -1, yoffset, alternative);
 			} else if (event.isOctave()) {
@@ -628,35 +645,37 @@ public class ScorePresenter {
 			TreeSet<ScoreObject> scoreObjectSet = (TreeSet<ScoreObject>) voice.getScoreObjectSet().stream()
 					.filter(so -> (round(so.getRelativePosition()) >= characterGroupRelativePosition) && (round(so.getRelativePosition()) < characterGroupRelativeEndPosition))
 					.collect(Collectors.toCollection(TreeSet::new));
-			ScoreObject firstObject = scoreObjectSet.first();
-			ScoreObject lastObject = scoreObjectSet.last();
-			ScoreObject firstNoteOrChord = scoreObjectSet.stream().filter(so -> !so.isRest()).findFirst().orElse(null);
-			if (firstNoteOrChord==null) break;
-			int stemDirection = voice.getStemDirection() != 0 ? voice.getStemDirection() : firstNoteOrChord.getStemDirection();
-			int beamDirection = getBeamDirection(scoreObjectSet);
-			int xPositionFirst = getXPosition(firstObject, xBarPosition, xWidth, stemDirection, 0);
-			int xPositionLast = getXPosition(lastObject, xBarPosition, xWidth, stemDirection, 0);
-			int xPositionCenter = (int) (0.5 * (xPositionFirst + xPositionLast));
-			int centerPitch = (int) (scoreObjectSet.stream().filter(so -> !so.isRest()).mapToDouble(so -> so.getAveragePitch()).average().orElse(0));
-			if (centerPitch > 0) {
-				int beamDeltaY = (int) (Score.STEM_SLOPE * (xPositionLast - xPositionFirst) * beamDirection);
-				int yPositionCenter = yBase + firstNoteOrChord.getY(centerPitch, 0, firstNoteOrChord.getMinimumNote().getClef()) * 3 - 42 + (stemDirection > 0 ? 0 : 2) - stemDirection * (Score.STEM_LENGTH + 7)
-						+ beamDeltaY;
-				int yPositionFirst = (int) (yPositionCenter - (Score.STEM_SLOPE * 2 * beamDirection * (xPositionFirst - xPositionCenter)));
-				int yPositionLast = (int) (yPositionCenter - (Score.STEM_SLOPE * 2 * beamDirection * (xPositionLast - xPositionCenter)));
-				int xPositionCenterLeft = xPositionCenter - (layout.hasFullTupletPresentation() ? 8 : 6);
-				int xPositionCenterRight = xPositionCenter + (layout.hasFullTupletPresentation() ? 8 : 6);
-				int yPositionCenterLeft = (int) (yPositionCenter - (Score.STEM_SLOPE * 2 * beamDirection * (xPositionCenterLeft - xPositionCenter)));
-				int yPositionCenterRight = (int) (yPositionCenter - (Score.STEM_SLOPE * 2 * beamDirection * (xPositionCenterRight - xPositionCenter)));
-				canvas.drawLine(xPositionFirst, yPositionFirst, xPositionCenterLeft, yPositionCenterLeft);
-				canvas.drawLine(xPositionCenterRight, yPositionCenterRight, xPositionLast, yPositionLast);
-				canvas.drawLine(xPositionFirst, yPositionFirst, xPositionFirst, yPositionFirst + stemDirection * 2);
-				canvas.drawLine(xPositionLast, yPositionLast, xPositionLast, yPositionLast + stemDirection * 2);
-				canvas.drawString("" + (layout.hasFullTupletPresentation() ? characterGroup.getFullCharacter() : characterGroup.getCharacter()),
-						"nole",
-						xPositionCenter,
-						yPositionCenter + 4 /*- stemDirection * 4*/,
-						"center");
+			if (!scoreObjectSet.isEmpty()) {
+				ScoreObject firstObject = scoreObjectSet.first();
+				ScoreObject lastObject = scoreObjectSet.last();
+				ScoreObject firstNoteOrChord = scoreObjectSet.stream().filter(so -> !so.isRest()).findFirst().orElse(null);
+				if (firstNoteOrChord == null) break;
+				int stemDirection = voice.getStemDirection() != 0 ? voice.getStemDirection() : firstNoteOrChord.getStemDirection();
+				int beamDirection = getBeamDirection(scoreObjectSet);
+				int xPositionFirst = getXPosition(firstObject, xBarPosition, xWidth, stemDirection, 0);
+				int xPositionLast = getXPosition(lastObject, xBarPosition, xWidth, stemDirection, 0);
+				int xPositionCenter = (int) (0.5 * (xPositionFirst + xPositionLast));
+				int centerPitch = (int) (scoreObjectSet.stream().filter(so -> !so.isRest()).mapToDouble(so -> so.getAveragePitch()).average().orElse(0));
+				if (centerPitch > 0) {
+					int beamDeltaY = (int) (Score.STEM_SLOPE * (xPositionLast - xPositionFirst) * beamDirection);
+					int yPositionCenter = yBase + firstNoteOrChord.getY(centerPitch, 0, firstNoteOrChord.getMinimumNote().getClef()) * 3 - 42 + (stemDirection > 0 ? 0 : 2) - stemDirection * (Score.STEM_LENGTH + 7)
+							+ beamDeltaY;
+					int yPositionFirst = (int) (yPositionCenter - (Score.STEM_SLOPE * 2 * beamDirection * (xPositionFirst - xPositionCenter)));
+					int yPositionLast = (int) (yPositionCenter - (Score.STEM_SLOPE * 2 * beamDirection * (xPositionLast - xPositionCenter)));
+					int xPositionCenterLeft = xPositionCenter - (layout.hasFullTupletPresentation() ? 8 : 6);
+					int xPositionCenterRight = xPositionCenter + (layout.hasFullTupletPresentation() ? 8 : 6);
+					int yPositionCenterLeft = (int) (yPositionCenter - (Score.STEM_SLOPE * 2 * beamDirection * (xPositionCenterLeft - xPositionCenter)));
+					int yPositionCenterRight = (int) (yPositionCenter - (Score.STEM_SLOPE * 2 * beamDirection * (xPositionCenterRight - xPositionCenter)));
+					canvas.drawLine(xPositionFirst, yPositionFirst, xPositionCenterLeft, yPositionCenterLeft);
+					canvas.drawLine(xPositionCenterRight, yPositionCenterRight, xPositionLast, yPositionLast);
+					canvas.drawLine(xPositionFirst, yPositionFirst, xPositionFirst, yPositionFirst + stemDirection * 2);
+					canvas.drawLine(xPositionLast, yPositionLast, xPositionLast, yPositionLast + stemDirection * 2);
+					canvas.drawString("" + (layout.hasFullTupletPresentation() ? characterGroup.getFullCharacter() : characterGroup.getCharacter()),
+							"nole",
+							xPositionCenter,
+							yPositionCenter + 4 /*- stemDirection * 4*/,
+							"center");
+				}
 			}
 		}
 		for (ScoreGroup masterGroup : voice.getGroups()) {

@@ -34,7 +34,6 @@ public class ScorePrinter {
 	private int lplen;
 	private int lpdiff;
 	private String ndur;
-	private String ndots;
 	private int npitch;
 	private int nstep;
 	private int noctv;
@@ -45,6 +44,9 @@ public class ScorePrinter {
 	private long closeBowPosition1 = Long.MAX_VALUE;
 	private long closeBowPosition2 = Long.MAX_VALUE;
 	private long closeVolta = 0;
+	private boolean openTuplet = false;
+	private int openPianoStaff = 0;
+
 	private boolean ambitus = false;
 	private boolean print_marks = true;
 	private boolean satb = false;
@@ -129,7 +131,16 @@ public class ScorePrinter {
 		ScoreSystem system = new ScoreSystem(trackList, scoreParameter);
 		for (ScoreStaff staff : system) {
 			CwnTrack track = staff.getTrack();
-			// for (CwnTrack track: trackList) {
+			//
+			// Piano ?
+			//
+			if (track.getPiano()) {
+				openPianoStaff++;
+				if (openPianoStaff == 1) {
+					_lilypond_code.append("   \\new PianoStaff <<" + EOL);
+					_lilypond_code.append("    \\set PianoStaff.instrumentName = \"" + track.getName() + "\"\n");
+				}
+			}
 			//
 			// SYSTEM
 			//
@@ -141,11 +152,21 @@ public class ScorePrinter {
 			//
 			// TRACK NAME
 			//
-			_lilypond_code.append("        \\set Staff.instrumentName = \"" + tName + "\"" + EOL);
+			if (openPianoStaff == 0) {
+				_lilypond_code.append("        \\set Staff.instrumentName = \"" + tName + "\"" + EOL);
+			}
 			appendNotes(staff, flag, scoreParameter.ppq, endPosition);
 			_lilypond_code.append("      } \\new Lyrics \\lyricsto \"" + flag + "\" { " + _lyrics.toString() + " } >>" + EOL);
 			_lilypond_code.append("    }" + EOL);
+			if (openPianoStaff == 2) {
+				_lilypond_code.append("   >>" + EOL);
+				openPianoStaff = 0;
+			}
 			i++;
+		}
+		if (openPianoStaff == 2) {
+			_lilypond_code.append("   >>" + EOL);
+			openPianoStaff = 0;
 		}
 		if (satb) {
 			ScoreStaff S = system.get(0);
@@ -319,7 +340,18 @@ public class ScorePrinter {
 	private void handleScoreObject(int ppq, ScoreObject object, boolean startBeam, boolean endBeam) {
 		if (object.isChord()) {
 			ScoreChord chord = (ScoreChord) object;
-			
+
+			if (chord.durationType.getCharacter() > 1) {
+				if (openTuplet == false) {
+					openTuplet = true;
+					_lilypond_code.append(" \\tuplet " + chord.durationType.getCharacter() + "/" + chord.durationType.getBeats() + " { ");
+				}
+			} else {
+				if (openTuplet == true) {
+					openTuplet = false;
+					_lilypond_code.append(" } ");
+				}
+			}
 			//
 			// VOLTA TO BE CLOSED?
 			//
@@ -451,17 +483,12 @@ public class ScorePrinter {
 	private String formatRest(ScoreRest rest, int ppq) {
 		long dur = rest.getDuration();
 		int numberOfDots = rest.getNumberOfDots();
-		ndots = "";
-		if (numberOfDots > 0) {
-			ndots = new String(new char[numberOfDots - 1]).replace('\0', '.');
-		}
-		return "r" + lpLength(dur, ppq) + ndots;
+		return "r" + lpLength(dur, ppq);
 	}
 	
 	private String formatNote(ScoreNote ne, ScoreChord sc, int ppq) {
 		// System.out.println("--> " + ne.getStartPosition() + ": " + ne.isSplit() + ", " + ne.hasStartTie() + ", " + ne.hasEndTie());
 		// Output.out(ne.getDuration() + ", " + ne.getDisplay(_content.getResolution()) + ", " + sc.duration() + ", " + sc.display());
-		// ndur = lpLength((int)ne.getDuration()); // TODO: tiplets etc
 		String aux_text = "";
 		if (print_marks) { // TODO: print marks??? => ScorePrintDialog!
 			// List<Object> list = MarkerTools.getMarks(ne);
@@ -471,19 +498,21 @@ public class ScorePrinter {
 			// if (aux_text.length() > 0)
 			// aux_text = "^\\markup { " + aux_text + " } ";
 		}
-		// TODO: triplets...
-		ndur = lpLength((int) sc.getDuration(), ppq);
+		// triplets are considered through the durationType.getFactor()
+		double dur = sc.getDuration()*sc.durationType.getFactor();
+		int numberOfDots = ne.getNumberOfDots();
+		double dotFactor = (Math.pow(2.0, numberOfDots+1)-1) / Math.pow(2.0, numberOfDots);
+		int dottedDur = (int)(dur*dotFactor);
+		ndur = lpLength(dottedDur, ppq);
 		npitch = ne.getPitch();
 		nstep = npitch % 12;
 		nenhs = ne.getEnharmonicShift() + 2;
 		noctv = (int) ((npitch - nstep) / 12) + OCT_CORRECTION[nenhs][nstep];
 		nbow = "";
 		nacct = "";
-		int numberOfDots = ne.getNumberOfDots();
-		ndots = "";
-		if (numberOfDots > 0) {
-			ndots = new String(new char[numberOfDots - 1]).replace('\0', '.');
-		}
+		// 1.5 1.75 1.875 : (2^(n+1)-1)/2^n
+
+
 		// close bow
 		if (ne.getStartPosition() <= closeBowPosition1 && closeBowPosition1 <= ne.getEndPosition()) {
 			nbow += ")";
@@ -546,7 +575,7 @@ public class ScorePrinter {
 		// TODO:
 		_lyrics.append(ne.getLyrics() + " ");
 		String splitNote = (ne.hasStartTie() ? " ~ " : "");
-		return NOTE[nenhs][nstep] + OCT[noctv] + ndur + ndots + nacct + nbow + splitNote + aux_text;
+		return NOTE[nenhs][nstep] + OCT[noctv] + ndur + nacct + nbow + splitNote + aux_text;
 	}
 	
 	private String lpLength(long midilen, int ppq) {

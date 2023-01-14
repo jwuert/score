@@ -57,7 +57,10 @@ public class MidiTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    @Test
+    public void loadMidi() {
 
     }
 }
