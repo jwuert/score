@@ -13,8 +13,8 @@ public class ScoreParameter {
 	public int metricLevel;
 	public int stretchFactor;
 	public final List<DurationType> durationTypeList;
-	public List<Markup> markup;
-	public Map<Long,List<String>> intervalMap = new HashMap<>();
+	public List<Markup.Type> markup;
+	public Map<Long,List<String>> markupMap = new HashMap<>();
 	public int barOffset;
 	public String filename;
 	
@@ -26,7 +26,7 @@ public class ScoreParameter {
 	}
 	
 	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList,
-						  List<Markup> markup, int barOffset) {
+						  List<Markup.Type> markup, int barOffset) {
 		// this.startPosition = startPosition;
 		this.endPosition = ppq * 1500 * 4; // 500 4/4 bars
 		this.ppq = ppq;

@@ -1,9 +1,6 @@
 package org.wuerthner.cwn.sample;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.wuerthner.cwn.api.*;
@@ -136,6 +133,16 @@ public class SampleTrack implements CwnTrack {
 
 	@Override
 	public boolean getPiano() {
+		return false;
+	}
+
+	@Override
+	public <T extends CwnEvent> Optional<T> findEventAtPosition(long position, Class<T> eventClass) {
+		return Optional.empty();
+	}
+
+	@Override
+	public boolean isInfoTrack() {
 		return false;
 	}
 }

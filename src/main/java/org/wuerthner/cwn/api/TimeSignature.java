@@ -66,6 +66,8 @@ public interface TimeSignature {
 	String getNumerator();
 	
 	String getDenominator();
+
+	int getDenominatorInt();
 	
 	int getNumeratorSum();
 	

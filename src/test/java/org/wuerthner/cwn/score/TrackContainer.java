@@ -44,8 +44,20 @@ public class TrackContainer implements CwnContainer {
     }
 
     @Override
+    public long getLastPosition() {
+        return findLastPosition();
+    }
+
+    @Override
     public int getBarOffset() {
         return barOffset;
+    }
+
+    @Override
+    public int getNumberOfBeats() {
+        if (trackList.isEmpty()) return 4;
+        else
+            return trackList.get(0).getTimeSignature(0).getTimeSignature().getDenominatorInt();
     }
 
     public void setBarOffset(int barOffset) {

@@ -135,6 +135,13 @@ public class Score {
 			// @formatter:on
 	};
 
+	public enum Genus {
+		UNDEFINED(0), MINOR(1), MAJOR(2), DIMINISHED(3);
+		public int code;
+		private Genus(int c) {
+			this.code = c;
+		}
+	}
 	static {
 		tonenameMap.put("c", 0);
 		tonenameMap.put("cis", 1);

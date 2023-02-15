@@ -26,7 +26,12 @@ public class SampleKeyEvent implements CwnKeyEvent, Comparable<CwnEvent> {
 	public int getKey() {
 		return key;
 	}
-	
+
+	@Override
+	public int getGenus() {
+		return 0;
+	}
+
 	@Override
 	public String toString() {
 		return "SampleKeyEvent={position: " + position + ", key: " + key + "}";

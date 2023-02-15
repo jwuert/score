@@ -1,6 +1,7 @@
 package org.wuerthner.cwn.api;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.wuerthner.cwn.api.exception.TimeSignatureException;
 
@@ -54,4 +55,8 @@ public interface CwnTrack {
 	public CwnNoteEvent getLowestNote();
 
 	public boolean getPiano();
+
+	public <T extends CwnEvent> Optional<T> findEventAtPosition(long position, Class<T> eventClass);
+
+	public boolean isInfoTrack();
 }

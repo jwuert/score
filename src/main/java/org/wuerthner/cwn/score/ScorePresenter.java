@@ -45,7 +45,7 @@ public class ScorePresenter {
 		if (scoreBuilder.getScoreParameter().getFilename() != null) {
 			canvas.drawString(scoreBuilder.getScoreParameter().getFilename(), "barNumber", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 20, "right");
 		}
-		if (scoreBuilder.getScoreParameter().markup.contains(Markup.NOTE_ATTRIBUTES)) {
+		if (scoreBuilder.getScoreParameter().markup.contains(Markup.Type.NOTE_ATTRIBUTES)) {
 			if (selection.hasSingleSelection()) {
 				CwnEvent event = selection.getSingleSelection();
 				CwnTrack track = scoreBuilder.getTrackList().get(0);
@@ -152,22 +152,11 @@ public class ScorePresenter {
 			pianoStaffNo++;
 			if (pianoStaffNo == 1) {
 				int y1 = yTop;
-				int y2 = yTop + layout.getStaffHeight() - layout.getSystemSpace();
-				canvas.drawLine(x1 - 8, y1 + 3, x1 - 8, y2 -2, 2);
-				canvas.drawLine(x1 - 11, y2, x1 - 8, y2 - 1, 2);
-				canvas.drawLine(x1 - 9, y1 + 4, x1 - 4, y1, 2);
-				canvas.drawLine(x1 - 10, y1 + 5, x1 - 10, y2 - 25, 2);
-				canvas.drawLine(x1 - 10, y2 - 25, x1 - 7, y2 - 10, 2);
-				canvas.drawLine(x1 - 7, y2 - 10, x1 - 7, y2 - 4, 2);
+				canvas.drawImage("pianostaff1", x1 - 12, y1, false);
 			} else if (pianoStaffNo == 2){
 				int y1 = yTop - layout.getSystemSpace();
-				int y2 = yTop + 4 * layout.getLineHeight();
-				canvas.drawLine(x1 - 8, y1 + 2, x1 - 8, y2-3, 2);
-				canvas.drawLine(x1 - 11, y1, x1 - 8, y1 + 1, 2);
-				canvas.drawLine(x1 - 9, y2 - 4, x1 - 4, y2, 2);
-				canvas.drawLine(x1 - 10, y2 - 5, x1 - 10, y1 + 25, 2);
-				canvas.drawLine(x1 - 10, y1 + 25, x1 - 7, y1 + 10, 2);
-				canvas.drawLine(x1 - 7, y1 + 10, x1 - 7, y1 + 4, 2);
+				canvas.drawImage("pianostaff2", x1 - 12, y1, false);
+				pianoStaffNo = 0;
 			}
 		}
 
@@ -185,7 +174,7 @@ public class ScorePresenter {
 				canvas.drawString(staff.getTrack().getName() , (mute ? "trackMuted" : "track"), x1 - 10, (int) (yTop + layout.getLineHeight() * 3), "right");
 			}
 
-			if (scoreBuilder.getScoreParameter().markup.contains(Markup.ATTRIBUTES)) {
+			if (scoreBuilder.getScoreParameter().markup.contains(Markup.Type.ATTRIBUTES)) {
 				int channel = scoreBuilder.getTrackList().get(staffIndex).getChannel();
 				int instrument = scoreBuilder.getTrackList().get(staffIndex).getInstrument();
 				int volume = scoreBuilder.getTrackList().get(staffIndex).getVolume();
@@ -198,7 +187,7 @@ public class ScorePresenter {
 				canvas.drawString(instrumentSelection + " ",
 						"nole", x1-10, yTop + layout.getLineHeight()*3 - 20, "right");
 			}
-			if (scoreBuilder.getScoreParameter().markup.contains(Markup.AMBITUS)) {
+			if (scoreBuilder.getScoreParameter().markup.contains(Markup.Type.AMBITUS)) {
 				ScoreBar bar = staff.getBar(0);
 				QuantizedPosition qp = new QuantizedPosition(bar, 0, 1);
 				QuantizedDuration qd = new QuantizedDuration(scoreBuilder.getScoreParameter(), 0);
@@ -570,9 +559,9 @@ public class ScorePresenter {
 			}
 		}
 		//
-		// Intervals
+		// Intervals, Crossings, Parallels, Riemann, etc...
 		//
-		Map<Long, List<String>> intervalMap = scoreBuilder.getScoreParameter().intervalMap;
+		Map<Long, List<String>> intervalMap = scoreBuilder.getScoreParameter().markupMap;
 		if (!intervalMap.isEmpty() && staffIndex==0) {
 			for (long pos = bar.getStartPosition(); pos < bar.getEndPosition(); pos = pos + scoreBuilder.getScoreParameter().resolutionInTicks) {
 				List<String> markList = intervalMap.get(pos);
@@ -580,10 +569,24 @@ public class ScorePresenter {
 					int relPosition = (int) ((pos - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration()) + 2;
 					int len = markList.size();
 					for (int i=0; i<len; i++) {
-						canvas.drawString(markList.get(i),
-								"markup", xBarPosition + offset + relPosition,
-								ySystemBottom + (int) (0.4 * layout.getStaffHeight() - i*8),
-								"left");
+						String markup = markList.get(i);
+						boolean markupBold = markup.indexOf("!")>0;
+						if (markupBold) { markup = markup.replace("!",""); }
+						String markupPattern = "^([^[_^]]+)(\\_([^^]+))?(\\^([^!]+))?$";
+						String markupBase = markup.replaceAll(markupPattern, "$1");
+						String markupSub = markup.replaceAll(markupPattern, "$3");
+						String markupSuper = markup.replaceAll(markupPattern, "$5");
+						int markupBaseOffset = markupBase.length()-1;
+						int markX = xBarPosition + offset + relPosition;
+						// int markY = ySystemBottom + (int) (0.4 * layout.getStaffHeight() - i*12) + 6;
+						int markY = ySystemBottom + (int) (0.4 * layout.getStaffHeight() - i*8);
+						canvas.drawString(markupBase, markupBold ? "markupBold" : "markup", markX, markY,"left");
+						if (!markupSub.equals("")) {
+							canvas.drawString(markupSub,"nole", markX+(4*markupBaseOffset)+7, markY+3, "left");
+						}
+						if (!markupSuper.equals("")) {
+							canvas.drawString(markupSuper,"nole", markX+(4*markupBaseOffset)+9, markY-3, "left");
+						}
 					}
 				}
 			}
@@ -943,7 +946,7 @@ public class ScorePresenter {
 		}
 		int vCenter = (int) ((layout.getLineHeight() * 4) + (layout.getSystemSpace()));
 		if (!hasEndTie) {
-			if (scoreBuilder.getScoreParameter().markup.contains(Markup.LYRICS) && !"".equals(lyrics)) {
+			if (scoreBuilder.getScoreParameter().markup.contains(Markup.Type.LYRICS) && !"".equals(lyrics)) {
 				canvas.drawString(lyrics, "lyrics", xPosition, yBase + vCenter + 4, "center");
 			}
 			if (layout.showVelocity()) {
@@ -1005,7 +1008,7 @@ public class ScorePresenter {
 		String name = "head" + base;
 		boolean alternative = selection.contains(note.getCwnNoteEvent());
 		canvas.drawImage(name, xPosition + 2, yPosition, alternative);
-		if (scoreBuilder.getScoreParameter().markup.contains(Markup.COLOR_VOICES)) {
+		if (scoreBuilder.getScoreParameter().markup.contains(Markup.Type.COLOR_VOICES)) {
 			canvas.drawDot(xPosition + 2, yPosition, note.getVoice());
 		}
 		if (sign != 0) {

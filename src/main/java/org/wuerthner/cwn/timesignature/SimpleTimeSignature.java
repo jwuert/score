@@ -70,12 +70,17 @@ public class SimpleTimeSignature implements TimeSignature {
 	public int getNumeratorSum() {
 		return ratioList.get(0).getNumeratorSum();
 	}
-	
+
 	@Override
 	public String getDenominator() {
 		return "" + ratioList.get(0).getDenominator();
 	}
-	
+
+	@Override
+	public int getDenominatorInt() {
+		return ratioList.get(0).getDenominator();
+	}
+
 	private final void init() {
 		Map<Integer, Integer> divisorBeatMap = new LinkedHashMap<>();
 		recurse(metric, divisorBeatMap);

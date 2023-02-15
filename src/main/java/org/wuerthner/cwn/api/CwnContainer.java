@@ -7,4 +7,6 @@ public interface CwnContainer {
     public boolean isEmpty();
     public long findLastPosition();
     public int getBarOffset();
+    public long getLastPosition();
+    public int getNumberOfBeats();
 }

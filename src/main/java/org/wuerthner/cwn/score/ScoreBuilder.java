@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.wuerthner.cwn.api.*;
+import org.wuerthner.cwn.markup.*;
 import org.wuerthner.cwn.position.PositionTools;
 
 public class ScoreBuilder implements Iterable<ScoreSystem> {
@@ -17,6 +18,13 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	private int maxSystemNo;
 	private CwnContainer container;
 	private boolean marks = false;
+	private final List<Markup> markupList = Arrays.asList(
+			new IntervalsMarkup(),
+			new CrossingsMarkup(),
+			new ParallelsMarkup(),
+			new RiemannHarmonyMarkup(),
+			new RiemannFunctionMarkup()
+	);
 
 	public ScoreBuilder(CwnContainer container, ScoreParameter scoreParameter, ScoreLayout scoreLayout) {
 		this(container, scoreParameter, scoreLayout, 9999);
@@ -41,9 +49,10 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 				clearMarks(trackList);
 				if (!scoreParameter.markup.isEmpty()) {
 					marks = true;
-					List<CwnTrack> activeTrackList = trackList.stream().filter(track -> !track.getMute()).collect(Collectors.toList());
-					checkPairs(activeTrackList, scoreParameter.markup);
-					checkInvervals(activeTrackList, scoreParameter.markup, scoreParameter.intervalMap);
+					List<CwnTrack> activeTrackList = trackList.stream().filter(track -> !track.isInfoTrack()).collect(Collectors.toList());
+					Optional<CwnTrack> infoTrackOpt = trackList.stream().filter(track -> track.isInfoTrack()).findFirst();
+					// checkPairs(activeTrackList);
+					checkInvervals(activeTrackList, infoTrackOpt);
 				}
 			}
 			if (update.full()) {
@@ -61,67 +70,44 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		}
 	}
 
-	private void checkInvervals(List<CwnTrack> trackList, List<Markup> markTypes, Map<Long,List<String>> markupMap) {
-		if (markTypes.contains(Markup.INTERVALS) || markTypes.contains(Markup.CROSSINGS)) {
-			List<Long> positions = trackList.stream()
-					.flatMap(track -> track.getList(CwnNoteEvent.class).stream())
-					.map(note -> note.getPosition())
-					.sorted()
-					.distinct()
-					.collect(Collectors.toList());
-			if (positions.isEmpty()) {
-				return;
+	private void checkInvervals(List<CwnTrack> trackList, Optional<CwnTrack> infoTrackOpt) {
+		List<Long> positions = trackList.stream()
+				.flatMap(track -> track.getList(CwnNoteEvent.class).stream())
+				.map(note -> note.getPosition())
+				.filter(position -> position%scoreParameter.ppq==0)
+				.sorted()
+				.distinct()
+				.collect(Collectors.toList());
+		if (positions.isEmpty()) {
+			return;
+		}
+		CwnKeyEvent key = trackList.get(0).getKey(0);
+		List<int[]> pitchList = new ArrayList<>();
+		for (CwnTrack track : trackList) {
+			int numberOfVoices = getMaxVoice(track);
+			for (int v=0; v<numberOfVoices; v++) {
+				int[] pitch = getPitchArray(positions, track, v);
+				pitchList.add(pitch);
 			}
-			List<int[]> pitchList = new ArrayList<>();
-			for (CwnTrack track : trackList) {
-				int numberOfVoices = getMaxVoice(track);
-				for (int v=0; v<numberOfVoices; v++) {
-					int[] pitch = getPitchArray(positions, track, v);
-					pitchList.add(pitch);
-				}
-			}
-			int bassIndex = getBassIndex(pitchList);
+		}
+		int bassIndex = getBassIndex(pitchList);
 
-			System.err.println("** bass: " + bassIndex);
-			for (int i=0; i< pitchList.size(); i++) {
-				Arrays.stream(pitchList.get(i)).forEach(x -> System.out.print(x + " "));
-				System.out.println();
-			}
+//			System.out.println("-----------------");
+//			System.out.println("** bass: " + bassIndex);
+//			for (int i=0; i< pitchList.size(); i++) {
+//				Arrays.stream(pitchList.get(i)).forEach(x -> System.out.print(x + " "));
+//				System.out.println();
+//			}
+//			System.out.println("-----------------");
 
-			if (markTypes.contains(Markup.INTERVALS)) {
-				// INTERVALS
-				int length = positions.size();
-				for (int i = 0; i < length; i++) {
-					int[] basePitch = pitchList.get(bassIndex);
-					for (int j = pitchList.size() - 1; j >= 0; j--) {
-						if (j != bassIndex) {
-							String value = getInverval(basePitch[i], pitchList.get(j)[i]);
-							List<String> list = markupMap.computeIfAbsent(positions.get(i), k -> new ArrayList<>());
-							if (!list.contains(value)) {
-								list.add(value);
-							}
-						}
-					}
-				}
-			}
-			if (markTypes.contains(Markup.CROSSINGS)) {
-				int length = positions.size();
-				for (int i = 0; i < length; i++) {
-					for (int voice1 = 0; voice1 < pitchList.size(); voice1++) {
-						for (int voice2 = voice1+1; voice2 < pitchList.size(); voice2++) {
-							if (getCrossing(pitchList.get(voice1)[i], pitchList.get(voice2)[i])<0) {
-								List<String> list = markupMap.computeIfAbsent(positions.get(i), k -> new ArrayList<>());
-								if (!list.contains("X")) {
-									list.add("X");
-								}
-							}
-						}
-					}
-				}
+		for (Markup markup : markupList) {
+			if (scoreParameter.markup.contains(markup.getType())) {
+				markup.mark(positions, pitchList, bassIndex, key, scoreParameter, infoTrackOpt);
 			}
 		}
 	}
 
+	// returns the position in the list containing the lowest pitch-average
 	private int getBassIndex(List<int[]> pitchList) {
 		int bassIndex = 0;
 		double lowestAverage = 255.0;
@@ -136,6 +122,9 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		return bassIndex;
 	}
 
+	// returns an array of pitches according to the list of positions - for a given track and voice
+	// when no event occurs on a specific position, the previous pitch is used
+	// TODO: this does not take the note duration into account: if eventPosition+duration < position, the pitch should NOT be written into the array, but 0 instead!
 	private int[] getPitchArray(List<Long> positions, CwnTrack track, int voice) {
 		int[] pitchArray = new int[positions.size()];
 		int pointer = 0;
@@ -194,87 +183,77 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			}
 			marks = false;
 		}
-		scoreParameter.intervalMap.clear();
+		scoreParameter.markupMap.clear();
 	}
 
-	private void checkPairs(List<CwnTrack> trackList, List<Markup> markTypes) {
-		int numberOfTracks = trackList.size();
-		for (int trackNo1 = 0; trackNo1 < numberOfTracks; trackNo1++) {
-			//
-			// TRACK 1
-			//
-			CwnTrack cwnTrack1 = trackList.get(trackNo1);
-			List<CwnNoteEvent> noteList1 = cwnTrack1.getList(CwnNoteEvent.class);
-			int numberOfNotes1 = noteList1.size();
-			CwnNoteEvent preNoteEvent1 = null;
-			for (int noteNo1 = 0; noteNo1 < numberOfNotes1; noteNo1++) {
-				//
-				// NOTE EVENT 1
-				//
-				CwnNoteEvent noteEvent1 = noteList1.get(noteNo1);
-				long startPosition1 = noteEvent1.getPosition();
-				for (int trackNo2 = trackNo1 + 1; trackNo2 < numberOfTracks; trackNo2++) {
-					//
-					// TRACK 2
-					//
-					CwnTrack cwnTrack2 = trackList.get(trackNo2);
-					List<CwnNoteEvent> noteList2 = cwnTrack2.getList(CwnNoteEvent.class);
-					int numberOfNotes2 = noteList2.size();
-					CwnNoteEvent preNoteEvent2 = null;
-					boolean matchPos = false;
-					for (int noteNo2 = 0; noteNo2 < numberOfNotes2; noteNo2++) {
-						//
-						// NOTE EVENT 2
-						//
-						CwnNoteEvent noteEvent2 = noteList2.get(noteNo2);
-						long startPosition2 = noteEvent2.getPosition();
-						if (startPosition2 == startPosition1) {
-							matchPos = true;
-							if (preNoteEvent1 != null && preNoteEvent2 != null) {
-								if (markTypes.contains(Markup.PARALLELS)) {
-									verifyParallels(preNoteEvent1, noteEvent1, preNoteEvent2, noteEvent2);
-								}
-							}
-						}
-						preNoteEvent2 = noteEvent2;
-					}
-				}
-				preNoteEvent1 = noteEvent1;
-			}
-		}
-	}
-
-	private String getInverval(int pitch1, int pitch2) {
-		int delta = Math.abs(pitch1 - pitch2);
-		String interval = (delta < Score.interval.length ? Score.interval[delta] : "?");
-		return interval;
-	}
-
-	private int getCrossing(int pitch1, int pitch2) {
-		return (int) Math.signum(pitch1 - pitch2);
-	}
-
-	private void verifyParallels(CwnNoteEvent preNoteEvent1, CwnNoteEvent noteEvent1, CwnNoteEvent preNoteEvent2, CwnNoteEvent noteEvent2) {
-		long startPosition1 = noteEvent1.getPosition();
-		long startPosition2 = noteEvent2.getPosition();
-		int deltaNote = Math.abs(noteEvent1.getPitch() - noteEvent2.getPitch());
-		if (deltaNote == 0 || deltaNote == 7 || deltaNote == 12 || deltaNote == 19 || deltaNote == 24) {
-			int slope1 = noteEvent1.getPitch() - preNoteEvent1.getPitch();
-			int slope2 = noteEvent2.getPitch() - preNoteEvent2.getPitch();
-			boolean brk1 = (startPosition1 > preNoteEvent1.getPosition() + preNoteEvent1.getDuration() + 12);
-			boolean brk2 = (startPosition2 > preNoteEvent2.getPosition() + preNoteEvent2.getDuration() + 12);
-			if (slope1 * slope2 > 0 && !brk1 && !brk2) {
-				int delta_prev = Math.abs(preNoteEvent1.getPitch() - preNoteEvent2.getPitch());
-				if (delta_prev == deltaNote) {
-					noteEvent1.addMark("P");
-					noteEvent2.addMark("P");
-				} else {
-					noteEvent1.addMark("(P)");
-					noteEvent2.addMark("(P)");
-				}
-			}
-		}
-	}
+//	private void checkPairs(List<CwnTrack> trackList) {
+//		int numberOfTracks = trackList.size();
+//		for (int trackNo1 = 0; trackNo1 < numberOfTracks; trackNo1++) {
+//			//
+//			// TRACK 1
+//			//
+//			CwnTrack cwnTrack1 = trackList.get(trackNo1);
+//			List<CwnNoteEvent> noteList1 = cwnTrack1.getList(CwnNoteEvent.class);
+//			int numberOfNotes1 = noteList1.size();
+//			CwnNoteEvent preNoteEvent1 = null;
+//			for (int noteNo1 = 0; noteNo1 < numberOfNotes1; noteNo1++) {
+//				//
+//				// NOTE EVENT 1
+//				//
+//				CwnNoteEvent noteEvent1 = noteList1.get(noteNo1);
+//				long startPosition1 = noteEvent1.getPosition();
+//				for (int trackNo2 = trackNo1 + 1; trackNo2 < numberOfTracks; trackNo2++) {
+//					//
+//					// TRACK 2
+//					//
+//					CwnTrack cwnTrack2 = trackList.get(trackNo2);
+//					List<CwnNoteEvent> noteList2 = cwnTrack2.getList(CwnNoteEvent.class);
+//					int numberOfNotes2 = noteList2.size();
+//					CwnNoteEvent preNoteEvent2 = null;
+//					boolean matchPos = false;
+//					for (int noteNo2 = 0; noteNo2 < numberOfNotes2; noteNo2++) {
+//						//
+//						// NOTE EVENT 2
+//						//
+//						CwnNoteEvent noteEvent2 = noteList2.get(noteNo2);
+//						long startPosition2 = noteEvent2.getPosition();
+//						if (startPosition2 == startPosition1) {
+//							matchPos = true;
+//							if (preNoteEvent1 != null && preNoteEvent2 != null) {
+//								if (scoreParameter.markup.contains(Markup.Type.PARALLELS)) {
+//									verifyParallels(preNoteEvent1, noteEvent1, preNoteEvent2, noteEvent2);
+//								}
+//							}
+//						}
+//						preNoteEvent2 = noteEvent2;
+//					}
+//				}
+//				preNoteEvent1 = noteEvent1;
+//			}
+//		}
+//	}
+//
+//	private void verifyParallels(CwnNoteEvent preNoteEvent1, CwnNoteEvent noteEvent1, CwnNoteEvent preNoteEvent2, CwnNoteEvent noteEvent2) {
+//		long startPosition1 = noteEvent1.getPosition();
+//		long startPosition2 = noteEvent2.getPosition();
+//		int deltaNote = Math.abs(noteEvent1.getPitch() - noteEvent2.getPitch());
+//		if (deltaNote == 0 || deltaNote == 7 || deltaNote == 12 || deltaNote == 19 || deltaNote == 24) {
+//			int slope1 = noteEvent1.getPitch() - preNoteEvent1.getPitch();
+//			int slope2 = noteEvent2.getPitch() - preNoteEvent2.getPitch();
+//			boolean brk1 = (startPosition1 > preNoteEvent1.getPosition() + preNoteEvent1.getDuration() + 12);
+//			boolean brk2 = (startPosition2 > preNoteEvent2.getPosition() + preNoteEvent2.getDuration() + 12);
+//			if (slope1 * slope2 > 0 && !brk1 && !brk2) {
+//				int delta_prev = Math.abs(preNoteEvent1.getPitch() - preNoteEvent2.getPitch());
+//				if (delta_prev == deltaNote) {
+//					noteEvent1.addMark("P");
+//					noteEvent2.addMark("P");
+//				} else {
+//					noteEvent1.addMark("(P)");
+//					noteEvent2.addMark("(P)");
+//				}
+//			}
+//		}
+//	}
 	
 	@SuppressWarnings("unchecked")
 	private void splitSystems(List<CwnTrack> trackList) {
