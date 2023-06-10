@@ -59,11 +59,14 @@ public class ScorePresenter {
 				canvas.drawString(duration, "barNumber", attrX+6, 32, "left");
 				if (event instanceof CwnNoteEvent) {
 					String pitch = Score.getCPitch(((CwnNoteEvent) event).getPitch(), ((CwnNoteEvent) event).getEnharmonicShift());
-					String voice = event instanceof CwnNoteEvent ? ""+(((CwnNoteEvent) event).getVoice()+1) : "";
+					String voice = "" + (((CwnNoteEvent) event).getVoice()+1);
+					String velocity = "" + ((CwnNoteEvent) event).getVelocity();
 					canvas.drawString("pitch:", "barNumber", attrX, 44, "right");
 					canvas.drawString("voice:", "barNumber", attrX, 56, "right");
+					canvas.drawString("velocity:", "barNumber", attrX, 68, "right");
 					canvas.drawString(pitch, "barNumber", attrX+6, 44, "left");
 					canvas.drawString(voice, "barNumber", attrX+6, 56, "left");
+					canvas.drawString(velocity, "barNumber", attrX+6, 68, "left");
 				} else if (event instanceof CwnSymbolEvent) {
 					String type = ((CwnSymbolEvent) event).getSymbolName();
 					String parameter = ""+((CwnSymbolEvent) event).getParameter();
@@ -91,13 +94,15 @@ public class ScorePresenter {
 			int yBottom = yTop + (system.size() - 1) * layout.getStaffHeight() + layout.getLineHeight() * 4;
 			canvas.drawLine((int) xBarPosition - 1, yTop, (int) xBarPosition - 1, yBottom);
 			canvas.drawLine((int) xBarPosition, yTop, (int) xBarPosition, yBottom);
+			boolean lastInStaff;
 			for (ScoreStaff staff : system) {
 				drawStaff(systemIndex, indent, staffIndex, staff);
 				xBarPosition = layout.getBorder() + (indent ? layout.getSystemIndent() : 0);
 				int barNumberPerStaff = 0;
 				for (ScoreBar bar : staff) {
+					lastInStaff = staff.size() == barNumberPerStaff+2;
 					double xWidth = bar.getStretchedDurationAsPixel(layout.getPixelPerTick());
-					drawBar(systemIndex, staffIndex, barIndex, bar, (int)xBarPosition, (int) xWidth, (barNumberPerStaff == 0), barIndex == 0, yTop, yBottom, staff.getTrack());
+					drawBar(systemIndex, staffIndex, barIndex, bar, (int)xBarPosition, (int) xWidth, (barNumberPerStaff == 0), barIndex == 0, lastInStaff, yTop, yBottom, staff.getTrack());
 					xBarPosition += bar.getOffset(layout.getPixelPerTick(), (barNumberPerStaff == 0), barIndex == 0);
 					int voiceIndex = 0;
 					for (ScoreVoice voice : bar) {
@@ -223,8 +228,9 @@ public class ScorePresenter {
 		}
 	}
 	
-	private void drawBar(int systemIndex, int staffIndex, int barIndex, ScoreBar bar, int xBarPosition, int xWidth, boolean firstBarInStaff, boolean firstBarInTotal, int ySystemTop, int ySystemBottom, CwnTrack track) {
+	private void drawBar(int systemIndex, int staffIndex, int barIndex, ScoreBar bar, int xBarPosition, int xWidth, boolean firstBarInStaff, boolean firstBarInTotal, boolean lastInStaff, int ySystemTop, int ySystemBottom, CwnTrack track) {
 		int yTop = layout.getBorder() + layout.getTitleHeight() + layout.getSystemSpace() + (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight();
+
 		if (staffIndex == 0 && firstBarInStaff) {
 			canvas.drawString("" + (barIndex + 1), "barNumber", xBarPosition, yTop - 4, "left");
 			if (systemIndex == 1) {
@@ -253,8 +259,8 @@ public class ScorePresenter {
 			}
 			TimeSignature timeSignature = bar.getTimeSignature();
 			boolean alternative = selection.contains(bar.getTimeSignatureEvent());
-			canvas.drawString(timeSignature.getNumerator(), alternative ? "selection" : "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13, "left");
-			canvas.drawString(timeSignature.getDenominator(), alternative ? "selection" : "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13 + layout.getLineHeight() * 2, "left");
+			canvas.drawString(timeSignature.getNumerator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13, "left", alternative);
+			canvas.drawString(timeSignature.getDenominator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13 + layout.getLineHeight() * 2, "left", alternative);
 			offset += Score.TIMESIGNATURE_WIDTH;
 		}
 		//
@@ -326,17 +332,17 @@ public class ScorePresenter {
 		// handle barline
 		//
 		CwnBarEvent barline = bar.getBarEvent();
-		if (barline == null || barline.getTypeString().equals(CwnBarEvent.STANDARD)) {
-			// int x = xBarPosition + 6 + offset;
-			int x = xBarPosition + offset + xWidth + 2;
-			if (xBarPosition + offset + xWidth < xRight - 12) { // 34
+		//if (barline == null || barline.getTypeString().equals(CwnBarEvent.STANDARD))
+		if (!firstBarInStaff) {
+			int x = xBarPosition;
+			//if (xBarPosition + offset + xWidth < xRight - 12) { // 34
 				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight());
-			}
-		} else {
+		}
+		if (barline!=null && !barline.getTypeString().equals(CwnBarEvent.STANDARD)) {
 			boolean alternative = selection.contains(barline);
 			String type = barline.getTypeString();
-			// int x = xBarPosition + 6 + offset;
-			int x = xBarPosition + offset + xWidth + 2;
+			int x = xBarPosition;
+			// int x = xBarPosition + offset + xWidth + 2;
 			
 			if (type.equals(CwnBarEvent.DOUBLE)) {
 				canvas.drawLine(x + 0, yTop, x + 0, yTop + 4 * layout.getLineHeight(), alternative);
@@ -379,7 +385,7 @@ public class ScorePresenter {
 				int x = xBarPosition + (xStart == 0 ? 0 : offset + xStart);
 				int y = yTop - layout.getSystemSpace();
 				boolean alternative = selection.contains(event);
-				canvas.drawString(event.getLabel(), "lyrics", x, y, "left"); // TODO: alternative color
+				canvas.drawString(event.getLabel(), "lyrics", x, y, "left", alternative);
 			}
 		}
 
@@ -564,28 +570,34 @@ public class ScorePresenter {
 		Map<Long, List<String>> intervalMap = scoreBuilder.getScoreParameter().markupMap;
 		if (!intervalMap.isEmpty() && staffIndex==0) {
 			for (long pos = bar.getStartPosition(); pos < bar.getEndPosition(); pos = pos + scoreBuilder.getScoreParameter().resolutionInTicks) {
-				List<String> markList = intervalMap.get(pos);
-				if (markList != null) {
-					int relPosition = (int) ((pos - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration()) + 2;
-					int len = markList.size();
-					for (int i=0; i<len; i++) {
-						String markup = markList.get(i);
-						boolean markupBold = markup.indexOf("!")>0;
-						if (markupBold) { markup = markup.replace("!",""); }
-						String markupPattern = "^([^[_^]]+)(\\_([^^]+))?(\\^([^!]+))?$";
-						String markupBase = markup.replaceAll(markupPattern, "$1");
-						String markupSub = markup.replaceAll(markupPattern, "$3");
-						String markupSuper = markup.replaceAll(markupPattern, "$5");
-						int markupBaseOffset = markupBase.length()-1;
-						int markX = xBarPosition + offset + relPosition;
-						// int markY = ySystemBottom + (int) (0.4 * layout.getStaffHeight() - i*12) + 6;
-						int markY = ySystemBottom + (int) (0.4 * layout.getStaffHeight() - i*8);
-						canvas.drawString(markupBase, markupBold ? "markupBold" : "markup", markX, markY,"left");
-						if (!markupSub.equals("")) {
-							canvas.drawString(markupSub,"nole", markX+(4*markupBaseOffset)+7, markY+3, "left");
-						}
-						if (!markupSuper.equals("")) {
-							canvas.drawString(markupSuper,"nole", markX+(4*markupBaseOffset)+9, markY-3, "left");
+				boolean isOnBeat = pos%scoreBuilder.getScoreParameter().ppq==0;
+				if (isOnBeat) {
+					List<String> markList = intervalMap.get(pos);
+					if (markList != null) {
+
+						int relPosition = (int) ((pos - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration()) + 2;
+						int len = markList.size();
+						for (int i = 0; i < len; i++) {
+							String markup = markList.get(i);
+							boolean markupBold = markup.indexOf("!") > 0;
+							if (markupBold) {
+								markup = markup.replace("!", "");
+							}
+							String markupPattern = "^([^[_^]]+)(\\_([^^]+))?(\\^([^!]+))?$";
+							String markupBase = markup.replaceAll(markupPattern, "$1");
+							String markupSub = markup.replaceAll(markupPattern, "$3");
+							String markupSuper = markup.replaceAll(markupPattern, "$5");
+							int markupBaseOffset = markupBase.length() - 1;
+							int markX = xBarPosition + offset + relPosition;
+							// int markY = ySystemBottom + (int) (0.4 * layout.getStaffHeight() - i*12) + 6;
+							int markY = ySystemBottom + (int) (0.4 * layout.getStaffHeight() - i * 8);
+							canvas.drawString(markupBase, markupBold ? "markupBold" : "markup", markX, markY, "left");
+							if (!markupSub.equals("")) {
+								canvas.drawString(markupSub, "nole", markX + (4 * markupBaseOffset) + 7, markY + 3, "left");
+							}
+							if (!markupSuper.equals("")) {
+								canvas.drawString(markupSuper, "nole", markX + (4 * markupBaseOffset) + 9, markY - 3, "left");
+							}
 						}
 					}
 				}
@@ -885,15 +897,12 @@ public class ScorePresenter {
 		boolean hasEndTie = false;
 		int accentPosition = (chord.getStemDirection() > 0 ? Integer.MAX_VALUE : 0);
 		List<CwnAccent> accentList = new ArrayList<>();
-
+		boolean alternative = false;
 		if (chord.size() > 1) {
 			int yNoteBottom = yBase + chord.getMinimumNote().getY() * 3 - 42;
 			int yNoteTop = yBase + chord.getMaximumNote().getY() * 3 - 42;
-			// int previousYNote = 0;
-			// boolean horizontalShift = false;
-			
 			for (ScoreNote note : chord.getObjectSet()) {
-				boolean alternative = selection.contains(note.getCwnNoteEvent());
+				alternative = selection.contains(note.getCwnNoteEvent());
 				hasEndTie = note.hasEndTie();
 				lyrics += note.getLyrics();
 				velocity = note.getCwnNoteEvent().getVelocity();
@@ -921,7 +930,7 @@ public class ScorePresenter {
 			}
 		} else {
 			ScoreNote note = chord.getObjectSet().first();
-			boolean alternative = selection.contains(note.getCwnNoteEvent());
+			alternative = selection.contains(note.getCwnNoteEvent());
 			hasEndTie = note.hasEndTie();
 			lyrics += note.getLyrics();
 			velocity = note.getCwnNoteEvent().getVelocity();
@@ -947,7 +956,7 @@ public class ScorePresenter {
 		int vCenter = (int) ((layout.getLineHeight() * 4) + (layout.getSystemSpace()));
 		if (!hasEndTie) {
 			if (scoreBuilder.getScoreParameter().markup.contains(Markup.Type.LYRICS) && !"".equals(lyrics)) {
-				canvas.drawString(lyrics, "lyrics", xPosition, yBase + vCenter + 4, "center");
+				canvas.drawString(lyrics, "lyrics", xPosition, yBase + vCenter + 4, "center", alternative);
 			}
 			if (layout.showVelocity()) {
 				canvas.drawLine(xPosition + 3, yBase + vCenter + 4, xPosition + 3, yBase + vCenter + 4 - (int) (velocity * (15.0 / 127.0)));

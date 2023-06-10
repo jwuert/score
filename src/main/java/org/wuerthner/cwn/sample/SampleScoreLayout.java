@@ -43,7 +43,12 @@ public class SampleScoreLayout implements ScoreLayout {
 	public boolean showVelocity() {
 		return true;
 	}
-	
+
+	@Override
+	public void setShowVelocity(boolean showVelocity) {
+
+	}
+
 	@Override
 	public int getWidth() {
 		return 8000;

@@ -403,7 +403,7 @@ public class ScoreBuilderTest {
 		}
 		public void drawLine(int x1, int y1, int x2, int y2) {
 		}
-		public void drawString(String string, String fontName, int x, int y, String align) {
+		public void drawString(String string, String fontName, int x, int y, String align, boolean alternative) {
 		}
 		public void drawImage(String string, int x, int y, boolean alternative) {
 			String n = (string.equals("head4") ? "D4" : string.equals("head2") ? "D2" : string.equals("rest4") ? "r4" : "");

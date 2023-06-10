@@ -285,6 +285,12 @@ public class ScorePrinter {
 					barEvent.getTypeString().equals(CwnBarEvent.END) ? "|." :
 					"|");
 			// @formatter:on
+			_lilypond_code.append("        \\bar \"" + barLine + "\"" + EOL);
+
+//			if (bar.getEndPosition() > endPosition+1) {
+//				break;
+//			}
+
 			//
 			// SYMBOLS
 			//
@@ -331,7 +337,7 @@ public class ScorePrinter {
 				}
 			}
 			_lilypond_code.append(EOL);
-			_lilypond_code.append("        \\bar \"" + barLine + "\"" + EOL);
+			// _lilypond_code.append("        \\bar \"" + barLine + "\"" + EOL);
 			// _lilypond_code.append(" \\set Score.repeatCommands = #'((volta #f)) ");
 			closeVolta(bar.getEndPosition());
 		}

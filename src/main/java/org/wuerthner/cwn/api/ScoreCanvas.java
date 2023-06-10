@@ -5,7 +5,11 @@ public interface ScoreCanvas {
 	
 	public void drawLine(int x1, int y1, int x2, int y2);
 	
-	public void drawString(String string, String fontName, int x, int y, String align);
+	public void drawString(String string, String fontName, int x, int y, String align, boolean alternative);
+
+	default void drawString(String string, String fontName, int x, int y, String align) {
+		drawString(string, fontName, x, y, align, false);
+	}
 
 	public void drawImage(String string, int x, int y, boolean alternative);
 

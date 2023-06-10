@@ -11,8 +11,6 @@ public class Riemann {
    // "The harmonic weight measures the correlation between the chord and its base harmony. Use values between 0 (no correlation) and 10.";
 
     private static int _harmonic_weight      = 8; // might try 5
-    private static int _step_size            = 960; // TODO: make configurable!
-    private static int _harmony_size         = 2;
 
     private static Harmony _harmony;
     private static Harmony _prev_harmony;

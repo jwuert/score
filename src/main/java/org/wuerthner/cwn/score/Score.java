@@ -239,10 +239,12 @@ public class Score {
 	}
 
 	public static final int getPitch(String name) {
+		if (name.indexOf('-')>0) return 0;
+		//System.out.println("=> " + name);
 		String s = name.replaceAll("\\s", "").replaceFirst("(\\d)", " $1");
 		String[] pair = s.split(" ");
-//		System.out.println(":" + pair[0].trim() + ":");
-//		System.out.println(":" + pair[1].trim() + ":");
+		//System.out.println(":" + pair[0].trim() + ":");
+		//System.out.println(":" + pair[1].trim() + ":");
 		return tonenameMap.get(pair[0].trim().toLowerCase()) + 12*(2+Integer.valueOf(pair[1].trim()));
 	}
 

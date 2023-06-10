@@ -31,4 +31,6 @@ public interface ScoreLayout {
 	public int lyricsSpace();
 	
 	public boolean showVelocity();
+
+	public void setShowVelocity(boolean showVelocity);
 }

@@ -142,6 +142,11 @@ public class SampleTrack implements CwnTrack {
 	}
 
 	@Override
+	public <T extends CwnEvent> Optional<T> findFirstEvent(Class<T> clasz) {
+		return Optional.empty();
+	}
+
+	@Override
 	public boolean isInfoTrack() {
 		return false;
 	}

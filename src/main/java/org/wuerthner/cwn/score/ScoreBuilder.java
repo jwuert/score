@@ -41,6 +41,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 	}
 
 	public void update(ScoreUpdate update) {
+		scoreLayout.setShowVelocity(scoreParameter.markup.contains(Markup.Type.VELOCITY));
 		// System.out.println("SB Update: " + update + ", " + scoreParameter.getSupportedDurationTypes());
 		List<CwnTrack> trackList = container.getTrackList();
 		// if (!update.redraw()) System.out.println("ScoreBuilder.update: " + update + " - # of tracks: " + trackList.size());
@@ -74,7 +75,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 		List<Long> positions = trackList.stream()
 				.flatMap(track -> track.getList(CwnNoteEvent.class).stream())
 				.map(note -> note.getPosition())
-				.filter(position -> position%scoreParameter.ppq==0)
+				// .filter(position -> position%scoreParameter.ppq==0) // this may be used to apply plugins only to beats, not to all positions!
 				.sorted()
 				.distinct()
 				.collect(Collectors.toList());
@@ -135,7 +136,7 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			if (event instanceof CwnNoteEvent && ((CwnNoteEvent)event).getVoice() == voice) {
 				long eventPosition = event.getPosition();
 				int eventPitch = ((CwnNoteEvent) event).getPitch();
-				while (position < eventPosition) {
+				while (position < eventPosition && positionIterator.hasNext()) {
 					// System.out.println(": " + position + " (" + eventPosition + ") - " + previousEventPitch);
 					pitchArray[pointer++] = previousEventPitch;
 					position = positionIterator.next();

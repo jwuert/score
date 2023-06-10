@@ -58,5 +58,7 @@ public interface CwnTrack {
 
 	public <T extends CwnEvent> Optional<T> findEventAtPosition(long position, Class<T> eventClass);
 
+	public <T extends CwnEvent> Optional<T> findFirstEvent(Class<T> clasz);
+
 	public boolean isInfoTrack();
 }
