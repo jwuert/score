@@ -29,7 +29,7 @@ public class Trias {
 				throw new InvalidPositionException("Invalid beat: " + beat);
 			}
 		} else if (position.matches(BAR_PATTERN)) {
-			int number = Integer.valueOf(position.trim()) - 1;
+			int number = Integer.parseInt(position.trim()) - 1;
 			bar = (number < 0 ? 0 : number);
 			beat = 0;
 			tick = 0;

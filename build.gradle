@@ -45,6 +45,7 @@ apply plugin: 'com.github.spotbugs'
 
 spotbugs {
 	ignoreFailures = true
+	excludeFilter = file("spotbugsExclude.xml")
 }
 
 apply plugin: 'maven-publish'
