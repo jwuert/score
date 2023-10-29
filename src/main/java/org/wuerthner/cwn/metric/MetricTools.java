@@ -49,7 +49,7 @@ public class MetricTools {
 	}
 	
 	public static final Metric cloneMetrics(Metric metric, int beat, DurationType durationType) {
-		Metric newMetric = metric.clone();
+		Metric newMetric = metric.cloneMetric();
 		List<Metric> metricList = newMetric.getFlatMetricList();
 		metricList.get(beat).setDurationType(durationType);
 		return newMetric;

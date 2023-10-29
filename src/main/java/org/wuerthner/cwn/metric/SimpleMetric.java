@@ -105,7 +105,7 @@ public class SimpleMetric implements Metric {
 	}
 	
 	@Override
-	public Metric clone() {
+	public Metric cloneMetric() {
 		return new SimpleMetric(divisor, durationType);
 	}
 }

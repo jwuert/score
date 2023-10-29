@@ -19,9 +19,10 @@ public class Trias {
 		if (position.matches(PATTERN)) {
 			int p1 = position.indexOf('.');
 			int p2 = position.indexOf('.', p1 + 1);
-			bar = Integer.valueOf(position.substring(0, p1).trim()) - 1;
-			beat = Integer.valueOf(position.substring(p1 + 1, p2).trim()) - 1;
-			tick = Integer.valueOf(position.substring(p2 + 1).trim());
+			// bar = Integer.valueOf(position.substring(0, p1).trim()) - 1;
+			bar = Integer.parseInt(position.substring(0, p1).trim()) - 1;
+			beat = Integer.parseInt(position.substring(p1 + 1, p2).trim()) - 1;
+			tick = Integer.parseInt(position.substring(p2 + 1).trim());
 			if (bar < 0) {
 				throw new InvalidPositionException("Invalid bar: " + bar);
 			} else if (beat < 0) {

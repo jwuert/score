@@ -30,7 +30,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 		this.scoreBar = scoreBar;
 		this.voiceIndex = voiceIndex;
 		this.stemDirection = (!scoreBar.isMultiVoiceBar() ? 0 : (voiceIndex & 1) == 0 ? -1 : +1);
-		this.metric = scoreBar.getTimeSignature().getMetric().clone();
+		this.metric = scoreBar.getTimeSignature().getMetric().cloneMetric();
 		this.scoreParameter = scoreParameter;
 		initMetric();
 	}

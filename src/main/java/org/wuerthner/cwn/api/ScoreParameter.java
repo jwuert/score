@@ -5,8 +5,8 @@ import java.util.*;
 import org.wuerthner.cwn.score.Score;
 
 public class ScoreParameter {
-	public final long startPosition = 0;
-	public final long endPosition;
+	public long startPosition = 0;
+	public long endPosition;
 	public int resolutionInTicks;
 	public int ppq;
 	public final int flags;
@@ -28,7 +28,7 @@ public class ScoreParameter {
 	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList,
 						  List<Markup.Type> markup, int barOffset) {
 		// this.startPosition = startPosition;
-		this.endPosition = ppq * 1500 * 4; // 500 4/4 bars
+		this.endPosition = ppq * 1500L * 4; // 500 4/4 bars
 		this.ppq = ppq;
 		this.resolutionInTicks = resolutionInTicks;
 		this.metricLevel = metricLevel;

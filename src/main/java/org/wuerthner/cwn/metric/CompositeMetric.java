@@ -160,8 +160,8 @@ public class CompositeMetric implements Metric {
 	}
 	
 	@Override
-	public Metric clone() {
-		Metric metric = new CompositeMetric(components.stream().map(m -> m.clone()).collect(Collectors.toList()));
+	public Metric cloneMetric() {
+		Metric metric = new CompositeMetric(components.stream().map(m -> m.cloneMetric()).collect(Collectors.toList()));
 		return metric;
 	}
 }

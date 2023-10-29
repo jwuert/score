@@ -15,7 +15,6 @@ public interface CwnPointer {
     default int getY(int clef) {
         int pitch = getPitch();
         int ypos = 0;
-        int step = pitch % 12;
         ypos = Score.invPitch[pitch];
         ypos += Score.yClef[clef];
         if (ypos < 1) {

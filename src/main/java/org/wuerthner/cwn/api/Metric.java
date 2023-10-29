@@ -34,7 +34,7 @@ public interface Metric extends Iterable<Metric> {
 	 */
 	int depth();
 	
-	Metric clone();
+	Metric cloneMetric();
 	
 	void setDurationType(DurationType durationType);
 	
