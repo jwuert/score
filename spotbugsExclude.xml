@@ -24,6 +24,12 @@
     </Or>
   </Match>
   <Match>
-    <Class name="org.wuerthner.cwn.midi" />
+    <Class name="org.wuerthner.cwn.midi.*" />
+  </Match>
+  <Match>
+    <Class name="org.wuerthner.cwn.midi.event.*" />
+  </Match>
+  <Match>
+    <Class name="org.wuerthner.cwn.midi.util.*" />
   </Match>
 </FindBugsFilter>
