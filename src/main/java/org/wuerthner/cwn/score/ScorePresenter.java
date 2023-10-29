@@ -568,13 +568,13 @@ public class ScorePresenter {
 		// Intervals, Crossings, Parallels, Riemann, etc...
 		//
 		Map<Long, List<String>> intervalMap = scoreBuilder.getScoreParameter().markupMap;
+		boolean requiresOnBeat = scoreBuilder.getScoreParameter().markup.contains(Markup.Type.HARMONY) || scoreBuilder.getScoreParameter().markup.contains(Markup.Type.RIEMANN);
 		if (!intervalMap.isEmpty() && staffIndex==0) {
 			for (long pos = bar.getStartPosition(); pos < bar.getEndPosition(); pos = pos + scoreBuilder.getScoreParameter().resolutionInTicks) {
 				boolean isOnBeat = pos%scoreBuilder.getScoreParameter().ppq==0;
-				if (isOnBeat) {
+				if (!requiresOnBeat || isOnBeat) {
 					List<String> markList = intervalMap.get(pos);
 					if (markList != null) {
-
 						int relPosition = (int) ((pos - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration()) + 2;
 						int len = markList.size();
 						for (int i = 0; i < len; i++) {

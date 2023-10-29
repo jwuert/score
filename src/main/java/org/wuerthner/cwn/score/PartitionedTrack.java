@@ -77,12 +77,16 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 
 	private ScoreBar rewindIfOverlap(ScoreBar scoreBar) {
 		ScoreBar bar = scoreBar;
-		while (bar.startsWithOverlap()) {
+		int count = 0;
+		while (bar.startsWithOverlap() && count++<20) {
 			int i = barList.indexOf(bar);
 			if (i < 0) throw new RuntimeException("PartinionedTrack: bar not found in barList!");
 			if (i > 0) {
 				bar = barList.get(i - 1);
 			}
+		}
+		if (count==20) {
+			System.out.println("rewind bar problem: " + bar.getStartPosition());
 		}
 		return bar;
 	}
