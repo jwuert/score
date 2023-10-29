@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
-<Match>
-  <Class name="org.wuerthner.cwn.api.CwnAccent" />
-  <Bug pattern="MS_OOI_PKGPROTECT" />
-</Match>
+  <Match>
+    <Class name="org.wuerthner.cwn.api.CwnAccent" />
+    <Bug pattern="MS_OOI_PKGPROTECT" />
+  </Match>
+  <Match>
+    <Class name="org.wuerthner.cwn.api.CwnSymbolEvent" />
+    <Bug pattern="MS_OOI_PKGPROTECT" />
+  </Match>
+  <Match>
+    <Class name="org.wuerthner.cwn.api.CwnTrack" />
+    <Bug pattern="MS_MUTABLE_ARRAY" />
+  </Match>
+
 </FindBugsFilter>
