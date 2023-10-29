@@ -88,7 +88,7 @@
 <fo:table-row>
 <fo:table-cell border="solid 0.1mm black" padding="3pt">
 <fo:block font-size="9pt">
-<fo:inline color="#cc0000">RQ-001</fo:inline>
+<fo:inline color="#cc0000">RQ-002</fo:inline>
 <fo:inline>:  The metric element defines the metric structure of a bar.</fo:inline>
 </fo:block>
 </fo:table-cell>
