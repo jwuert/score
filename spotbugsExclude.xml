@@ -12,5 +12,18 @@
     <Class name="org.wuerthner.cwn.api.CwnTrack" />
     <Bug pattern="MS_MUTABLE_ARRAY" />
   </Match>
-
+  <Match>
+    <Class name="org.wuerthner.cwn.api.ScoreParameter" />
+    <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+  </Match>
+  <Match>
+    <Class name="org.wuerthner.cwn.metric.Ratio" />
+    <Or>
+      <Bug pattern="EI_EXPOSE_REP2" />
+      <Bug pattern="EI_EXPOSE_REP" />
+    </Or>
+  </Match>
+  <Match>
+    <Class name="org.wuerthner.cwn.midi" />
+  </Match>
 </FindBugsFilter>
