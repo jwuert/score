@@ -135,6 +135,21 @@ public class SampleNoteEvent implements CwnNoteEvent, Comparable<CwnEvent> {
 		}
 		return 1;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof SampleNoteEvent) {
+			SampleNoteEvent that = (SampleNoteEvent) o;
+			return (this.getPosition()==that.getPosition() && this.getPitch()==that.getPitch());
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Long.hashCode(this.getPosition())+Integer.hashCode(this.getPitch());
+	}
 	
 	@Override
 	public void addMark(String mark) {

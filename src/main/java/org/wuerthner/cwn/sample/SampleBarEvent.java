@@ -41,4 +41,19 @@ public class SampleBarEvent implements CwnBarEvent, Comparable<CwnEvent> {
 		}
 		return 1;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof SampleBarEvent) {
+			SampleBarEvent that = (SampleBarEvent) o;
+			return (this.getPosition()==that.getPosition());
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Long.hashCode(this.getPosition());
+	}
 }
