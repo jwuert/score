@@ -49,7 +49,7 @@ public class SampleKeyEvent implements CwnKeyEvent, Comparable<CwnEvent> {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof SampleBarEvent) {
+		if (o instanceof SampleKeyEvent) {
 			SampleKeyEvent that = (SampleKeyEvent) o;
 			return (this.getPosition()==that.getPosition());
 		} else {

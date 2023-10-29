@@ -43,7 +43,7 @@ public class SampleClefEvent implements CwnClefEvent, Comparable<CwnEvent> {
 	}
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof SampleBarEvent) {
+		if (o instanceof SampleClefEvent) {
 			SampleClefEvent that = (SampleClefEvent) o;
 			return (this.getPosition()==that.getPosition());
 		} else {

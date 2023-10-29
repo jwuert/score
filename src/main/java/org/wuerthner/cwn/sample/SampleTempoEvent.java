@@ -48,4 +48,18 @@ public class SampleTempoEvent implements CwnTempoEvent, Comparable<CwnEvent> {
 		}
 		return 1;
 	}
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof SampleTempoEvent) {
+			SampleTempoEvent that = (SampleTempoEvent) o;
+			return (this.getPosition()==that.getPosition());
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Long.hashCode(this.getPosition());
+	}
 }
