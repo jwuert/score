@@ -98,7 +98,7 @@ public class Chord {
 
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        for (i=0; i<count; i++) {
+        for (int i=0; i<count; i++) {
             buf.append(RiemannTools.sKey[key[i]] + " (" + mult[i] + ")");
             if (i<count-1) buf.append(", ");
         }

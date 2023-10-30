@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,7 +72,7 @@ public class PrintTest {
 		String fileBase = Long.toString(System.nanoTime());
 		try {
 			File lilypondFile = createOutputFile(fileBase, "ly");
-			Files.write(lilypondFile.toPath(), lyString.getBytes());
+			Files.write(lilypondFile.toPath(), lyString.getBytes(StandardCharsets.UTF_8));
 			String pdfFilePrefix = new File(lilypondFile.getAbsolutePath().substring(0, lilypondFile.getAbsolutePath().length() - 3)).toString();
 			String result = executeCommand("lilypond -o " + pdfFilePrefix + " " + lilypondFile.getAbsolutePath());
 			System.out.println("result: " + result);
