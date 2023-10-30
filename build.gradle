@@ -10,6 +10,7 @@ buildscript {
 	}
 }
 plugins {
+	id 'jacoco-report-aggregation'
 	id 'com.github.spotbugs' version '4.8.0' apply false
 }
 
@@ -49,6 +50,13 @@ spotbugs {
 	reportLevel = "high"
 }
 
+apply plugin: 'jacoco-report-aggregation'
+tasks.named('check') {
+	dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
+}
+
+
+
 apply plugin: 'maven-publish'
 
 //afterEvaluate { project ->
@@ -78,6 +86,7 @@ apply plugin: 'maven-publish'
 		}
 	}
 //}
+
 dependencies {
 	testImplementation 'org.wuerthner.specs:specs:2.2.0'
 	testImplementation group: 'junit', name: 'junit', version: '4.+'
