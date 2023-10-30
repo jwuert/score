@@ -35,4 +35,9 @@
   <Match>
     <Package name="org.wuerthner.cwn.midi.util" />
   </Match>
+  <Match>
+    <Class name="org.wuerthner.cwn.score.Score" />
+    <Bug pattern="MS_MUTABLE_ARRAY" />
+  </Match>
+
 </FindBugsFilter>

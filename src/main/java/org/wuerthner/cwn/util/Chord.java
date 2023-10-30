@@ -25,8 +25,9 @@ public class Chord {
     public Chord(List<CwnNoteEvent> es) {
         count = 0;
         bass  = 256;
-        __key  = new int[es.size()];
-        __mult = new int[es.size()];
+        //__key  = new int[es.size()];
+        //__mult = new int[es.size()];
+        init(es.size());
         for (Iterator it = es.iterator(); it.hasNext();) {
             ne = (CwnNoteEvent)it.next();
             pi = ne.getPitch();
@@ -58,8 +59,9 @@ public class Chord {
     public Chord(int[] pitchArray) {
         count = 0;
         bass  = 256;
-        __key  = new int[pitchArray.length];
-        __mult = new int[pitchArray.length];
+        // __key  = new int[pitchArray.length];
+        // __mult = new int[pitchArray.length];
+        init(pitchArray.length);
         for (int pi : pitchArray) {
             if (pi < bass) bass = pi;
             p = RiemannTools.keyOfStep(pi%12, 0);
@@ -84,6 +86,10 @@ public class Chord {
             key[i]  = __key[i];
             mult[i] = __mult[i];
         }
+    }
+    private void init(int size) {
+        __key  = new int[size];
+        __mult = new int[size];
     }
 
     public String toString() {

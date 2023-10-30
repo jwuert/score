@@ -245,7 +245,7 @@ public class Score {
 		String[] pair = s.split(" ");
 		//System.out.println(":" + pair[0].trim() + ":");
 		//System.out.println(":" + pair[1].trim() + ":");
-		return tonenameMap.get(pair[0].trim().toLowerCase()) + 12*(2+Integer.valueOf(pair[1].trim()));
+		return tonenameMap.get(pair[0].trim().toLowerCase()) + 12*(2+Integer.parseInt(pair[1].trim()));
 	}
 
 	public static final int getEnharmonicShift(String name) {
