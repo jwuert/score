@@ -115,7 +115,7 @@ public class ScoreTestSuite {
 			String pair[] = s.replaceAll(KEY, "").trim().split("\\s", 2);
 			Trias trias = PositionTools.makeTrias(cwnTrack, pair[0]);
 			long position = trias.bar == 0 ? 0 : PositionTools.getPosition(cwnTrack, trias);
-			int key = Integer.valueOf(pair[1].trim());
+			int key = Integer.parseInt(pair[1].trim());
 			cwnTrack.addEvent(cwnFactory.createKeyEvent(position, key));
 		});
 		try {
@@ -131,7 +131,7 @@ public class ScoreTestSuite {
 			String pair[] = s.replaceAll(CLEF, "").trim().split("\\s", 2);
 			Trias trias = PositionTools.makeTrias(cwnTrack, pair[0]);
 			long position = trias.bar == 0 ? 0 : PositionTools.getPosition(cwnTrack, trias);
-			int clef = Integer.valueOf(pair[1].trim());
+			int clef = Integer.parseInt(pair[1].trim());
 			cwnTrack.addEvent(cwnFactory.createClefEvent(position, clef));
 		});
 		try {
@@ -147,7 +147,7 @@ public class ScoreTestSuite {
 			Trias trias = PositionTools.makeTrias(cwnTrack, pair[0]);
 			int voice = 0;
 			if (pair.length > 2) {
-				voice = Integer.valueOf(pair[2].trim()) - 1;
+				voice = Integer.parseInt(pair[2].trim()) - 1;
 			}
 			long position = PositionTools.getPosition(cwnTrack, trias);
 			long duration = PositionTools.transformDuration(cwnTrack, pair[1]);
@@ -179,7 +179,7 @@ public class ScoreTestSuite {
 				long duration = PositionTools.transformDuration(cwnTrack, pair[1]);
 				int voice = 0;
 				if (pair.length > 2) {
-					voice = Integer.valueOf(pair[2].trim()) - 1;
+					voice = Integer.parseInt(pair[2].trim()) - 1;
 				}
 				TestScoreObject scoreObject = new TestScoreObject(scoreBar, position, duration, voice);
 				scoreBar.addTestNote(scoreObject);

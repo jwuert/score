@@ -68,20 +68,17 @@ public class PrintTest {
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
 				new ArrayList<>(), 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
 		String lyString = scorePrinter.print(title, subtitle, composer, false, scoreParameter, trackList, scoreParameter.endPosition);
-		System.out.println(lyString);
 		String fileBase = Long.toString(System.nanoTime());
 		try {
 			File lilypondFile = createOutputFile(fileBase, "ly");
 			Files.write(lilypondFile.toPath(), lyString.getBytes(StandardCharsets.UTF_8));
 			String pdfFilePrefix = new File(lilypondFile.getAbsolutePath().substring(0, lilypondFile.getAbsolutePath().length() - 3)).toString();
 			String result = executeCommand("lilypond -o " + pdfFilePrefix + " " + lilypondFile.getAbsolutePath());
-			System.out.println("result: " + result);
 			File pdfFile = new File(pdfFilePrefix + ".pdf");
 			if (isLinux()) {
 				Runtime.getRuntime().exec("evince " + pdfFile.getCanonicalPath(), null, pdfFile.getParentFile());
 			} else if (isWindows()) {
 				Runtime.getRuntime().exec("C:\\Program Files (x86)\\Adobe\\Acrobat Reader DC\\Reader\\AcroRd32.exe " + pdfFile.getCanonicalPath(), null, pdfFile.getParentFile());
-				
 				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + pdfFile.getCanonicalPath(), null, pdfFile.getParentFile());
 			}
 		} catch (IOException e) {
@@ -101,7 +98,7 @@ public class PrintTest {
 		try {
 			p = Runtime.getRuntime().exec(command);
 			p.waitFor();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
 			String line = "";
 			while ((line = reader.readLine()) != null) {
 				output.append(line + "\n");

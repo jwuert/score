@@ -1,5 +1,6 @@
 package org.wuerthner.cwn.track;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -398,6 +399,6 @@ public class TrackTest {
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
 				new ArrayList<>(), 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
-
+		assertEquals(10, scoreBuilder.getNumberOfShownBars());
 	}
 }
