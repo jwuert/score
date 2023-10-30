@@ -45,7 +45,7 @@ apply plugin: 'com.github.spotbugs'
 
 spotbugs {
 	ignoreFailures = true
-	// excludeFilter = file("spotbugsExclude.xml")
+	excludeFilter = file("spotbugsExclude.xml")
 	reportLevel = "high"
 }
 
