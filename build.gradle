@@ -1,40 +1,22 @@
-buildscript {
-	repositories {
-		mavenLocal()
-		maven {
-			url 'https://plugins.gradle.org/m2/'
-		}
-	}
-	dependencies {
-		classpath 'gradle.plugin.edu.sc.seis.gradle:launch4j:1.6.1'
-	}
-}
 plugins {
+	id 'java'
 	id 'jacoco-report-aggregation'
-	id 'com.github.spotbugs' version '4.8.0' apply false
+	id 'com.github.spotbugs' version '4.8.0' apply true
+	id 'maven-publish'
 }
 
 group 'org.wuerthner.score'
-version '1.1.0-SNAPSHOT'
-
-
-
-apply plugin: 'java'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
+version '1.2.0'
 
 repositories {
 	mavenLocal()
 	maven {
-		url 'http://diskstation2:8081/repository/maven-releases/';
-		setAllowInsecureProtocol(true);
-		allowInsecureProtocol = true;
+		url 'http://diskstation2:8081/repository/maven-releases/'
+		allowInsecureProtocol = true
 	}
 	maven {
-		url 'http://diskstation2:8081/repository/maven-snapshots/';
-		setAllowInsecureProtocol(true);
-		allowInsecureProtocol = true;
+		url 'http://diskstation2:8081/repository/maven-snapshots/'
+		allowInsecureProtocol = true
 	}
 	mavenCentral()
 	maven {
@@ -42,50 +24,40 @@ repositories {
 	}
 }
 
-apply plugin: 'com.github.spotbugs'
-
 spotbugs {
 	ignoreFailures = true
 	excludeFilter = file("spotbugsExclude.xml")
 	reportLevel = "high"
 }
 
-apply plugin: 'jacoco-report-aggregation'
 tasks.named('check') {
 	dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
 }
 
+publishing {
+	repositories {
+		maven {
+			name = 'nexus'
+			def urlLocalSnapshot = 'http://localhost:8082/repository/maven-snapshots/'
+			def urlLocalReleases = 'http://localhost:8082/repository/maven-releases/'
+			def urlDSReleases = 'http://diskstation2:8081/repository/maven-releases/'
+			def urlDSSnapshots = 'http://diskstation2:8081/repository/maven-snapshots/'
+			url = version.endsWith('SNAPSHOT') ? urlDSSnapshots : urlDSReleases;
 
-
-apply plugin: 'maven-publish'
-
-//afterEvaluate { project ->
-	publishing {
-		repositories {
-			maven {
-				name = 'nexus'
-				def urlLocalSnapshot = 'http://localhost:8082/repository/maven-snapshots/';
-				def urlLocalReleases = 'http://localhost:8082/repository/maven-releases/';
-				def urlDSReleases = 'http://diskstation2:8081/repository/maven-releases/';
-				def urlDSSnapshots = 'http://diskstation2:8081/repository/maven-snapshots/';
-				url = version.endsWith('SNAPSHOT') ? urlDSSnapshots : urlDSReleases;
-
-				setAllowInsecureProtocol(true);
-				allowInsecureProtocol = true;
-				credentials {
-					username = project.repoUser
-					password = project.repoPassword
-				}
-			}
-		}
-		publications {
-			maven(MavenPublication) {
-				artifactId = rootProject.name
-				from components.java
+			allowInsecureProtocol = true;
+			credentials {
+				username = project.repoUser
+				password = project.repoPassword
 			}
 		}
 	}
-//}
+	publications {
+		maven(MavenPublication) {
+			artifactId = rootProject.name
+			from components.java
+		}
+	}
+}
 
 dependencies {
 	testImplementation 'org.wuerthner.specs:specs:2.2.0'
