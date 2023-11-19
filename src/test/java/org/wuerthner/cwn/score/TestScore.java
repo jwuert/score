@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import org.wuerthner.cwn.api.*;
+import org.wuerthner.cwn.sample.SampleFactory;
+import org.wuerthner.cwn.sample.SampleScoreLayout;
+import org.wuerthner.cwn.timesignature.SimpleTimeSignature;
 
 public class TestScore {
 	public final static String TEST = "";
@@ -40,4 +43,66 @@ public class TestScore {
 			fail(e.toString());
 		}
 	}
+
+	@Test
+	public void testOverlap() {
+		CwnFactory factory = new SampleFactory();
+		ScoreParameter scoreParameter = new ScoreParameter(960, 480, 1,4, 0,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				new ArrayList<>(), 0);
+		CwnTrack track = factory.createTrack(960);
+		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
+		track.addEvent(factory.createKeyEvent(0, 0));
+		track.addEvent(factory.createClefEvent(0, 0));
+		track.addEvent(factory.createNoteEvent(1920, 2400, 78, 0, 0, 0));
+
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(Arrays.asList(track), 0), scoreParameter, new SampleScoreLayout(), 1);
+		Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
+		ScoreVoice voiceBar1 = barIterator.next().iterator().next();
+
+		ScoreObject scoreObject;
+		Iterator<ScoreObject> scoreObjectIterator1 = voiceBar1.iterator();
+		// bar 1
+		scoreObject = scoreObjectIterator1.next();
+		assertTrue(scoreObject.isRest() && scoreObject.getDuration()==1920);
+		scoreObject = scoreObjectIterator1.next();
+		assertTrue(scoreObject.isChord() && scoreObject.getDuration()==1920);
+		assertTrue(scoreObject.getDurationType() == DurationType.REGULAR);
+		// bar 2
+		ScoreVoice voiceBar2 = barIterator.next().iterator().next();
+		Iterator<ScoreObject> scoreObjectIterator2 = voiceBar2.iterator();
+		scoreObject = scoreObjectIterator2.next();
+		assertTrue(scoreObject.isChord() && scoreObject.getDuration()==480);
+		assertTrue(scoreObject.getDurationType() == DurationType.REGULAR);
+	}
+
+	@Test
+	public void testSmallTriplets() {
+		CwnFactory factory = new SampleFactory();
+		ScoreParameter scoreParameter = new ScoreParameter(960, 240, 1,4, 0,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				new ArrayList<>(), 0);
+		CwnTrack track = factory.createTrack(960);
+		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
+		track.addEvent(factory.createKeyEvent(0, 0));
+		track.addEvent(factory.createClefEvent(0, 0));
+		track.addEvent(factory.createNoteEvent(0, 480, 78, 0, 0, 0));
+		track.addEvent(factory.createNoteEvent(480, 160, 79, 0, 0, 0));
+		track.addEvent(factory.createNoteEvent(640, 160, 81, 0, 0, 0));
+		track.addEvent(factory.createNoteEvent(800, 160, 82, 0, 0, 0));
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(Arrays.asList(track), 0), scoreParameter, new SampleScoreLayout(), 1);
+		Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
+		ScoreVoice voiceBar1 = barIterator.next().iterator().next();
+
+		ScoreObject scoreObject;
+		Iterator<ScoreObject> scoreObjectIterator1 = voiceBar1.iterator();
+		// bar 1
+		scoreObject = scoreObjectIterator1.next();
+		System.out.println(scoreObject);
+		scoreObject = scoreObjectIterator1.next();
+		System.out.println(scoreObject);
+		scoreObject = scoreObjectIterator1.next();
+		System.out.println(scoreObject);
+	}
+
 }

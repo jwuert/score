@@ -3,11 +3,7 @@ package org.wuerthner.cwn.score;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.wuerthner.cwn.api.CwnAccent;
-import org.wuerthner.cwn.api.CwnBarEvent;
-import org.wuerthner.cwn.api.CwnSymbolEvent;
-import org.wuerthner.cwn.api.CwnTrack;
-import org.wuerthner.cwn.api.ScoreParameter;
+import org.wuerthner.cwn.api.*;
 
 public class ScorePrinter {
 	
@@ -129,6 +125,7 @@ public class ScorePrinter {
 		int i = 0;
 		
 		ScoreSystem system = new ScoreSystem(trackList, scoreParameter);
+		removeEmptyTrailingBars(system);
 		for (ScoreStaff staff : system) {
 			CwnTrack track = staff.getTrack();
 			//
@@ -232,7 +229,36 @@ public class ScorePrinter {
 		
 		return _lilypond_code.toString();
 	}
-	
+
+	private void removeEmptyTrailingBars(ScoreSystem system) {
+		int size = system.size();
+		boolean remove = true;
+		int counter = 0;
+		while (remove) {
+			for (int i = 0; i < size; i++) {
+				ScoreStaff staff = system.get(i);
+				ScoreBar bar = staff.getBar(staff.getBarListSize() - 1);
+				if (bar.isMultiVoiceBar()) {
+					remove = false;
+					break;
+				}
+				for (ScoreObject so : bar.getVoice(0).getScoreObjectSet()) {
+					if (!so.isRest()) {
+						remove = false;
+						break;
+					}
+				}
+			}
+			if (remove) {
+				for (int i = 0; i < size; i++) {
+					ScoreStaff staff = system.get(i);
+					staff.removeLastBar();
+				}
+			}
+			if (counter++ > 100) break;
+		}
+	}
+
 	private void appendNotes(ScoreStaff staff, String flag, int ppq, long endPosition) {
 		int clef = -99;
 		int key = -99;
@@ -292,18 +318,29 @@ public class ScorePrinter {
 //			}
 
 			//
-			// SYMBOLS
-			//
-			// TODO!
-			//
 			// SCORE
 			//
 			_lilypond_code.append("          ");
-			symbols.addAll(bar.getSymbols());
+			if (bar.isMultiVoiceBar()) {
+				_lilypond_code.append("<<" + EOL);
+			}
 			for (ScoreVoice voice : bar) {
+				symbols.addAll(bar.getSymbols(voice.getVoiceIndex()));
+				if (bar.isMultiVoiceBar()) {
+					_lilypond_code.append("          ");
+					if (voice.getVoiceIndex()==0) {
+						_lilypond_code.append("{ \\voiceOne ");
+					} else if (voice.getVoiceIndex()==1) {
+						_lilypond_code.append("{ \\voiceTwo ");
+					} else if (voice.getVoiceIndex()==2) {
+						_lilypond_code.append("{ \\voiceThree ");
+					} else if (voice.getVoiceIndex()==3) {
+						_lilypond_code.append("{ \\voiceFour ");
+					}
+				}
 				if (autoBeamPrint) {
 					for (ScoreObject object : voice) {
-						handleScoreObject(ppq, object, false, false);
+						handleScoreObject(ppq, object, false, false, bar.getScoreParameter());
 					}
 				} else {
 					//
@@ -329,12 +366,20 @@ public class ScorePrinter {
 										int numberOfBeams = (endBeam ? 0 : 1);
 										_lilypond_code.append(EOL + "\\set stemRightBeamCount = #" + numberOfBeams + EOL);
 									}
-									handleScoreObject(ppq, object, startBeam, endBeam);
+									handleScoreObject(ppq, object, startBeam, endBeam, bar.getScoreParameter());
 								}
 							}
 						}
 					}
 				}
+				if (bar.isMultiVoiceBar()) {
+					_lilypond_code.append(EOL);
+					_lilypond_code.append("          ");
+					_lilypond_code.append("} \\\\" + EOL);
+				}
+			}
+			if (bar.isMultiVoiceBar()) {
+				_lilypond_code.append("          >>");
 			}
 			_lilypond_code.append(EOL);
 			// _lilypond_code.append("        \\bar \"" + barLine + "\"" + EOL);
@@ -343,10 +388,41 @@ public class ScorePrinter {
 		}
 	}
 	
-	private void handleScoreObject(int ppq, ScoreObject object, boolean startBeam, boolean endBeam) {
+	private void handleScoreObject(int ppq, ScoreObject object, boolean startBeam, boolean endBeam, ScoreParameter scoreParameter) {
 		if (object.isChord()) {
 			ScoreChord chord = (ScoreChord) object;
 
+			for (CwnSymbolEvent symbol : symbols) {
+				if (chord.getStartPosition() >= symbol.getPosition()) {
+					if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_PPP)) {
+						_lilypond_code.append(" \\ppp ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_PP)) {
+						_lilypond_code.append(" \\pp ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_P)) {
+						_lilypond_code.append(" \\p ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_MP)) {
+						_lilypond_code.append(" \\mp ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_MF)) {
+						_lilypond_code.append(" \\mf ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_F)) {
+						_lilypond_code.append(" \\f ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FF)) {
+						_lilypond_code.append(" \\ff ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FFF)) {
+						_lilypond_code.append(" \\fff ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FP)) {
+						_lilypond_code.append(" \\fp ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SF)) {
+						_lilypond_code.append(" \\sf ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SFF)) {
+						_lilypond_code.append(" \\sff ");
+					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SFZ)) {
+						_lilypond_code.append(" \\sfz ");
+					}
+				}
+			}
+
+System.out.println("char: " + chord.durationType.getCharacter());
 			if (chord.durationType.getCharacter() > 1) {
 				if (openTuplet == false) {
 					openTuplet = true;
@@ -438,30 +514,30 @@ public class ScorePrinter {
 					} else if (symbol.isDecrescendo()) {
 						_lilypond_code.append(" \\>");
 						symbolsXCrescendoToClose.add(symbol);
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_PPP)) {
-						_lilypond_code.append(" \\ppp ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_PP)) {
-						_lilypond_code.append(" \\pp ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_P)) {
-						_lilypond_code.append(" \\p ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_MP)) {
-						_lilypond_code.append(" \\mp ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_MF)) {
-						_lilypond_code.append(" \\mf ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_F)) {
-						_lilypond_code.append(" \\f ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FF)) {
-						_lilypond_code.append(" \\ff ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FFF)) {
-						_lilypond_code.append(" \\fff ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FP)) {
-						_lilypond_code.append(" \\fp ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SF)) {
-						_lilypond_code.append(" \\sf ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SFF)) {
-						_lilypond_code.append(" \\sff ");
-					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SFZ)) {
-						_lilypond_code.append(" \\sfz ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_PPP)) {
+//						_lilypond_code.append(" \\ppp ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_PP)) {
+//						_lilypond_code.append(" \\pp ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_P)) {
+//						_lilypond_code.append(" \\p ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_MP)) {
+//						_lilypond_code.append(" \\mp ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_MF)) {
+//						_lilypond_code.append(" \\mf ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_F)) {
+//						_lilypond_code.append(" \\f ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FF)) {
+//						_lilypond_code.append(" \\ff ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FFF)) {
+//						_lilypond_code.append(" \\fff ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_FP)) {
+//						_lilypond_code.append(" \\fp ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SF)) {
+//						_lilypond_code.append(" \\sf ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SFF)) {
+//						_lilypond_code.append(" \\sff ");
+//					} else if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_SFZ)) {
+//						_lilypond_code.append(" \\sfz ");
 					}
 				}
 			}
@@ -472,6 +548,14 @@ public class ScorePrinter {
 			// REST
 			//
 			ScoreRest rest = (ScoreRest) object;
+			System.out.println("REST: " + rest);
+			QuantizedDuration restDuration = new QuantizedDuration(scoreParameter, rest.getDuration());
+			if (restDuration.getType() == DurationType.REGULAR) {
+				if (openTuplet == true) {
+					openTuplet = false;
+					_lilypond_code.append(" } ");
+				}
+			}
 			_lilypond_code.append(formatRest(rest, ppq) + " ");
 		} else if (object.isNote()) {
 			throw new RuntimeException("TODO: Note Element!");
@@ -578,7 +662,7 @@ public class ScorePrinter {
 		}
 		
 		// Output.out("pit: " + npitch + ", step: " + nstep + ", oct: " + noctv + ", enh: " + nenhs);
-		// TODO:
+		String lyrics = ne.getLyrics();
 		_lyrics.append(ne.getLyrics() + " ");
 		String splitNote = (ne.hasStartTie() ? " ~ " : "");
 		return NOTE[nenhs][nstep] + OCT[noctv] + ndur + nacct + nbow + splitNote + aux_text;

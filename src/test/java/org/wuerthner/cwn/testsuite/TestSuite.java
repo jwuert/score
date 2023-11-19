@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.wuerthner.specs.Specification;
+// import org.wuerthner.specs.Specification;
 
 // @formatter:off
 @RunWith(Suite.class)
@@ -39,7 +39,7 @@ public class TestSuite {
 	public static class CloseReport {
 		@Test
 		public void close() throws IOException {
-			Specification.collect();
+			// Specification.collect();
 		}
 	}
 }

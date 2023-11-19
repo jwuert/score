@@ -72,4 +72,18 @@ public class RiemannTest {
         System.out.println(m2 + ": " + m2.matches(markupPattern) + " - " + m2.replaceAll(markupPattern, "$1") + " . " + m2.replaceAll(markupPattern, "$3") + " . " + m2.replaceAll(markupPattern, "$5"));
         System.out.println(m3 + ": " + m3.matches(markupPattern) + " - " + m3.replaceAll(markupPattern, "$1") + " . " + m3.replaceAll(markupPattern, "$3") + " . " + m3.replaceAll(markupPattern, "$5"));
     }
+
+    @Test
+    public void testSimple() {
+        List<CwnNoteEvent> CDur = new ArrayList<>();
+        CDur.add(new SampleNoteEvent(0, 960, 72, 0, 80, 0));
+        CDur.add(new SampleNoteEvent(0, 960, 76, 0, 80, 0));
+        CDur.add(new SampleNoteEvent(0, 960, 79, 0, 80, 0));
+        CDur.add(new SampleNoteEvent(0, 960, 84, 0, 80, 0));
+        Chord C = new Chord(CDur);
+        Harmony h0 = new Harmony(9,2); // C-Dur
+        Harmony h1 = new Harmony(h0, C);
+        System.out.println(h0.toString2());
+        System.out.println(h1.toString2());
+    }
 }

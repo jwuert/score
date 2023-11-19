@@ -29,7 +29,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	public ScoreVoice(ScoreBar scoreBar, int voiceIndex, ScoreParameter scoreParameter) {
 		this.scoreBar = scoreBar;
 		this.voiceIndex = voiceIndex;
-		this.stemDirection = (!scoreBar.isMultiVoiceBar() ? 0 : (voiceIndex & 1) == 0 ? -1 : +1);
+		this.stemDirection = (!scoreBar.isMultiVoiceBar() ? 0 : (voiceIndex & 1) == 0 ? +1 : -1);
 		this.metric = scoreBar.getTimeSignature().getMetric().cloneMetric();
 		this.scoreParameter = scoreParameter;
 		initMetric();
@@ -38,7 +38,9 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	private void initMetric() {
 		scoreBar.getTrack().getList(CwnNoteEvent.class).stream().filter(n -> n.getPosition() >= scoreBar.getStartPosition() && n.getPosition() < getEndPosition()).forEach(n -> {
 			final List<Metric> metricList = metric.getFlatMetricList();
-			QuantizedDuration qdur = new QuantizedDuration(scoreBar.getScoreParameter(), n.getDuration());
+			long overlap = Math.max(0, (n.getPosition()+n.getDuration()) - scoreBar.getEndPosition());
+
+			QuantizedDuration qdur = new QuantizedDuration(scoreBar.getScoreParameter(), n.getDuration() - overlap);
 			if (qdur.getType() == DurationType.TRIPLET) {
 				long relativePositionWithinBar = n.getPosition() - scoreBar.getStartPosition();
 				int beat = PositionTools.getBeat(metric, relativePositionWithinBar, scoreBar.getScoreParameter());
@@ -56,7 +58,6 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	}
 	
 	public void addNote(CwnNoteEvent cwnNoteEvent, long noteStartPosition, long noteDuration) {
-		// System.out.println(" SV.addNote: " + noteStartPosition + " [" + noteDuration + "]");
 		QuantizedPosition position = new QuantizedPosition(scoreBar, noteStartPosition, metric);
 		QuantizedDuration duration = new QuantizedDuration(scoreBar.getScoreParameter(), noteDuration, position.getType());
 		boolean isUngrouped = cwnNoteEvent.isUngrouped();
@@ -285,6 +286,10 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 			}
 			handleDelta(currentPosition, getEndPosition());
 		}
+	}
+
+	public int getVoiceIndex() {
+		return voiceIndex;
 	}
 	
 	private void handleDelta(long from, long to) {

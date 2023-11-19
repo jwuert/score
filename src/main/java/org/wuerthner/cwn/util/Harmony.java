@@ -41,6 +41,7 @@ public class Harmony {
         _bass     = 0;
         _bass_abs = RiemannTools.step_of_key[base_key];
         _addons   = "";
+        System.out.println("# base_key: " + base_key + ", base_genus: " + base_genus);
     }
 
     /**
@@ -87,6 +88,7 @@ public class Harmony {
             analyse(); // sets _key, _genus, _bass
             _addons   = constructAddons();
         }
+        System.out.println(ie.getPosition() + ": " + _key + ", " + _genus);
     }
 
     public Harmony(Harmony prev_harmony, Chord c) {
@@ -102,6 +104,7 @@ public class Harmony {
         _bass_abs = c.bass;
         analyse(); // sets _key, _genus, _bass
         _addons   = constructAddons();
+        System.out.println("    : " + _key + ", " + _genus);
     }
 
     public boolean hasMoreThan(int n) {

@@ -18,7 +18,7 @@ public class QuantizedDuration {
 	 * @param duration
 	 */
 	public QuantizedDuration(ScoreParameter scoreParameter, long duration) {
-		this(scoreParameter, duration, scoreParameter.getSupportedDurationTypes());
+		this(scoreParameter, duration, false, scoreParameter.getSupportedDurationTypes());
 	}
 	
 	/**
@@ -29,10 +29,14 @@ public class QuantizedDuration {
 	 * @param durationTypeCharacter
 	 */
 	public QuantizedDuration(ScoreParameter scoreParameter, long duration, DurationType durationTypeCharacter) {
-		this(scoreParameter, duration, DurationType.getSupportedTypesForCharacter(durationTypeCharacter));
+		this(scoreParameter, duration, durationTypeCharacter!=DurationType.REGULAR, DurationType.getSupportedTypesForCharacter(durationTypeCharacter));
 	}
 	
-	private QuantizedDuration(ScoreParameter scoreParameter, long duration, List<DurationType> durationTypeList) {
+	 private QuantizedDuration(ScoreParameter scoreParameter, long duration, boolean nonRegularCharacterInMetric, List<DurationType> durationTypeList) {
+		int minDelta = getMinDelta(DurationType.REGULAR, scoreParameter, duration)[0];
+		if (nonRegularCharacterInMetric && minDelta==0) {
+			durationTypeList.add(0, DurationType.REGULAR); // in order to fix a bug, so that a regular duration typed note is not turned into a dotted triplet!
+		}
 		int durationTypeSize = durationTypeList.size();
 		int[][] minMatrix = new int[durationTypeSize][];
 		int totalMinimum = Integer.MAX_VALUE;
@@ -75,7 +79,7 @@ public class QuantizedDuration {
 		return "duration: " + snappedDuration + ", type: " + durationType;
 	}
 	
-	private int[] getMinDelta(DurationType type, ScoreParameter scoreParameter, long duration) {
+	public int[] getMinDelta(DurationType type, ScoreParameter scoreParameter, long duration) {
 		int resolutionTicks = scoreParameter.getResolutionInTicks();
 		double value = (resolutionTicks / type.getFactor());
 		int minDeltaTicks = Integer.MAX_VALUE;
