@@ -39,7 +39,6 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 		scoreBar.getTrack().getList(CwnNoteEvent.class).stream().filter(n -> n.getPosition() >= scoreBar.getStartPosition() && n.getPosition() < getEndPosition()).forEach(n -> {
 			final List<Metric> metricList = metric.getFlatMetricList();
 			long overlap = Math.max(0, (n.getPosition()+n.getDuration()) - scoreBar.getEndPosition());
-
 			QuantizedDuration qdur = new QuantizedDuration(scoreBar.getScoreParameter(), n.getDuration() - overlap);
 			if (qdur.getType() == DurationType.TRIPLET) {
 				long relativePositionWithinBar = n.getPosition() - scoreBar.getStartPosition();
@@ -65,7 +64,6 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 			ScoreObject previousObject = scoreObjectSet.last();
 			// check duration of previous note:
 			long newPosition = position.getSnappedPosition() + scoreBar.getStartPosition();
-			// System.out.println("  at pos: " + newPosition);
 			if (newPosition > previousObject.getStartPosition() && newPosition < previousObject.getEndPosition()) {
 				if (ScoreNote.class.isAssignableFrom(previousObject.getClass())) {
 					// todo: configurable: show orig length or adjusted length?
@@ -75,7 +73,6 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 						// This assures that a note (duration) always ends before the next note begins!
 						scoreObjectSet.remove(previousObject);
 						ScoreNote newPreviousNote = new ScoreNote((ScoreNote) previousObject, scoreBar, newPosition - previousObject.getStartPosition());
-						// System.out.println("  prev: " + previousObject + " ex by " + newPreviousNote);
 						add(newPreviousNote);
 					}
 				} else {
@@ -99,7 +96,6 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 		}
 		ScoreNote scoreNote = new ScoreNote(scoreBar, cwnNoteEvent, position, duration, stemDirection, isUngrouped);
 		scoreBar.handleSign(scoreNote);
-		// System.out.println("  ADD FINALLY: " + scoreNote);
 		add(scoreNote);
 		long cutoff = noteDuration - duration.getSnappedDuration();
 		if (0.5 * scoreParameter.getResolutionInTicks() < cutoff) {
@@ -143,9 +139,7 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	}
 	
 	public void group() {
-		//System.out.println("-- GROUP --");
 		makeChords();
-		//System.out.println("-- " + scoreObjectSet.size() + " + " + scoreChordSet.size());
 		groupForBeams();
 		groupForDurationCharacter();
 	}
@@ -161,7 +155,6 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 				scoreChordSet.add(new ScoreChord(scoreBar, scoreObjectList));
 			}
 		}
-		// scoreObjectSet.stream().forEach(System.out::println);
 	}
 	
 	/**
@@ -176,24 +169,15 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 		ScoreGroup group1 = null;
 		int groupLevel1 = scoreParameter.metricLevel;
 		double factor = metric.duration();
-		// List<Double> flatDurationList1a = metric.getCumulativeDurationList(groupLevel1);
 		List<Double> flatDurationList1 = metric.getCumulativeDurationList(groupLevel1).stream().map(d -> d * 1.0 / factor).collect(Collectors.toList());
 		
 		List<Metric> flatMetricList1 = metric.getFlatMetricList(groupLevel1);
-		// System.out.println("");
-		// System.out.println("====> " + this.getStartPosition());
-		// System.out.println(" " + flatMetricList1);
-		
+
 		int range1 = 0;
-		
-		// double recentAveragePitch = 0;
-		// System.out.println("--------------------------------------------------------");
 		for (ScoreObject scoreObject : this) {
-			// System.out.println(" " + scoreObject);
 			if (flatDurationList1.contains(scoreObject.getRelativePosition())) {
 				range1++;
 				group1 = new ScoreGroup(flatDurationList1.get(range1 - 1), flatMetricList1.get(range1 - 1), scoreBar);
-				// System.out.println(" * new group " + group1.getRelativeStartPosition() + " *");
 				scoreGroupSet.add(group1);
 			}
 			if (group1 != null) {
@@ -216,37 +200,62 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	/**
 	 * This function creates groups on only one level to provide information about triplets, quintuplets, etc. (The brackets include rests)
 	 */
+//	private void groupForDurationCharacter() {
+//		List<Metric> flatMetricList = metric.getFlatMetricList();
+//		double factor = metric.duration();
+//		double position = 0;
+//		int character = 0;
+//		int previousCharacter = 0;
+//		for (Metric metric : flatMetricList) {
+//			character = metric.getDurationType().getCharacter();
+//			if (character > 1) {
+//				if (character != previousCharacter) {
+//					makeCharacterGroup(position, metric);
+//				} else {
+//					// only add new group if a scoreObject exists at that exact start position!
+//					final double relativePosition = position * 1.0 / factor;
+//					boolean scoreObjectExists = scoreObjectSet.stream().anyMatch(so -> so.getRelativePosition() == relativePosition);
+//					if (scoreObjectExists) {
+//						makeCharacterGroup(position, metric);
+//					} else {
+//						characterGroupSet.last().updateGroup(metric.duration(), scoreObjectSet);
+//					}
+//				}
+//			}
+//			previousCharacter = character;
+//			position += metric.duration();
+//		}
+//	}
+
 	private void groupForDurationCharacter() {
-		List<Metric> flatMetricList = metric.getFlatMetricList();
-		double factor = metric.duration();
-		double position = 0;
 		int character = 0;
 		int previousCharacter = 0;
-		for (Metric metric : flatMetricList) {
-			character = metric.getDurationType().getCharacter();
-			if (character > 1) {
-				if (character != previousCharacter) {
-					makeCharacterGroup(position, metric);
+		CharacterGroup group = null;
+		for (ScoreObject so : scoreObjectSet) {
+			character = so.getDurationType().getCharacter();
+			if (character != previousCharacter) {
+				if (group!=null) characterGroupSet.add(group);
+				if (character>1) {
+					group = new CharacterGroup(so.getRelativePosition(), so.getRelativeDuration(), character, so.getDurationType().getPresentation(), scoreBar.getScoreParameter().ppq);
 				} else {
-					// only add new group if a scoreObject exists at that exact start position!
-					final double relativePosition = position * 1.0 / factor;
-					boolean scoreObjectExists = scoreObjectSet.stream().anyMatch(so -> so.getRelativePosition() == relativePosition);
-					if (scoreObjectExists) {
-						makeCharacterGroup(position, metric);
-					} else {
-						characterGroupSet.last().updateGroup(metric.duration(), scoreObjectSet);
-					}
+					group = null;
+				}
+			} else {
+				if (group!=null) {
+					group.addRelativeDuration(so.getRelativeDuration());
 				}
 			}
 			previousCharacter = character;
-			position += metric.duration();
+		}
+		if (group!=null) {
+			characterGroupSet.add(group);
 		}
 	}
 	
-	private void makeCharacterGroup(double position, Metric metric) {
-		CharacterGroup group = new CharacterGroup(metric, position, scoreObjectSet, scoreBar.getScoreParameter().ppq);
-		characterGroupSet.add(group);
-	}
+//	private void makeCharacterGroup(double position, Metric metric) {
+//		CharacterGroup group = new CharacterGroup(metric, position, scoreObjectSet, scoreBar.getScoreParameter().ppq);
+//		characterGroupSet.add(group);
+//	}
 	
 	public Set<ScoreGroup> getGroups() {
 		return scoreGroupSet;
@@ -303,7 +312,6 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 					break;
 				}
 				long nextPosition = currentPosition + absoluteDuration;
-				// System.out.println("from/to: " + from + "/" + to + ", cur: " + currentPosition + ", np: " + nextPosition + " (abs dur: " + absoluteDuration + ") fbeat: " + firstBeatPosition);
 				if (from < nextPosition) {
 					long restStartPosition = Math.max(from, currentPosition);
 					long restEndPosition = Math.min(to, nextPosition);
@@ -318,7 +326,6 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 						long nextBarPosition = PositionTools.nextBar(scoreBar.getTrack(), firstBeatPosition);
 						split(firstBeatPosition, nextBarPosition, restStartPosition, restDuration, metric, qpos.getType());
 					} else {
-						// System.out.println("add rest: " + restStartPosition + " : " + restDuration);
 						scoreObjectSet.add(new ScoreRest(scoreBar, restStartPosition, restDuration));
 					}
 				}
@@ -328,10 +335,8 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	}
 	
 	private void split(long frameLeftPosition, long frameRightPosition, long restStartPosition, long restDuration, Metric metric, DurationType startingDurationType) {
-		// System.out.println("split: " + frameLeftPosition + "-" + frameRightPosition + ", b: " + restStartPosition + " : " + restDuration + " # " + metric);
 		int ppq = scoreBar.getTrack().getPPQ();
 		if (isPresentableDuration(restDuration, startingDurationType)) {
-			// System.out.println("+add rest: " + restStartPosition + " : " + restDuration);
 			//
 			//
 			QuantizedPosition position = new QuantizedPosition(scoreBar, restStartPosition, metric);
@@ -339,10 +344,8 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 			//
 			//
 			scoreObjectSet.add(new ScoreRest(scoreBar, position, duration));
-			// scoreObjectSet.add(new ScoreRest(scoreBar, restStartPosition, restDuration));
 		} else {
 			int numberOfEvents = metric.numberOfEvents();
-			// int eventDuration = (int) metric.duration();// (int) ((frameRightPosition - frameLeftPosition) * 1.0 / numberOfEvents);
 			long frameSplitPosition = frameLeftPosition;
 			if (numberOfEvents == 1) {
 				// the last event cannot be further split!
@@ -381,10 +384,8 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	}
 	
 	private boolean isPresentableDuration(long duration, DurationType durationType) {
-		// int resolutionInTicks = scoreBar.getScoreParameter().getResolutionInTicks();
 		int ppq = scoreBar.getScoreParameter().ppq;
 		int convertedDuration = (int) (duration * 32 * durationType.getFactor() / ppq);
-		// System.out.println(" => " + convertedDuration + " : " + durationType);
 		return isPowerOf2(convertedDuration) || (scoreBar.getScoreParameter().allowDottedRests() && isPowerOf2((int) (convertedDuration * 2.0 / 3.0)));
 	}
 	

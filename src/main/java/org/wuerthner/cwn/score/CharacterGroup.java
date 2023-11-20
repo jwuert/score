@@ -18,7 +18,15 @@ public class CharacterGroup implements Comparable<CharacterGroup> {
 		this.fullCharacter = metric.getDurationType().getPresentation();
 		this.ppq = ppq;
 	}
-	
+
+	public CharacterGroup(double relativePosition, double relativeDuration, int character, String presentation, int ppq) {
+		this.relativePosition = relativePosition;
+		this.relativeDuration = relativeDuration;
+		this.character = character;
+		this.fullCharacter = presentation;
+		this.ppq = ppq;
+	}
+
 	public void updateGroup(double duration, TreeSet<ScoreObject> scoreObjectSet) {
 		this.relativeDuration += duration;
 	}
@@ -46,5 +54,9 @@ public class CharacterGroup implements Comparable<CharacterGroup> {
 	@Override
 	public int compareTo(CharacterGroup characterGroup) {
 		return (int) (ppq * (this.relativePosition - characterGroup.relativePosition));
+	}
+
+	public void addRelativeDuration(double relativeDuration) {
+		this.relativeDuration += relativeDuration;
 	}
 }
