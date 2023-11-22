@@ -12,7 +12,7 @@ public class Score {
 	public static final double STEM_SLOPE = 0.05;
 	public static final double NOTE_HEAD_WIDTH = 6;
 	public static final int STEM_LENGTH = 19;
-	public static final int TIMESIGNATURE_WIDTH = 14;
+	public static final int TIMESIGNATURE_WIDTH = 12;
 	public static final int CLEF_WIDTH = 28;
 	public static final int KEY_WIDTH = 7;
 

@@ -251,19 +251,6 @@ public class ScorePresenter {
 			offset += Score.CLEF_WIDTH;
 		}
 		//
-		// handle time signature
-		//
-		if (bar.hasExplicitTimeSignature() || firstBarInTotal) {
-			if (debug) {
-				canvas.drawLine(xBarPosition + offset, yTop - layout.getSystemSpace(), xBarPosition + offset + Score.TIMESIGNATURE_WIDTH - 2, yTop - layout.getSystemSpace(), "green");
-			}
-			TimeSignature timeSignature = bar.getTimeSignature();
-			boolean alternative = selection.contains(bar.getTimeSignatureEvent());
-			canvas.drawString(timeSignature.getNumerator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 4, yTop + 13, "left", alternative);
-			canvas.drawString(timeSignature.getDenominator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 4, yTop + 13 + layout.getLineHeight() * 2, "left", alternative);
-			offset += Score.TIMESIGNATURE_WIDTH;
-		}
-		//
 		// handle key
 		//
 		if (bar.hasExplicitKey() || firstBarInStaff) {
@@ -272,6 +259,7 @@ public class ScorePresenter {
 			int clef = bar.getClef();
 			int key = bar.getKey();
 			int count = 0;
+			boolean alternative = selection.contains(bar.getKeyEvent());
 			if (bar.hasExplicitKey()) {
 				int signsToBeRemoved = bar.getSignsToBeRemoved(); // <0 means "b", >0 means "#" have to be removed!
 				if (signsToBeRemoved > 0) { // remove sharps
@@ -279,7 +267,7 @@ public class ScorePresenter {
 						if (i >= key) {
 							int x = (int) ((count++ * 6));
 							int y = ((Score.sharpTab[i] + Score.signShift[clef]) * 3 - 12);
-							canvas.drawImage("nat", xBarPosition + offset + x, yTop + y, false);
+							canvas.drawImage("nat", xBarPosition + offset + x, yTop + y, alternative);
 						}
 					}
 				} else if (signsToBeRemoved < 0) { // remove flats
@@ -287,7 +275,7 @@ public class ScorePresenter {
 						if (-i <= key) {
 							int x = (int) ((count++ * 6));
 							int y = ((Score.flatTab[i] + Score.signShift[clef]) * 3 - 12);
-							canvas.drawImage("nat", xBarPosition + offset + x, yTop + y, false);
+							canvas.drawImage("nat", xBarPosition + offset + x, yTop + y, alternative);
 						}
 					}
 				}
@@ -296,7 +284,6 @@ public class ScorePresenter {
 			if (debug) {
 				canvas.drawLine(xBarPosition + offset, yTop - layout.getSystemSpace(), xBarPosition + offset + Math.abs(bar.getKey()) * Score.KEY_WIDTH, yTop - layout.getSystemSpace(), "green");
 			}
-			boolean alternative = selection.contains(bar.getKeyEvent());
 			for (int i = 0; i < Math.abs(key); i++) {
 				int x = (int) ((i * 6));
 				if (key > 0) { // sharps
@@ -307,8 +294,20 @@ public class ScorePresenter {
 					canvas.drawImage("flat", xBarPosition + offset + x, yTop + y, alternative);
 				}
 			}
-			
 			offset += Math.abs(bar.getKey()) * Score.KEY_WIDTH + 2;
+		}
+		//
+		// handle time signature
+		//
+		if (bar.hasExplicitTimeSignature() || firstBarInTotal) {
+			if (debug) {
+				canvas.drawLine(xBarPosition + offset, yTop - layout.getSystemSpace(), xBarPosition + offset + Score.TIMESIGNATURE_WIDTH - 2, yTop - layout.getSystemSpace(), "green");
+			}
+			TimeSignature timeSignature = bar.getTimeSignature();
+			boolean alternative = selection.contains(bar.getTimeSignatureEvent());
+			canvas.drawString(timeSignature.getNumerator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13, "left", alternative);
+			canvas.drawString(timeSignature.getDenominator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13 + layout.getLineHeight() * 2, "left", alternative);
+			offset += Score.TIMESIGNATURE_WIDTH;
 		}
 		// SPACING:
 		// offset += 12;
