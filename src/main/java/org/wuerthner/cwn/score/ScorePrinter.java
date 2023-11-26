@@ -349,8 +349,6 @@ public class ScorePrinter {
 					for (ScoreGroup masterGroup : voice.getGroups()) {
 						for (ScoreGroup beamGroup : masterGroup.getSubGroups()) {
 							for (ScoreGroup splitGroup : beamGroup.getSubGroups()) {
-								// System.out.println("SG");
-								// System.out.println(splitGroup);
 								for (ScoreObject object : splitGroup.getObjectSet()) {
 									// startBeam is true for the first note of the outer group (start of the 8th beam)
 									// endBeam is true for the last note of the outer group (end of the 8th beam)
@@ -422,7 +420,6 @@ public class ScorePrinter {
 				}
 			}
 
-System.out.println("char: " + chord.durationType.getCharacter());
 			if (chord.durationType.getCharacter() > 1) {
 				if (openTuplet == false) {
 					openTuplet = true;
@@ -444,7 +441,6 @@ System.out.println("char: " + chord.durationType.getCharacter());
 			//
 			List<CwnSymbolEvent> removeSymbols = new ArrayList<>();
 			for (CwnSymbolEvent symbol : symbols) {
-				// System.out.println(symbol + " ? " + CwnSymbolEvent.SYMBOL_MF + " =? " + (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_MF)));
 				if (chord.getStartPosition() >= symbol.getPosition()) {
 					if (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_CASE1)) {
 						_lilypond_code.append(" \\set Score.repeatCommands = #'((volta \"1.\")) ");
@@ -502,7 +498,6 @@ System.out.println("char: " + chord.durationType.getCharacter());
 			//
 			removeSymbols = new ArrayList<>();
 			for (CwnSymbolEvent symbol : symbols) {
-				// System.out.println(symbol + " ? " + CwnSymbolEvent.SYMBOL_MF + " =? " + (symbol.getSymbolName().equals(CwnSymbolEvent.SYMBOL_MF)));
 				if (chord.getStartPosition() >= symbol.getPosition()) {
 					removeSymbols.add(symbol);
 					if (symbol.isBowUp() || symbol.isBowDown()) {
@@ -548,7 +543,6 @@ System.out.println("char: " + chord.durationType.getCharacter());
 			// REST
 			//
 			ScoreRest rest = (ScoreRest) object;
-			System.out.println("REST: " + rest);
 			QuantizedDuration restDuration = new QuantizedDuration(scoreParameter, rest.getDuration());
 			if (restDuration.getType() == DurationType.REGULAR) {
 				if (openTuplet == true) {
@@ -577,8 +571,6 @@ System.out.println("char: " + chord.durationType.getCharacter());
 	}
 	
 	private String formatNote(ScoreNote ne, ScoreChord sc, int ppq) {
-		// System.out.println("--> " + ne.getStartPosition() + ": " + ne.isSplit() + ", " + ne.hasStartTie() + ", " + ne.hasEndTie());
-		// Output.out(ne.getDuration() + ", " + ne.getDisplay(_content.getResolution()) + ", " + sc.duration() + ", " + sc.display());
 		String aux_text = "";
 		if (print_marks) { // TODO: print marks??? => ScorePrintDialog!
 			// List<Object> list = MarkerTools.getMarks(ne);

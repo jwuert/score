@@ -18,6 +18,9 @@ public class Score {
 
 	public static final Map<String,Integer> tonenameMap = new HashMap<>();
 	public static final Map<String,Integer> tonenameShiftMap = new HashMap<>();
+	public static final String[] KEYS = new String[] { "Ces", "Ges", "Des", "As", "Es", "B", "F", "C", "G", "D", "A", "E", "H", "Fis", "Cis" };
+	public static final String [] GENUS = new String[]{"Undefined", "Minor", "Major", "Diminished"};
+	public final static String[] CLEFS = new String[] { "Violin", "Bass", "Violin 8+", "Violin 15+", "Violin 8-", "Bass 8-", "Bass 15-", "Varbaritone", "Subbass", "Soprano", "Mezzosoprano", "Alto", "Tenor", "-" };
 
 	static final int[][] allSigns = new int[][] {
 		// @formatter:off
@@ -240,11 +243,8 @@ public class Score {
 
 	public static final int getPitch(String name) {
 		if (name.indexOf('-')>0) return 0;
-		//System.out.println("=> " + name);
 		String s = name.replaceAll("\\s", "").replaceFirst("(\\d)", " $1");
 		String[] pair = s.split(" ");
-		//System.out.println(":" + pair[0].trim() + ":");
-		//System.out.println(":" + pair[1].trim() + ":");
 		return tonenameMap.get(pair[0].trim().toLowerCase()) + 12*(2+Integer.parseInt(pair[1].trim()));
 	}
 

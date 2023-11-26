@@ -39,12 +39,10 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 		scoreBar.getTrack().getList(CwnNoteEvent.class).stream().filter(n -> n.getPosition() >= scoreBar.getStartPosition() && n.getPosition() < getEndPosition()).forEach(n -> {
 			final List<Metric> metricList = metric.getFlatMetricList();
 			long overlap = Math.max(0, (n.getPosition()+n.getDuration()) - scoreBar.getEndPosition());
+
 			QuantizedDuration qdur = new QuantizedDuration(scoreBar.getScoreParameter(), n.getDuration() - overlap);
-			if (qdur.getType() == DurationType.TRIPLET) {
-				long relativePositionWithinBar = n.getPosition() - scoreBar.getStartPosition();
-				int beat = PositionTools.getBeat(metric, relativePositionWithinBar, scoreBar.getScoreParameter());
-				metricList.get(beat).setDurationType(qdur.getType());
-			} else if (qdur.getType() == DurationType.QUINTUPLET) {
+			if (qdur.getType().getCharacter()>1) { // && n.getDuration() <= 2*scoreBar.getScoreParameter().ppq) {
+				// tuplets only of note durations up to half notes
 				long relativePositionWithinBar = n.getPosition() - scoreBar.getStartPosition();
 				int beat = PositionTools.getBeat(metric, relativePositionWithinBar, scoreBar.getScoreParameter());
 				metricList.get(beat).setDurationType(qdur.getType());

@@ -82,9 +82,11 @@ public class ScoreUpdate {
     public ScoreUpdate restrictToRange(CwnSelection<? extends CwnEvent> selection) {
         List<? extends CwnEvent> sel = selection.getSelection();
         int size = sel.size();
-        long start = sel.get(0).getPosition();
-        long end = sel.get(size-1).getPosition() + sel.get(size-1).getDuration();
-        restrictToRange(start, end);
+        if (size>0) {
+            long start = sel.get(0).getPosition();
+            long end = sel.get(size - 1).getPosition() + sel.get(size - 1).getDuration();
+            restrictToRange(start, end);
+        }
         return this;
     }
 

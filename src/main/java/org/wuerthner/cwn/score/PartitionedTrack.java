@@ -71,7 +71,6 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 					debugBarList.add("~" + (index+i));
 				}
 			}
-			System.out.println(" [staff] update bar(s): " + debugBarList);
 		}
 	}
 
@@ -86,7 +85,7 @@ public class PartitionedTrack implements Iterable<ScoreBar> {
 			}
 		}
 		if (count==20) {
-			System.out.println("rewind bar problem: " + bar.getStartPosition());
+			System.err.println("rewind bar problem: " + bar.getStartPosition());
 		}
 		return bar;
 	}

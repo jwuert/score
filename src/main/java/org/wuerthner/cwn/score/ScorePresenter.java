@@ -41,7 +41,7 @@ public class ScorePresenter {
 		canvas.open();
 		canvas.drawString(title, "title", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() - 30, "center");
 		canvas.drawString(subtitle, "subtitle", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() + 0, "center");
-		canvas.drawString(composer, "track", (int) (layout.getWidth() - 30), layout.getTitleHeight(), "right");
+		canvas.drawString(composer, "track", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 10, "right");
 		if (scoreBuilder.getScoreParameter().getFilename() != null) {
 			canvas.drawString(scoreBuilder.getScoreParameter().getFilename(), "barNumber", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 20, "right");
 		}
@@ -77,6 +77,39 @@ public class ScorePresenter {
 					canvas.drawString(type, "barNumber", attrX+6, 44, "left");
 					canvas.drawString(parameter, "barNumber", attrX+6, 56, "left");
 					canvas.drawString(offset, "barNumber", attrX+6, 68, "left");
+				} else if (event instanceof CwnBarEvent) {
+					String type = ((CwnBarEvent)event).getTypeString();
+					canvas.drawString("type:", "barNumber", attrX, 44, "right");
+					canvas.drawString(type, "barNumber", attrX+6, 44, "left");
+				} else if (event instanceof CwnTempoEvent) {
+					String label = ((CwnTempoEvent) event).getLabel();
+					String tempo = ""+((CwnTempoEvent) event).getTempo();
+					canvas.drawString("label:", "barNumber", attrX, 44, "right");
+					canvas.drawString("tempo:", "barNumber", attrX, 56, "right");
+					canvas.drawString(label, "barNumber", attrX+6, 44, "left");
+					canvas.drawString(tempo, "barNumber", attrX+6, 56, "left");
+				} else if (event instanceof CwnKeyEvent) {
+					String key = Score.KEYS[((CwnKeyEvent)event).getKey()+7];
+					String genus = Score.GENUS[((CwnKeyEvent)event).getGenus()];
+					canvas.drawString("key:", "barNumber", attrX, 44, "right");
+					canvas.drawString("genus:", "barNumber", attrX, 56, "right");
+					canvas.drawString(key, "barNumber", attrX+6, 44, "left");
+					canvas.drawString(genus, "barNumber", attrX+6, 56, "left");
+				} else if (event instanceof CwnClefEvent) {
+					String clef = Score.CLEFS[((CwnClefEvent)event).getClef()];
+					canvas.drawString("clef:", "barNumber", attrX, 44, "right");
+					canvas.drawString(clef, "barNumber", attrX+6, 44, "left");
+				} else if (event instanceof CwnTimeSignatureEvent) {
+					String timeSignature = ((CwnTimeSignatureEvent)event).getTimeSignature().toString();
+					canvas.drawString("signature:", "barNumber", attrX, 44, "right");
+					canvas.drawString(timeSignature, "barNumber", attrX+6, 44, "left");
+				} else if (event instanceof CwnInfoEvent) {
+					String name = ((CwnInfoEvent)event).getName();
+					String info = ((CwnInfoEvent)event).getInfo(0) + " : " + ((CwnInfoEvent)event).getInfo(1);
+					canvas.drawString("name:", "barNumber", attrX, 44, "right");
+					canvas.drawString("info:", "barNumber", attrX, 56, "right");
+					canvas.drawString(name, "barNumber", attrX+6, 44, "left");
+					canvas.drawString(info, "barNumber", attrX+6, 56, "left");
 				}
 			}
 		}
@@ -550,11 +583,13 @@ public class ScorePresenter {
 			int xEnd = (int) ((event.getPosition() + event.getDuration() - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
 			int y = yTop - layout.getSystemSpace() ;//+ event.getVerticalOffset();
 			boolean alternative = selection.contains(event);
+			int eventParameter = event.getParameter();
+			int eventVerticalOffset = event.getVerticalOffset();
 			if (event.isCrescendo()) {
 				//
 				// Crescendo
 				//
-				y += layout.getStaffHeight() - 4;
+				y += layout.getStaffHeight() - 4 + eventVerticalOffset;
 				if (alternative) {
 					canvas.drawLine(xBarPosition + offset + xStart, y, xBarPosition + offset + xEnd, y - 4, "red");
 					canvas.drawLine(xBarPosition + offset + xStart, y, xBarPosition + offset + xEnd, y + 4, "red");
@@ -570,7 +605,7 @@ public class ScorePresenter {
 				//
 				// Decrescendo
 				//
-				y += layout.getStaffHeight() - 4;
+				y += layout.getStaffHeight() - 4 + eventVerticalOffset;
 				if (alternative) {
 					canvas.drawLine(xBarPosition + offset + xStart, y - 4, xBarPosition + offset + xEnd, y, "red");
 					canvas.drawLine(xBarPosition + offset + xStart, y + 4, xBarPosition + offset + xEnd, y, "red");
@@ -589,14 +624,12 @@ public class ScorePresenter {
 				int xoffset = 4;
 				int yoffset = 10;
 				int yAdd = 0;
-				int delta = event.getParameter();
-				int vOffset = event.getVerticalOffset();
 				// System.out.println("=> " + vOffset + ", " + delta);
 				// canvas.drawArc(xBarPosition + offset + xStart + xoffset, y+yAdd, xBarPosition + offset + xEnd + xoffset, y +yAdd - delta, 1, yoffset, alternative);
 				canvas.drawArc(xBarPosition + offset + xStart + xoffset,
-						y+yAdd+vOffset,
+						y+yAdd+eventVerticalOffset,
 						xBarPosition + offset + xEnd + xoffset,
-						y +yAdd + vOffset + delta,
+						y +yAdd + eventVerticalOffset + eventParameter,
 						1, yoffset, alternative);
 			} else if (event.isBowDown()) {
 				//
@@ -605,13 +638,11 @@ public class ScorePresenter {
 				int xoffset = 4;
 				int yoffset = +10;
 				int yAdd = 0;//-30 - layout.getLineHeight()*5;
-				int delta = event.getParameter();
-				int vOffset = event.getVerticalOffset();
 				// canvas.drawArc(xBarPosition + offset + xStart + xoffset, y-yAdd, xBarPosition + offset + xEnd + xoffset, y -yAdd - delta, -1, yoffset, alternative);
 				canvas.drawArc(xBarPosition + offset + xStart + xoffset,
-						y+yAdd+vOffset,
+						y+yAdd+eventVerticalOffset,
 						xBarPosition + offset + xEnd + xoffset,
-						y +yAdd + vOffset + delta,
+						y +yAdd + eventVerticalOffset + eventParameter,
 						-1, yoffset, alternative);
 			} else if (event.isOctave()) {
 				if (event.getSymbolName().equals("o"+CwnSymbolEvent.SYMBOL_8VA)) canvas.drawString("8va", "nole", xBarPosition + offset + xStart -2, y+6, "left", alternative);
@@ -626,8 +657,8 @@ public class ScorePresenter {
 				canvas.drawLine(xBarPosition + offset - 4, y, xBarPosition + offset + xEnd, y, alternative);
 				canvas.drawLine(xBarPosition + offset - 4, y, xBarPosition + offset - 4, y + 16, alternative);
 			} else {
-				y += layout.getStaffHeight() - 10;
-				canvas.drawImage(event.getSymbolName(), xBarPosition + offset + xStart, y, alternative);
+				y += layout.getStaffHeight() - 10 + eventVerticalOffset;
+				canvas.drawImage(event.getSymbolName(), xBarPosition + offset + xStart + eventParameter, y, alternative);
 			}
 		}
 		//

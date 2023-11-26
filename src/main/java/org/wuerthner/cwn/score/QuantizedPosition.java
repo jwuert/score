@@ -26,9 +26,7 @@ public class QuantizedPosition {
 			positionWithinBar = 0;
 		}
 		metricGeometry = getDurationType(scoreBar.getScoreParameter(), positionWithinBar, scoreBar.getTimeSignature().getMetric());
-		//System.out.println("metricGeometry: " + metricGeometry.beatStartPosition + ", " + metricGeometry.beat + ", " + metricGeometry.durationType);
 		snappedPosition = metricGeometry.beatStartPosition + getSnappedPosition(metricGeometry.durationType, scoreBar.getScoreParameter(), positionWithinBar - metricGeometry.beatStartPosition);
-		//System.out.println("  pos: " + snappedPosition);
 	}
 	
 	private MetricGeometry getDurationType(ScoreParameter scoreParameter, long relativePosition, final Metric metric) {
@@ -62,7 +60,6 @@ public class QuantizedPosition {
 	}
 	
 	private long getSnappedPosition(DurationType type, ScoreParameter scoreParameter, long relativePositionInBeat) {
-		// System.out.println(" snap: " + resolutionInTicks + " (" + type.getFactor() + ")");
 		int resInTicks = (int) (resolutionInTicks / type.getFactor());
 		
 		long snappedPosition = relativePositionInBeat;

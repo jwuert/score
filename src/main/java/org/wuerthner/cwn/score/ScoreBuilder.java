@@ -42,7 +42,6 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 
 	public void update(ScoreUpdate update) {
 		scoreLayout.setShowVelocity(scoreParameter.markup.contains(Markup.Type.VELOCITY));
-		// System.out.println("SB Update: " + update + ", " + scoreParameter.getSupportedDurationTypes());
 		List<CwnTrack> trackList = container.getTrackList();
 		// if (!update.redraw()) System.out.println("ScoreBuilder.update: " + update + " - # of tracks: " + trackList.size());
 		if (!update.redraw() && !trackList.isEmpty()) {
@@ -137,12 +136,10 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 				long eventPosition = event.getPosition();
 				int eventPitch = ((CwnNoteEvent) event).getPitch();
 				while (position < eventPosition && positionIterator.hasNext()) {
-					// System.out.println(": " + position + " (" + eventPosition + ") - " + previousEventPitch);
 					pitchArray[pointer++] = previousEventPitch;
 					position = positionIterator.next();
 				}
 				if (position == eventPosition) {
-					// System.out.println("M " + position + " (" + eventPosition + ") - " + eventPitch);
 					pitchArray[pointer++] = eventPitch;
 					if (positionIterator.hasNext()) {
 						position = positionIterator.next();
@@ -155,7 +152,6 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 			}
 		}
 		if (position >= 0) {
-			// System.out.println(": " + position + " - " + previousEventPitch);
 			pitchArray[pointer++] = previousEventPitch;
 			if (positionIterator.hasNext()) {
 				position = positionIterator.next();
@@ -427,7 +423,6 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 				if (position >= bar.getStartPosition() && position < bar.getEndPosition()) {
 					int positionInBar = (int) (position - bar.getStartPosition());
 					double relPositionInBar = positionInBar *1.0/ bar.getDuration();
-					// System.out.println(" positionInBar: " + positionInBar + ", relPos: " + relPositionInBar);
 					resultX = x + (int)(barWidthInPixel*relPositionInBar);
 					break;
 				}

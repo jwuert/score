@@ -32,7 +32,7 @@ public class QuantizedDuration {
 		this(scoreParameter, duration, durationTypeCharacter!=DurationType.REGULAR, DurationType.getSupportedTypesForCharacter(durationTypeCharacter));
 	}
 	
-	 private QuantizedDuration(ScoreParameter scoreParameter, long duration, boolean nonRegularCharacterInMetric, List<DurationType> durationTypeList) {
+	 public QuantizedDuration(ScoreParameter scoreParameter, long duration, boolean nonRegularCharacterInMetric, List<DurationType> durationTypeList) {
 		int minDelta = getMinDelta(DurationType.REGULAR, scoreParameter, duration)[0];
 		if (nonRegularCharacterInMetric && minDelta==0) {
 			durationTypeList.add(0, DurationType.REGULAR); // in order to fix a bug, so that a regular duration typed note is not turned into a dotted triplet!
@@ -79,19 +79,24 @@ public class QuantizedDuration {
 		return "duration: " + snappedDuration + ", type: " + durationType;
 	}
 	
-	public int[] getMinDelta(DurationType type, ScoreParameter scoreParameter, long duration) {
-		int resolutionTicks = scoreParameter.getResolutionInTicks();
-		double value = (resolutionTicks / type.getFactor());
+	int[] getMinDelta(DurationType type, ScoreParameter scoreParameter, long duration) {
+		int resolutionTicks = scoreParameter.getResolutionInTicks(); // e.g. 240
+		double value = (resolutionTicks / type.getFactor()); // reg: 240 - trip: 160 - quint: 192
 		int minDeltaTicks = Integer.MAX_VALUE;
 		int snappedDuration = 0;
 		int snappedPower = 0;
 		for (int i = 0; i < 10; i++) {
-			double valueDuration = value * Math.pow(2, i);
-			int deltaTicks = (int) Math.abs(duration - valueDuration);
-			if (deltaTicks < minDeltaTicks) {
-				minDeltaTicks = deltaTicks;
-				snappedDuration = (int) valueDuration;
-				snappedPower = i;
+			double valueDuration = value * Math.pow(2, i); // reg: 240, 480, 960, 1920 - trip: 160, 320, 640, 1280 - quint: 192, 384, 768, 1536
+			for (double factor = 1.0; factor <= 1.25; factor += 0.25) {
+				if (factor==1.0 || type==DurationType.REGULAR) { // only if REGULAR, test on factor 1.25 in addition (e.g. quarter plus sixteenth)
+
+					int deltaTicks = (int) Math.abs(duration - valueDuration*factor);
+					if (deltaTicks < minDeltaTicks) {
+						minDeltaTicks = deltaTicks;
+						snappedDuration = (int) (valueDuration);
+						snappedPower = i;
+					}
+				}
 			}
 		}
 		return new int[] { minDeltaTicks, snappedDuration, snappedPower };
