@@ -13,6 +13,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class DurationTest {
 
     @Test
@@ -20,26 +23,28 @@ public class DurationTest {
         ScoreParameter scoreParameter = new ScoreParameter(960, 240, 1,4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
                 Arrays.asList(DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET),
                 new ArrayList<>(), 0);
-        System.out.println("res. in ticks: " + scoreParameter.getResolutionInTicks());
         QuantizedDuration qdur = new QuantizedDuration(scoreParameter, 1200);
-        System.out.println(qdur);
         int[] md;
-        System.out.println(String.format("%10s %10s %10s %10s %10s","Regular","Factor","min-delta", "snap-dur", "snap-pow"));
 
         md = qdur.getMinDelta(DurationType.REGULAR, scoreParameter, 1200);
-        System.out.println(String.format("%10s %10f %10d %10d %10d","Regular", DurationType.REGULAR.getFactor(), md[0],md[1],md[2]));
+        assertEquals(0, md[0]);
+        assertEquals(960, md[1]);
+        assertEquals(2, md[2]);
 
         md = qdur.getMinDelta(DurationType.TRIPLET, scoreParameter, 1200);
-        System.out.println(String.format("%10s %10f %10d %10d %10d","Triplet", DurationType.TRIPLET.getFactor(), md[0],md[1],md[2]));
+        assertEquals(80, md[0]);
+        assertEquals(1280, md[1]);
+        assertEquals(3, md[2]);
 
         md = qdur.getMinDelta(DurationType.QUINTUPLET, scoreParameter, 1200);
-        System.out.println(String.format("%10s %10f %10d %10d %10d","Quintuplet", DurationType.QUINTUPLET.getFactor(), md[0],md[1],md[2]));
+        assertEquals(336, md[0]);
+        assertEquals(1536, md[1]);
+        assertEquals(3, md[2]);
 
         md = qdur.getMinDelta(DurationType.DOTTED, scoreParameter, 1200);
-        System.out.println(String.format("%10s %10f %10d %10d %10d","Dotted", DurationType.DOTTED.getFactor(), md[0],md[1],md[2]));
-
-//        md = qdur.getMinDelta(DurationType.HALFDOTTED, scoreParameter, 1200);
-//        System.out.println(String.format("%10s %10f %10d %10d %10d","Half-Dotted", DurationType.HALFDOTTED.getFactor(), md[0],md[1],md[2]));
+        assertEquals(240, md[0]);
+        assertEquals(1440, md[1]);
+        assertEquals(2, md[2]);
     }
 
     @Test
@@ -57,9 +62,12 @@ public class DurationTest {
         track.addEvent(factory.createClefEvent(0, 0));
         ScoreBar bar = new ScoreBar(0, track, scoreParameter);
         QuantizedPosition qpos = new QuantizedPosition(bar, 0, 240);
-        System.out.println("qpos type: " + qpos.getType());
+        assertEquals(0l, qpos.getSnappedPosition());
+        assertEquals(DurationType.REGULAR, qpos.getType());
         QuantizedDuration qdur = new QuantizedDuration(scoreParameter, 1200, qpos.getType());
-        System.out.println(qdur);
+        assertEquals(960, qdur.getSnappedDuration());
+        assertEquals(DurationType.REGULAR, qdur.getType());
+        assertEquals(2, qdur.getPower());
     }
 
     @Test
@@ -81,8 +89,38 @@ public class DurationTest {
         ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
         Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
         ScoreVoice voice = barIterator.next().iterator().next();
+        assertEquals(4, voice.size());
         for (ScoreObject scoreObject : voice) {
             System.out.println(scoreObject);
+        }
+        Iterator<ScoreObject> voiceIterator = voice.iterator();
+        {
+            ScoreObject so = voiceIterator.next();
+            assertTrue(so.isChord());
+            assertEquals(0, so.getStartPosition());
+            assertEquals(960, so.getDuration());
+            assertEquals(DurationType.REGULAR, so.getDurationType());
+        }
+        {
+            ScoreObject so = voiceIterator.next();
+            assertTrue(so.isChord());
+            assertEquals(960, so.getStartPosition());
+            assertEquals(240, so.getDuration());
+            assertEquals(DurationType.REGULAR, so.getDurationType());
+        }
+        {
+            ScoreObject so = voiceIterator.next();
+            assertTrue(so.isRest());
+            assertEquals(1200, so.getStartPosition());
+            assertEquals(720, so.getDuration());
+            assertEquals(DurationType.DOTTED, so.getDurationType());
+        }
+        {
+            ScoreObject so = voiceIterator.next();
+            assertTrue(so.isRest());
+            assertEquals(1920, so.getStartPosition());
+            assertEquals(1920, so.getDuration());
+            assertEquals(DurationType.REGULAR, so.getDurationType());
         }
     }
 }

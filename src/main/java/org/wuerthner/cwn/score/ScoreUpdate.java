@@ -29,12 +29,16 @@ public class ScoreUpdate {
 
     public ScoreUpdate(CwnTrack track) {
         this.type = Type.REBUILD;
-        restrictToTrack(track);
+        if (track!=null) {
+            restrictToTrack(track);
+        }
     }
 
     public ScoreUpdate(CwnTrack track, CwnSelection<? extends CwnEvent> selection) {
         this.type = Type.REBUILD;
-        restrictToTrack(track);
+        if (track!=null) {
+            restrictToTrack(track);
+        }
         restrictToRange(selection);
     }
 
@@ -132,23 +136,4 @@ public class ScoreUpdate {
             return type.name() + " - " + (start==0 && end==Long.MAX_VALUE ? "full range" : "range [bar]: " + (startTrias.bar+1) + "-" + (endTrias.bar+1)) + ", tracks: " + tracks;
         }
     }
-
-//    private long findPositionBefore(long position) {
-//        long result = Long.MAX_VALUE;
-//        for (CwnTrack track : restrictedTrackList) {
-//            result = Math.min(result, findPositionBefore(track, position));
-//        }
-//        return result;
-//    }
-//
-//    private long findPositionBefore(CwnTrack track, long position) {
-//        long result = position;
-//        for (CwnNoteEvent noteEvent : track.getList(CwnNoteEvent.class)) {
-//            if (noteEvent.getPosition()>=position) {
-//                break;
-//            }
-//            result = noteEvent.getPosition();
-//        }
-//        return result;
-//    }
 }
