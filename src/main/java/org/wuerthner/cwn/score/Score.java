@@ -7,12 +7,13 @@ public class Score {
 	public static final int NONE = 0;
 	public static final int ALLOW_DOTTED_RESTS = 1;
 	public static final int SPLIT_RESTS = 2;
+	public static final int MERGE_RESTS_IN_EMPTY_BARS = 4;
 	
 	public static final int Y_CENTER = 17;
 	public static final double STEM_SLOPE = 0.05;
 	public static final double NOTE_HEAD_WIDTH = 6;
 	public static final int STEM_LENGTH = 19;
-	public static final int TIMESIGNATURE_WIDTH = 12;
+	public static final int TIMESIGNATURE_WIDTH = 8;
 	public static final int CLEF_WIDTH = 28;
 	public static final int KEY_WIDTH = 7;
 

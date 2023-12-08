@@ -264,6 +264,7 @@ public class ScorePrinter {
 		int key = -99;
 		String met0 = "-99";
 		String met1 = "-99";
+		int barNumber = 1;
 		for (ScoreBar bar : staff) {
 			if (bar.getStartPosition() > endPosition) {
 				break;
@@ -312,6 +313,7 @@ public class ScorePrinter {
 					"|");
 			// @formatter:on
 			_lilypond_code.append("        \\bar \"" + barLine + "\"" + EOL);
+			_lilypond_code.append("          % --- Bar No. " + barNumber++ + " ---" + EOL);
 
 //			if (bar.getEndPosition() > endPosition+1) {
 //				break;

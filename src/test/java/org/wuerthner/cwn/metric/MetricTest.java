@@ -190,4 +190,17 @@ public class MetricTest {
 		assertTrue(subMetric2.numberOfEvents() == 2);
 		assertTrue(subMetric2.duration() == 0.5);
 	}
+
+	@Test
+	public void test68() {
+		System.out.println("6/8:");
+		Metric metric = MetricTools.createRegularMetrics("6/8");
+		System.out.println(metric.toString());
+		System.out.println(metric.numberOfEvents());
+
+		System.out.println("\n4/4:");
+		metric = MetricTools.createRegularMetrics("4/4");
+		System.out.println(metric.toString());
+		System.out.println(metric.numberOfEvents());
+	}
 }

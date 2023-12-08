@@ -6,7 +6,8 @@ import org.wuerthner.cwn.api.DurationType;
 import org.wuerthner.cwn.api.ScoreParameter;
 
 public class QuantizedDuration {
-	
+
+	private final static double[] factors = new double[] {1.0, 1.125, 1.25, 1.375, 1.75};
 	private final DurationType durationType;
 	private final int snappedDuration;
 	private final int snappedPower;
@@ -87,9 +88,10 @@ public class QuantizedDuration {
 		int snappedPower = 0;
 		for (int i = 0; i < 10; i++) {
 			double valueDuration = value * Math.pow(2, i); // reg: 240, 480, 960, 1920 - trip: 160, 320, 640, 1280 - quint: 192, 384, 768, 1536
-			for (double factor = 1.0; factor <= 1.25; factor += 0.25) {
-				if (factor==1.0 || type==DurationType.REGULAR) { // only if REGULAR, test on factor 1.25 in addition (e.g. quarter plus sixteenth)
-
+			for (double factor : factors) {
+				if (factor==1.0 ||
+						(type==DurationType.REGULAR && (factor!=1.75 || !scoreParameter.durationTypeList.contains(DurationType.BIDOTTED)))) {
+					// only if REGULAR, test on factor 1.25 in addition (e.g. 1/4 + 1/16), 1.375 (1/2 + 1/8 + 1/16)
 					int deltaTicks = (int) Math.abs(duration - valueDuration*factor);
 					if (deltaTicks < minDeltaTicks) {
 						minDeltaTicks = deltaTicks;

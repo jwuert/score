@@ -71,10 +71,10 @@ public class SampleNoteEvent implements CwnNoteEvent, Comparable<CwnEvent> {
 		return velocity;
 	}
 	
-	@Override
-	public int getTuplet() {
-		return 0;
-	}
+//	@Override
+//	public int getTuplet() {
+//		return 0;
+//	}
 	
 	@Override
 	public int getVoice() {

@@ -227,27 +227,31 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 
 	private void groupForDurationCharacter() {
 		int character = 0;
-		int previousCharacter = 0;
 		CharacterGroup group = null;
+		int counter = 0;
 		for (ScoreObject so : scoreObjectSet) {
 			character = so.getDurationType().getCharacter();
-			if (character != previousCharacter) {
-				if (group!=null) characterGroupSet.add(group);
-				if (character>1) {
+			if (character>1) {
+				if (group==null) {
 					group = new CharacterGroup(so.getRelativePosition(), so.getRelativeDuration(), character, so.getDurationType().getPresentation(), scoreBar.getScoreParameter().ppq);
+					characterGroupSet.add(group);
+					counter++;
 				} else {
-					group = null;
+					group.addRelativeDuration(so.getRelativeDuration());
+					counter++;
+					if (counter == character) {
+						group = null;
+						counter = 0;
+					}
 				}
 			} else {
-				if (group!=null) {
-					group.addRelativeDuration(so.getRelativeDuration());
-				}
+				group = null;
+				counter = 0;
 			}
-			previousCharacter = character;
 		}
-		if (group!=null) {
-			characterGroupSet.add(group);
-		}
+//		if (group!=null) {
+//			characterGroupSet.add(group);
+//		}
 	}
 	
 //	private void makeCharacterGroup(double position, Metric metric) {
@@ -283,8 +287,9 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 	}
 	
 	public void fillWithRests() {
-		if (scoreObjectSet.isEmpty() && isPresentableDuration(getDuration(), DurationType.REGULAR)) {
-			scoreObjectSet.add(new ScoreRest(scoreBar, getStartPosition(), getDuration()));
+		if (scoreObjectSet.isEmpty() && isPresentableDuration(getDuration(), DurationType.REGULAR) && scoreBar.getScoreParameter().mergeRestsInEmptyBar()) {
+			scoreObjectSet.add(new ScoreRest(scoreBar, new QuantizedPosition(scoreBar, getStartPosition(), metric),
+					new QuantizedDuration(scoreParameter, getDuration())));
 		} else {
 			long currentPosition = getStartPosition();
 			for (ScoreObject scoreNote : Collections.unmodifiableSet(new TreeSet<>(scoreObjectSet))) {
@@ -324,7 +329,9 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 						long nextBarPosition = PositionTools.nextBar(scoreBar.getTrack(), firstBeatPosition);
 						split(firstBeatPosition, nextBarPosition, restStartPosition, restDuration, metric, qpos.getType());
 					} else {
-						scoreObjectSet.add(new ScoreRest(scoreBar, restStartPosition, restDuration));
+//						 scoreObjectSet.add(new ScoreRest(scoreBar, restStartPosition, restDuration));
+						scoreObjectSet.add(new ScoreRest(scoreBar, new QuantizedPosition(scoreBar, restStartPosition, metric),
+								new QuantizedDuration(scoreParameter, restDuration)));
 					}
 				}
 				currentPosition = nextPosition;

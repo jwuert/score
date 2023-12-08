@@ -338,9 +338,9 @@ public class ScorePresenter {
 			}
 			TimeSignature timeSignature = bar.getTimeSignature();
 			boolean alternative = selection.contains(bar.getTimeSignatureEvent());
-			canvas.drawString(timeSignature.getNumerator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13, "left", alternative);
-			canvas.drawString(timeSignature.getDenominator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13 + layout.getLineHeight() * 2, "left", alternative);
-			offset += Score.TIMESIGNATURE_WIDTH;
+			canvas.drawString(timeSignature.getNumerator(), "timeSignature", xBarPosition + 3 + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13, "left", alternative);
+			canvas.drawString(timeSignature.getDenominator(), "timeSignature", xBarPosition + 3 + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13 + layout.getLineHeight() * 2, "left", alternative);
+			// offset += Score.TIMESIGNATURE_WIDTH;
 		}
 		// SPACING:
 		// offset += 12;
@@ -743,8 +743,9 @@ public class ScorePresenter {
 			//
 			// duration character group "characterGroup"
 			//
-			double characterGroupRelativePosition = round(characterGroup.getRelativePosition() / metric.duration());
-			double characterGroupRelativeDuration = round(characterGroup.getRelativeDuration() / metric.duration());
+			double characterGroupRelativePosition = round(characterGroup.getRelativePosition() );/// metric.duration());
+			double characterGroupRelativeDuration = round(characterGroup.getRelativeDuration() );/// metric.duration());
+
 			int characterGroupStartPosition = (int) (xBarPosition + characterGroupRelativePosition * xWidth);
 			if (debug) {
 				int characterGroupEndPosition = (int) (characterGroupStartPosition + characterGroupRelativeDuration * xWidth - 3);
@@ -1010,7 +1011,7 @@ public class ScorePresenter {
 				drawHelpLines(xPosition + xShift, yBase, yNote, note);
 				// tie?
 				if (note.hasStartTie()) {
-					drawArc(note, xPosition, yNote, yNote,xWidth - 4, alternative, multivoice);
+					drawArc(note, xPosition, yNote, yNote,xWidth - 14, alternative, multivoice);
 				}
 				if (note.getCwnNoteEvent().hasAccents()) {
 					accentList.addAll(note.getCwnNoteEvent().getAccentList());
@@ -1036,7 +1037,7 @@ public class ScorePresenter {
 			drawHelpLines(xPosition, yBase, yNote, note);
 			// tie?
 			if (note.hasStartTie()) {
-				drawArc(note, xPosition, yNote, yNote, xWidth - 4, alternative, multivoice);
+				drawArc(note, xPosition, yNote, yNote, xWidth - 14, alternative, multivoice);
 			}
 			if (beamGroupSize == 1) {
 				drawStem(xPosition, yNote, yNote, note);

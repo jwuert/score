@@ -129,7 +129,7 @@ public class ScoreBuilderTest {
 		track.addEvent(noteEvent1);
 		track.addEvent(noteEvent2);
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1, 4, Score.ALLOW_DOTTED_RESTS,
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 0, 4, Score.ALLOW_DOTTED_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
 				new ArrayList<>(), 0); // 4 bars - allow dotted rests
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
@@ -206,13 +206,11 @@ public class ScoreBuilderTest {
 		// bar 3
 		track.addEvent(factory.createNoteEvent(2*D1+D2, D4, 87, 0, 0, 0));
 		trackList.add(track);
-		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1, 4, Score.ALLOW_DOTTED_RESTS,
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 0, 4, Score.ALLOW_DOTTED_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
 				new ArrayList<>(), 0); // 4 bars - allow dotted rests
-		System.out.println("sp1: " + scoreParameter.getBarOffset() + ", " + scoreParameter.startPosition + "-" + scoreParameter.endPosition);
 		TrackContainer container = new TrackContainer(trackList, 0);
 		ScoreBuilder scoreBuilder = new ScoreBuilder(container, scoreParameter, new SampleScoreLayout(), 1);
-		System.out.println("sp2: " + scoreParameter.getBarOffset() + ", " + scoreParameter.startPosition + "-" + scoreParameter.endPosition);
 
 		// scoreBuilder.update(ScoreUpdate.FULL.setTrack(track));
 
@@ -251,7 +249,7 @@ public class ScoreBuilderTest {
 		// bar 4
 		ScoreBar origBar4 = staff.getBar(3);
 		{
-			assertEquals(origBar4.getVoice(0).getScoreObjectSet().size(), 1);
+			assertEquals(1, origBar4.getVoice(0).getScoreObjectSet().size());
 			List<String> list = origBar4.getVoice(0).getScoreObjectSet().stream().map(obj -> obj.getStartPosition() + ":" + obj.getDuration() + ":" + obj.getAveragePitch()).collect(Collectors.toList());
 			assertEquals(list.get(0), "4608:1536:0.0");
 		}
