@@ -1,5 +1,6 @@
 title: test split-notes 4/4
 flag:	allowDottedRests
+flag:   mergeRestsInEmptyBars
 char:	D
 size:	4
 #

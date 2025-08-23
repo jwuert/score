@@ -6,7 +6,8 @@ import org.wuerthner.cwn.api.DurationType;
 import org.wuerthner.cwn.api.ScoreParameter;
 
 public class QuantizedDuration {
-	
+
+	private final static double[] factors = new double[] {1.0, 1.125, 1.25, 1.375, 1.75};
 	private final DurationType durationType;
 	private final int snappedDuration;
 	private final int snappedPower;
@@ -18,7 +19,7 @@ public class QuantizedDuration {
 	 * @param duration
 	 */
 	public QuantizedDuration(ScoreParameter scoreParameter, long duration) {
-		this(scoreParameter, duration, scoreParameter.getSupportedDurationTypes());
+		this(scoreParameter, duration, false, scoreParameter.getSupportedDurationTypes());
 	}
 	
 	/**
@@ -29,10 +30,14 @@ public class QuantizedDuration {
 	 * @param durationTypeCharacter
 	 */
 	public QuantizedDuration(ScoreParameter scoreParameter, long duration, DurationType durationTypeCharacter) {
-		this(scoreParameter, duration, DurationType.getSupportedTypesForCharacter(durationTypeCharacter));
+		this(scoreParameter, duration, durationTypeCharacter!=DurationType.REGULAR, DurationType.getSupportedTypesForCharacter(durationTypeCharacter));
 	}
 	
-	private QuantizedDuration(ScoreParameter scoreParameter, long duration, List<DurationType> durationTypeList) {
+	 public QuantizedDuration(ScoreParameter scoreParameter, long duration, boolean nonRegularCharacterInMetric, List<DurationType> durationTypeList) {
+		int minDelta = getMinDelta(DurationType.REGULAR, scoreParameter, duration)[0];
+		if (nonRegularCharacterInMetric && minDelta==0) {
+			durationTypeList.add(0, DurationType.REGULAR); // in order to fix a bug, so that a regular duration typed note is not turned into a dotted triplet!
+		}
 		int durationTypeSize = durationTypeList.size();
 		int[][] minMatrix = new int[durationTypeSize][];
 		int totalMinimum = Integer.MAX_VALUE;
@@ -75,19 +80,25 @@ public class QuantizedDuration {
 		return "duration: " + snappedDuration + ", type: " + durationType;
 	}
 	
-	private int[] getMinDelta(DurationType type, ScoreParameter scoreParameter, long duration) {
-		int resolutionTicks = scoreParameter.getResolutionInTicks();
-		double value = (resolutionTicks / type.getFactor());
+	int[] getMinDelta(DurationType type, ScoreParameter scoreParameter, long duration) {
+		int resolutionTicks = scoreParameter.getResolutionInTicks(); // e.g. 240
+		double value = (resolutionTicks / type.getFactor()); // reg: 240 - trip: 160 - quint: 192
 		int minDeltaTicks = Integer.MAX_VALUE;
 		int snappedDuration = 0;
 		int snappedPower = 0;
 		for (int i = 0; i < 10; i++) {
-			double valueDuration = value * Math.pow(2, i);
-			int deltaTicks = (int) Math.abs(duration - valueDuration);
-			if (deltaTicks < minDeltaTicks) {
-				minDeltaTicks = deltaTicks;
-				snappedDuration = (int) valueDuration;
-				snappedPower = i;
+			double valueDuration = value * Math.pow(2, i); // reg: 240, 480, 960, 1920 - trip: 160, 320, 640, 1280 - quint: 192, 384, 768, 1536
+			for (double factor : factors) {
+				if (factor==1.0 ||
+						(type==DurationType.REGULAR && (factor!=1.75 || !scoreParameter.durationTypeList.contains(DurationType.BIDOTTED)))) {
+					// only if REGULAR, test on factor 1.25 in addition (e.g. 1/4 + 1/16), 1.375 (1/2 + 1/8 + 1/16)
+					int deltaTicks = (int) Math.abs(duration - valueDuration*factor);
+					if (deltaTicks < minDeltaTicks) {
+						minDeltaTicks = deltaTicks;
+						snappedDuration = (int) (valueDuration);
+						snappedPower = i;
+					}
+				}
 			}
 		}
 		return new int[] { minDeltaTicks, snappedDuration, snappedPower };

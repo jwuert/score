@@ -4,6 +4,7 @@ import org.wuerthner.cwn.api.exception.InvalidPositionException;
 
 public class Trias {
 	public final static String PATTERN = "^\\s*\\d+\\s*\\.\\s*\\d+\\s*\\.\\s*\\d+\\s*$";
+	public final static String BEAT_PATTERN = "^\\s*\\d+\\s*\\.\\s*\\d+\\s*$";
 	public final static String BAR_PATTERN = "^\\s*\\d+\\s*$";
 	public final int bar;
 	public final int beat;
@@ -19,7 +20,6 @@ public class Trias {
 		if (position.matches(PATTERN)) {
 			int p1 = position.indexOf('.');
 			int p2 = position.indexOf('.', p1 + 1);
-			// bar = Integer.valueOf(position.substring(0, p1).trim()) - 1;
 			bar = Integer.parseInt(position.substring(0, p1).trim()) - 1;
 			beat = Integer.parseInt(position.substring(p1 + 1, p2).trim()) - 1;
 			tick = Integer.parseInt(position.substring(p2 + 1).trim());
@@ -28,9 +28,19 @@ public class Trias {
 			} else if (beat < 0) {
 				throw new InvalidPositionException("Invalid beat: " + beat);
 			}
+		} else if (position.matches(BEAT_PATTERN)) {
+			int p1 = position.indexOf('.');
+			bar = Integer.parseInt(position.substring(0, p1).trim()) - 1;
+			beat = Integer.parseInt(position.substring(p1 + 1).trim()) - 1;
+			tick = 0;
+			if (bar < 0) {
+				throw new InvalidPositionException("Invalid bar: " + bar);
+			} else if (beat < 0) {
+				throw new InvalidPositionException("Invalid beat: " + beat);
+			}
 		} else if (position.matches(BAR_PATTERN)) {
 			int number = Integer.parseInt(position.trim()) - 1;
-			bar = (number < 0 ? 0 : number);
+			bar = Math.max(number, 0);
 			beat = 0;
 			tick = 0;
 		} else {
@@ -63,10 +73,10 @@ public class Trias {
 		return makeString(""+(bar+1), 2) + "." + makeString(""+(beat+1), 2) + "." + makeString(""+tick, 4);
 	}
 
-	private final String makeString(String n, int len) {
-		StringBuffer buf = new StringBuffer();
+	private String makeString(String n, int len) {
+		StringBuilder buf = new StringBuilder();
 		int l = n.length();
-		for (int i=len; i>=l; i--) buf.append(" ");
+		buf.append(" ".repeat(Math.max(0, len - l + 1)));
 		buf.append(n);
 		return buf.toString();
 	}

@@ -9,7 +9,7 @@ public class ScoreParameter {
 	public long endPosition;
 	public int resolutionInTicks;
 	public int ppq;
-	public final int flags;
+	public int flags;
 	public int metricLevel;
 	public int stretchFactor;
 	public final List<DurationType> durationTypeList;
@@ -20,7 +20,7 @@ public class ScoreParameter {
 	
 	private ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset) {
 		this(ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
-				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				Arrays.asList(DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET),
 				new ArrayList<>(), barOffset);
 		// Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED }));
 	}
@@ -38,15 +38,20 @@ public class ScoreParameter {
 		this.markup = markup;
 		this.barOffset = barOffset;
 	}
+	
 
 	public boolean allowDottedRests() {
 		return (flags & Score.ALLOW_DOTTED_RESTS) != 0;
 	}
+
+	public boolean mergeRestsInEmptyBar() { return (flags & Score.MERGE_RESTS_IN_EMPTY_BARS) != 0; }
 	
 	public boolean splitRests() {
 		return (flags & Score.SPLIT_RESTS) != 0;
 	}
-	
+
+	public void setFlags(int flags) { this.flags = flags; }
+
 	public List<DurationType> getSupportedDurationTypes() {
 		return Collections.unmodifiableList(durationTypeList);
 	}
@@ -78,31 +83,31 @@ public class ScoreParameter {
 	public void setFilename(String filename) { this.filename = filename; }
 
 	public void setTuplet(boolean t2, boolean t3, boolean t4, boolean t5, boolean t6) {
-		if (t2 && !durationTypeList.contains(DurationType.DUPLET)) {
-			durationTypeList.add(DurationType.DUPLET);
-		} else if (!t2 && durationTypeList.contains(DurationType.DUPLET)) {
-			durationTypeList.remove(DurationType.DUPLET);
-		}
-		if (t3 && !durationTypeList.contains(DurationType.TRIPLET)) {
-			durationTypeList.add(DurationType.TRIPLET);
-		} else if (!t3 && durationTypeList.contains(DurationType.TRIPLET)) {
-			durationTypeList.remove(DurationType.TRIPLET);
-		}
-		if (t4 && !durationTypeList.contains(DurationType.QUADRUPLET)) {
-			durationTypeList.add(DurationType.QUADRUPLET);
-		} else if (!t4 && durationTypeList.contains(DurationType.QUADRUPLET)) {
-			durationTypeList.remove(DurationType.QUADRUPLET);
-		}
-		if (t5 && !durationTypeList.contains(DurationType.QUINTUPLET)) {
-			durationTypeList.add(DurationType.QUINTUPLET);
-		} else if (!t5 && durationTypeList.contains(DurationType.QUINTUPLET)) {
-			durationTypeList.remove(DurationType.QUINTUPLET);
-		}
-		if (t6 && !durationTypeList.contains(DurationType.SEXTUPLET)) {
-			durationTypeList.add(DurationType.SEXTUPLET);
-		} else if (!t6 && durationTypeList.contains(DurationType.SEXTUPLET)) {
-			durationTypeList.remove(DurationType.SEXTUPLET);
-		}
+//		if (t2 && !durationTypeList.contains(DurationType.DUPLET)) {
+//			durationTypeList.add(DurationType.DUPLET);
+//		} else if (!t2 && durationTypeList.contains(DurationType.DUPLET)) {
+//			durationTypeList.remove(DurationType.DUPLET);
+//		}
+//		if (t3 && !durationTypeList.contains(DurationType.TRIPLET)) {
+//			durationTypeList.add(DurationType.TRIPLET);
+//		} else if (!t3 && durationTypeList.contains(DurationType.TRIPLET)) {
+//			durationTypeList.remove(DurationType.TRIPLET);
+//		}
+//		if (t4 && !durationTypeList.contains(DurationType.QUADRUPLET)) {
+//			durationTypeList.add(DurationType.QUADRUPLET);
+//		} else if (!t4 && durationTypeList.contains(DurationType.QUADRUPLET)) {
+//			durationTypeList.remove(DurationType.QUADRUPLET);
+//		}
+//		if (t5 && !durationTypeList.contains(DurationType.QUINTUPLET)) {
+//			durationTypeList.add(DurationType.QUINTUPLET);
+//		} else if (!t5 && durationTypeList.contains(DurationType.QUINTUPLET)) {
+//			durationTypeList.remove(DurationType.QUINTUPLET);
+//		}
+//		if (t6 && !durationTypeList.contains(DurationType.SEXTUPLET)) {
+//			durationTypeList.add(DurationType.SEXTUPLET);
+//		} else if (!t6 && durationTypeList.contains(DurationType.SEXTUPLET)) {
+//			durationTypeList.remove(DurationType.SEXTUPLET);
+//		}
 //		if (t7 && !durationTypeList.contains(DurationType.SEPTUPLET)) {
 //			durationTypeList.add(DurationType.SEPTUPLET);
 //		} else if (!t7 && durationTypeList.contains(DurationType.SEPTUPLET)) {

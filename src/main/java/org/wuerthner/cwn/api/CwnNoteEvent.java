@@ -15,7 +15,7 @@ public interface CwnNoteEvent extends CwnEvent {
 	
 	public int getVelocity();
 	
-	public int getTuplet();
+	// public int getTuplet();
 	
 	public int getVoice();
 	

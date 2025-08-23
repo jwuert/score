@@ -18,6 +18,7 @@ public class TestSelection implements CwnSelection<CwnEvent> {
         public long getMouseRightPosition() {				return 0;			}
         public int getMouseStaff() {				return 0;			}
         public SelectionType getSelectionType() {				return null;			}
+        public SelectionSubType getSelectionSubType() { return null; }
         public CwnPointer getPointer() {				return new CwnPointer() {
         public Region getRegion() {					return null;				}
         public long getPosition() {					return 0;				}
@@ -27,7 +28,12 @@ public class TestSelection implements CwnSelection<CwnEvent> {
         public void setRegion(Region region) {				}
         public int getStaffIndex() {					return 0;				}
         public void setStaffIndex(int index) {				}
-        public void clear() {				}			};			}
+        public void clear() {				}
+        public void setRelativeY(int y) {}
+        public int getRelativeY() { return 0; }
+        public void setDeltaY(int y) {}
+        public int getDeltaY() { return 0; }
+        };			}
         public boolean hasSingleSelection() {				return false;			}
         public CwnEvent getSingleSelection() {				return null;			}
         public List<CwnEvent> getSelection() {				return null;			}

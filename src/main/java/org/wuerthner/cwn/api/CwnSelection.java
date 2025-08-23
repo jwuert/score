@@ -6,6 +6,10 @@ public interface CwnSelection<T> {
 	public enum SelectionType {
 		NOTE, POSITION
 	}
+
+	public enum SelectionSubType {
+		WITHIN_STAFF, ABOVE_STAFF, BELOW_STAFF_RANGE, BELOW_STAFF_POINT, NONE
+	}
 	
 	public boolean contains(T event);
 	
@@ -28,6 +32,8 @@ public interface CwnSelection<T> {
 	public int getMouseStaff();
 	
 	public SelectionType getSelectionType();
+
+	public SelectionSubType getSelectionSubType();
 
 	public CwnPointer getPointer();
 
