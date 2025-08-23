@@ -28,12 +28,39 @@ public class ScoreChord extends AbstractScoreObject {
 		hasShiftedNotes = handleHorizontalShift();
 	}
 
+	private static long getLongestDuration(List<ScoreObject> scoreObjects) {
+		long longestDuration = 0;
+		for (ScoreObject scoreObject : scoreObjects) {
+			long dur = scoreObject.getDuration();
+			if (dur>longestDuration) {
+				longestDuration = dur;
+			}
+		}
+		return longestDuration;
+	}
+
 	private static long getShortestDuration(List<ScoreObject> scoreObjects) {
 		long shortestDuration = Long.MAX_VALUE;
 		for (ScoreObject scoreObject : scoreObjects) {
-			shortestDuration = Math.min(shortestDuration, scoreObject.getDuration());
+			long dur = scoreObject.getDuration();
+			if (dur<shortestDuration) {
+				shortestDuration = dur;
+			}
 		}
 		return shortestDuration;
+	}
+
+	private static DurationType getLongestDurationType(List<ScoreObject> scoreObjects) {
+		long longestDuration = 0;
+		ScoreObject obj = null;
+		for (ScoreObject scoreObject : scoreObjects) {
+			long dur = scoreObject.getDuration();
+			if (dur>longestDuration) {
+				obj = scoreObject;
+				longestDuration = dur;
+			}
+		}
+		return obj.getDurationType();
 	}
 
 	private static DurationType getShortestDurationType(List<ScoreObject> scoreObjects) {
@@ -41,8 +68,10 @@ public class ScoreChord extends AbstractScoreObject {
 		ScoreObject obj = null;
 		for (ScoreObject scoreObject : scoreObjects) {
 			long dur = scoreObject.getDuration();
-			if (dur<shortestDuration) { obj = scoreObject; }
-			shortestDuration = Math.min(shortestDuration, dur);
+			if (dur<shortestDuration) {
+				obj = scoreObject;
+				shortestDuration = dur;
+			}
 		}
 		return obj.getDurationType();
 	}
@@ -142,8 +171,36 @@ public class ScoreChord extends AbstractScoreObject {
 	}
 	
 	@Override
+	// public int getNumberOfFlags() { return scoreNoteSet.first().getNumberOfFlags(); }
 	public int getNumberOfFlags() {
-		return scoreNoteSet.first().getNumberOfFlags();
+		ScoreNote n = null;
+		long duration = Long.MAX_VALUE;
+		for (ScoreNote note : scoreNoteSet) {
+			if (note.getDuration()<duration) {
+				n = note;
+				duration = note.getDuration();
+			}
+		}
+		if (n!=null) {
+			return n.getNumberOfFlags();
+		}
+		return 0;
+	}
+
+	@Override
+	public int getNumberOfDots() {
+		ScoreNote n = null;
+		long duration = Long.MAX_VALUE;
+		for (ScoreNote note : scoreNoteSet) {
+			if (note.getDuration()<duration) {
+				n = note;
+				duration = note.getDuration();
+			}
+		}
+		if (n!=null) {
+			return n.getNumberOfDots();
+		}
+		return 0;
 	}
 	
 	private boolean handleHorizontalShift() {

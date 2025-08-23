@@ -895,6 +895,7 @@ public class ScorePresenter {
 							scoreObject = scoreObjectArray[a];
 							// flags
 							int numberOfFlags = scoreObject.getNumberOfFlags();
+
 							int previousNumberOfFlags = (a > 0 ? scoreObjectArray[a - 1].getNumberOfFlags() : 0);
 							int nextNumberOfFlags = (a < len - 1 ? scoreObjectArray[a + 1].getNumberOfFlags() : 0);
 							// x
@@ -999,6 +1000,8 @@ public class ScorePresenter {
 		if (chord.size() > 1) {
 			int yNoteBottom = yBase + chord.getMinimumNote().getY() * 3 - 42;
 			int yNoteTop = yBase + chord.getMaximumNote().getY() * 3 - 42;
+			int base = chord.getDurationBase();
+			int dots = chord.getNumberOfDots();
 			for (ScoreNote note : chord.getObjectSet()) {
 				alternative = selection.contains(note.getCwnNoteEvent());
 				hasEndTie = note.hasEndTie();
@@ -1007,7 +1010,7 @@ public class ScorePresenter {
 				int yNote = yBase + note.getY() * 3 - 42;
 				int xShift = note.getHorizontalShift();
 				// draw
-				drawHead(xPosition + xShift, yNote, note);
+				drawHead(xPosition + xShift, yNote, note, base, dots);
 				drawHelpLines(xPosition + xShift, yBase, yNote, note);
 				// tie?
 				if (note.hasStartTie()) {
@@ -1033,7 +1036,9 @@ public class ScorePresenter {
 			lyrics += note.getLyrics();
 			velocity = note.getCwnNoteEvent().getVelocity();
 			int yNote = yBase + note.getY() * 3 - 42;
-			drawHead(xPosition, yNote, note);
+			int base = note.getDurationBase();
+			int dots = note.getNumberOfDots();
+			drawHead(xPosition, yNote, note, base, dots);
 			drawHelpLines(xPosition, yBase, yNote, note);
 			// tie?
 			if (note.hasStartTie()) {
@@ -1060,16 +1065,17 @@ public class ScorePresenter {
 				canvas.drawLine(xPosition + 3, yBase + vCenter + 4, xPosition + 3, yBase + vCenter + 4 - (int) (velocity * (15.0 / 127.0)));
 				canvas.drawLine(xPosition + 4, yBase + vCenter + 4, xPosition + 4, yBase + vCenter + 4 - (int) (velocity * (15.0 / 127.0)));
 			}
-		}
-		if (accentPosition > 0 && accentPosition < Integer.MAX_VALUE) {
-			for (CwnAccent accent : accentList) {
-				if (accent.getName().equals(CwnAccent.ACCENT_FERMATA) || accent.getName().equals(CwnAccent.ACCENT_SHORTFERMATA) || accent.getName().equals(CwnAccent.ACCENT_LONGFERMATA)) {
-					accentPosition = Math.min(yBase - 14, accentPosition);
+			//}
+			if (accentPosition > 0 && accentPosition < Integer.MAX_VALUE) {
+				for (CwnAccent accent : accentList) {
+					if (accent.getName().equals(CwnAccent.ACCENT_FERMATA) || accent.getName().equals(CwnAccent.ACCENT_SHORTFERMATA) || accent.getName().equals(CwnAccent.ACCENT_LONGFERMATA)) {
+						accentPosition = Math.min(yBase - 14, accentPosition);
+					}
+					canvas.drawImage(accent.getName(), xPosition - 2, accentPosition - 2, false);
 				}
-				canvas.drawImage(accent.getName(), xPosition - 2, accentPosition - 2, false);
 			}
+			// canvas.drawLine(xPosition, yBase + vCenter, xPosition + 20, yBase + vCenter);
 		}
-		// canvas.drawLine(xPosition, yBase + vCenter, xPosition + 20, yBase + vCenter);
 	}
 
 	private void drawMarks(int xPosition, int yBase, ScoreChord chord) {
@@ -1122,9 +1128,7 @@ public class ScorePresenter {
 		}
 	}
 	
-	private void drawHead(int xPosition, int yPosition, ScoreNote note) {
-		int base = note.getDurationBase();
-		int dots = note.getNumberOfDots();
+	private void drawHead(int xPosition, int yPosition, ScoreNote note, int base, int dots) {
 		int sign = note.getSign();
 		String name = "head" + base;
 		boolean alternative = selection.contains(note.getCwnNoteEvent());

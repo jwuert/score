@@ -58,40 +58,50 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 		QuantizedPosition position = new QuantizedPosition(scoreBar, noteStartPosition, metric);
 		QuantizedDuration duration = new QuantizedDuration(scoreBar.getScoreParameter(), noteDuration, position.getType());
 		boolean isUngrouped = cwnNoteEvent.isUngrouped();
-		if (!scoreObjectSet.isEmpty()) {
-			ScoreObject previousObject = scoreObjectSet.last();
-			// check duration of previous note:
+		// old approach to adjust the length of a previous note if the following note begins before the previous note ends. Does not take chords into account!
+//		if (!scoreObjectSet.isEmpty()) {
+//			ScoreObject previousObject = scoreObjectSet.last();
+//			// check duration of previous note:
+//			long newPosition = position.getSnappedPosition() + scoreBar.getStartPosition();
+//			if (newPosition > previousObject.getStartPosition() && newPosition < previousObject.getEndPosition()) {
+//				if (ScoreNote.class.isAssignableFrom(previousObject.getClass())) {
+//					// todo: configurable: show orig length or adjusted length?
+//					boolean adjustLength = true;
+//					if (adjustLength) {
+//						// Substitute previous note by a copy with adjusted duration!
+//						// This assures that a note (duration) always ends before the next note begins!
+//						scoreObjectSet.remove(previousObject);
+//						ScoreNote newPreviousNote = new ScoreNote((ScoreNote) previousObject, scoreBar, newPosition - previousObject.getStartPosition());
+//						add(newPreviousNote);
+//					}
+//				} else {
+//					throw new RuntimeException("Error in ScoreVoice.addNote(): " + newPosition + " < " + previousObject.getEndPosition());
+//				}
+//			}
+//			// check pitch delta to previous note:
+////			if (newPosition > previousObject.getStartPosition() && ScoreNote.class.isAssignableFrom(previousObject.getClass())) {
+////			}
+//		}
+		// new approach to adjust notes or chords if the following note begins before the note or chord ends:
+		boolean adjustLength = true;
+		// todo: configurable: show orig length or adjusted length?
+		if (adjustLength && !scoreObjectSet.isEmpty()) {
+			long previousObjectStartPosition = scoreObjectSet.last().getStartPosition();
+			List<ScoreObject> previousObjectList = scoreObjectSet.stream().filter(so -> so.getStartPosition() == previousObjectStartPosition).collect(Collectors.toList());
+			long previousObjectLongestEndPosition = 0;
+			for (ScoreObject so : previousObjectList) { long ep = so.getEndPosition(); if (previousObjectLongestEndPosition < ep) previousObjectLongestEndPosition = ep; }
 			long newPosition = position.getSnappedPosition() + scoreBar.getStartPosition();
-			if (newPosition > previousObject.getStartPosition() && newPosition < previousObject.getEndPosition()) {
-				if (ScoreNote.class.isAssignableFrom(previousObject.getClass())) {
-					// todo: configurable: show orig length or adjusted length?
-					boolean adjustLength = true;
-					if (adjustLength) {
-						// Substitute previous note by a copy with adjusted duration!
-						// This assures that a note (duration) always ends before the next note begins!
+			if (newPosition > previousObjectStartPosition && newPosition < previousObjectLongestEndPosition) {
+				for (ScoreObject previousObject : previousObjectList) {
+					if (ScoreNote.class.isAssignableFrom(previousObject.getClass())) {
 						scoreObjectSet.remove(previousObject);
-						ScoreNote newPreviousNote = new ScoreNote((ScoreNote) previousObject, scoreBar, newPosition - previousObject.getStartPosition());
+						ScoreNote newPreviousNote = new ScoreNote((ScoreNote) previousObject, scoreBar, newPosition - previousObjectStartPosition);
 						add(newPreviousNote);
 					}
-				} else {
-					throw new RuntimeException("Error in ScoreVoice.addNote(): " + newPosition + " < " + previousObject.getEndPosition());
 				}
 			}
-			// check pitch delta to previous note:
-			if (newPosition > previousObject.getStartPosition() && ScoreNote.class.isAssignableFrom(previousObject.getClass())) {
-				// int previousPitch = ((ScoreNote) previousObject).getPitch();
-				// System.out.println("----------------------");
-				// Trias t = PositionTools.getTrias(scoreBar.getTrack(), newPosition);
-				// System.out.println("pos: " + t.toString());
-				// System.out.println("pp: " + previousPitch);
-				// System.out.println("cp: " + cwnNoteEvent.getPitch());
-				// System.out.println(" " + Math.abs(cwnNoteEvent.getPitch() - previousPitch));
-				// if (Math.abs(cwnNoteEvent.getPitch() - previousPitch) > 8) {
-				// If two subsequent pitches are too far apart (8) then the notes will not be grouped!
-				// isUngrouped = true;
-				// }
-			}
 		}
+
 		ScoreNote scoreNote = new ScoreNote(scoreBar, cwnNoteEvent, position, duration, stemDirection, isUngrouped);
 		scoreBar.handleSign(scoreNote);
 		add(scoreNote);
@@ -291,10 +301,17 @@ public class ScoreVoice implements Iterable<ScoreObject> {
 			scoreObjectSet.add(new ScoreRest(scoreBar, new QuantizedPosition(scoreBar, getStartPosition(), metric),
 					new QuantizedDuration(scoreParameter, getDuration())));
 		} else {
+			// for (ScoreObject so : scoreObjectSet) { System.out.println(" -> " + so.getStartPosition() + "-" + so.getEndPosition() + ", " + so.getDuration());}
 			long currentPosition = getStartPosition();
+			long currentNoteStart = -1;
 			for (ScoreObject scoreNote : Collections.unmodifiableSet(new TreeSet<>(scoreObjectSet))) {
 				handleDelta(currentPosition, scoreNote.getStartPosition());
-				currentPosition = scoreNote.getEndPosition();
+				if (scoreNote.getStartPosition() != currentNoteStart) {
+					currentPosition = scoreNote.getEndPosition();
+				} else if (scoreNote.getEndPosition() < currentPosition) {
+					currentPosition = scoreNote.getEndPosition();
+				}
+				currentNoteStart = scoreNote.getStartPosition();
 			}
 			handleDelta(currentPosition, getEndPosition());
 		}

@@ -98,6 +98,7 @@ public abstract class AbstractScoreObject implements ScoreObject {
 	
 	@Override
 	public int getNumberOfDots() {
+		// System.out.println("## NOD: duration " + duration + ", dots: " + durationType.getDots());
 		return durationType.getDots();
 	}
 	

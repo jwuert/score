@@ -127,6 +127,7 @@ public class ScorePrinter {
 		ScoreSystem system = new ScoreSystem(trackList, scoreParameter);
 		removeEmptyTrailingBars(system);
 		for (ScoreStaff staff : system) {
+			System.out.println(staff);
 			CwnTrack track = staff.getTrack();
 			//
 			// Piano ?
@@ -613,6 +614,7 @@ public class ScorePrinter {
 		if (ne.getCwnNoteEvent().hasAccents()) {
 			List<? extends CwnAccent> accentList = ne.getCwnNoteEvent().getAccentList();
 			String name;
+			if (!ne.hasEndTie()) {
 			for (CwnAccent accent : accentList) {
 				name = accent.getName();
 				// @formatter:off
@@ -652,7 +654,7 @@ public class ScorePrinter {
 						"";
 					// @formatter:on
 			}
-			
+			}
 		}
 		
 		// Output.out("pit: " + npitch + ", step: " + nstep + ", oct: " + noctv + ", enh: " + nenhs);

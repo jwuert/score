@@ -326,7 +326,9 @@ public class ScoreBuilder implements Iterable<ScoreSystem> {
 				barArray[scoreIndex] = barIteratorArray[scoreIndex].next();
 			} catch (NoSuchElementException e) {
 				// add rest at the end
-				barArray[scoreIndex] = new ScoreBar(barArray[scoreIndex]);
+				if (barArray[scoreIndex]!=null) {
+					barArray[scoreIndex] = new ScoreBar(barArray[scoreIndex]);
+				}
 			}
 		}
 	}
