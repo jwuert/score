@@ -1,5 +1,6 @@
 title: test multiple signatures
 flag:	allowDottedRests
+flag:   mergeRestsInEmptyBars
 #flag:	splitRests
 size:	6
 #show:	true

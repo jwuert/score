@@ -82,7 +82,6 @@ public class ScoreGroup implements Comparable<ScoreGroup> {
 	}
 	
 	public void addToGroupLevel1(ScoreObject scoreObject) {
-		// System.out.println("ATGL1 " + scoreObject.getStartPosition() + ", " + scoreObject.getDuration() + ": " + scoreBar.getStartPosition() + " - " + (currentGroup==null ? "-" : currentGroup.masterGroupStart + "/" + currentGroup.relativeStart));
 		double relativeObjectStart = scoreObject.getRelativePosition();
 		if (scoreObject.groupable()) {
 			if (currentGroup == null) {
@@ -99,9 +98,7 @@ public class ScoreGroup implements Comparable<ScoreGroup> {
 	}
 	
 	public void addToGroupLevel2(ScoreObject scoreObject) {
-		// System.out.println("ATGL2 " + scoreObject.getStartPosition() + ", " + scoreObject.getDuration() + ": " + scoreBar.getStartPosition() + " - " + (currentGroup==null ? "-" : currentGroup.masterGroupStart + "/" + currentGroup.relativeStart));
 		double relativeObjectStart = scoreObject.getRelativePosition();
-		// System.out.println("g: " + relativeObjectStart + "-" + masterGroupStart + ":" + (relativeObjectStart - masterGroupStart) + " : " + cumulativeDurationList);
 		if (isOnBeat(relativeObjectStart - masterGroupStart)) {
 			currentGroup = new ScoreGroup(relativeObjectStart, masterGroupStart, metric, scoreBar, depth + 1);
 			scoreGroupList.add(currentGroup);

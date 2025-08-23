@@ -34,8 +34,8 @@ public class Chord {
     public Chord(int[] pitchArray) {
         count = 0;
         bass = 256;
-        // __key  = new int[pitchArray.length];
-        // __mult = new int[pitchArray.length];
+        __key  = new int[pitchArray.length];
+        __mult = new int[pitchArray.length];
         init(pitchArray);
     }
 
@@ -45,15 +45,19 @@ public class Chord {
             p = RiemannTools.keyOfStep(pi%12, 0);
             done = false;
             for (i=0; i<count; i++) {
-                if (__key[i] == p) {
+                //if (__key!=null && __key.length>i)
+               if (__key[i] == p) {
                     __mult[i]++;
                     done = true;
                     break;
                 }
+                    //}
             }
             if (!done) {
-                __key[count] = p;
-                __mult[count] = 1;
+                // if (__key!=null && __key.length>count) {
+                    __key[count] = p;
+                    __mult[count] = 1;
+                // }
                 count++;
             }
         }
@@ -61,8 +65,10 @@ public class Chord {
         key  = new int[count];
         mult = new int[count];
         for (i=0; i<count; i++) {
-            key[i]  = __key[i];
-            mult[i] = __mult[i];
+            //if (__key!=null && __key.length>i) {
+                key[i] = __key[i];
+                mult[i] = __mult[i];
+            //}
         }
     }
     private void init(List<CwnNoteEvent> es) {

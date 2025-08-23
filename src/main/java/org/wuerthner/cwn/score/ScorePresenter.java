@@ -41,7 +41,7 @@ public class ScorePresenter {
 		canvas.open();
 		canvas.drawString(title, "title", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() - 30, "center");
 		canvas.drawString(subtitle, "subtitle", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() + 0, "center");
-		canvas.drawString(composer, "track", (int) (layout.getWidth() - 30), layout.getTitleHeight(), "right");
+		canvas.drawString(composer, "track", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 10, "right");
 		if (scoreBuilder.getScoreParameter().getFilename() != null) {
 			canvas.drawString(scoreBuilder.getScoreParameter().getFilename(), "barNumber", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 20, "right");
 		}
@@ -70,13 +70,46 @@ public class ScorePresenter {
 				} else if (event instanceof CwnSymbolEvent) {
 					String type = ((CwnSymbolEvent) event).getSymbolName();
 					String parameter = ""+((CwnSymbolEvent) event).getParameter();
-					String offset = ""+((CwnSymbolEvent) event).getParameter();
+					String offset = ""+((CwnSymbolEvent) event).getVerticalOffset();
 					canvas.drawString("type:", "barNumber", attrX, 44, "right");
 					canvas.drawString("parameter:", "barNumber", attrX, 56, "right");
 					canvas.drawString("offset:", "barNumber", attrX, 68, "right");
 					canvas.drawString(type, "barNumber", attrX+6, 44, "left");
 					canvas.drawString(parameter, "barNumber", attrX+6, 56, "left");
 					canvas.drawString(offset, "barNumber", attrX+6, 68, "left");
+				} else if (event instanceof CwnBarEvent) {
+					String type = ((CwnBarEvent)event).getTypeString();
+					canvas.drawString("type:", "barNumber", attrX, 44, "right");
+					canvas.drawString(type, "barNumber", attrX+6, 44, "left");
+				} else if (event instanceof CwnTempoEvent) {
+					String label = ((CwnTempoEvent) event).getLabel();
+					String tempo = ""+((CwnTempoEvent) event).getTempo();
+					canvas.drawString("label:", "barNumber", attrX, 44, "right");
+					canvas.drawString("tempo:", "barNumber", attrX, 56, "right");
+					canvas.drawString(label, "barNumber", attrX+6, 44, "left");
+					canvas.drawString(tempo, "barNumber", attrX+6, 56, "left");
+				} else if (event instanceof CwnKeyEvent) {
+					String key = Score.KEYS[((CwnKeyEvent)event).getKey()+7];
+					String genus = Score.GENUS[((CwnKeyEvent)event).getGenus()];
+					canvas.drawString("key:", "barNumber", attrX, 44, "right");
+					canvas.drawString("genus:", "barNumber", attrX, 56, "right");
+					canvas.drawString(key, "barNumber", attrX+6, 44, "left");
+					canvas.drawString(genus, "barNumber", attrX+6, 56, "left");
+				} else if (event instanceof CwnClefEvent) {
+					String clef = Score.CLEFS[((CwnClefEvent)event).getClef()];
+					canvas.drawString("clef:", "barNumber", attrX, 44, "right");
+					canvas.drawString(clef, "barNumber", attrX+6, 44, "left");
+				} else if (event instanceof CwnTimeSignatureEvent) {
+					String timeSignature = ((CwnTimeSignatureEvent)event).getTimeSignature().toString();
+					canvas.drawString("signature:", "barNumber", attrX, 44, "right");
+					canvas.drawString(timeSignature, "barNumber", attrX+6, 44, "left");
+				} else if (event instanceof CwnInfoEvent) {
+					String name = ((CwnInfoEvent)event).getName();
+					String info = ((CwnInfoEvent)event).getInfo(0) + " : " + ((CwnInfoEvent)event).getInfo(1);
+					canvas.drawString("name:", "barNumber", attrX, 44, "right");
+					canvas.drawString("info:", "barNumber", attrX, 56, "right");
+					canvas.drawString(name, "barNumber", attrX+6, 44, "left");
+					canvas.drawString(info, "barNumber", attrX+6, 56, "left");
 				}
 			}
 		}
@@ -106,7 +139,7 @@ public class ScorePresenter {
 					xBarPosition += bar.getOffset(layout.getPixelPerTick(), (barNumberPerStaff == 0), barIndex == 0);
 					int voiceIndex = 0;
 					for (ScoreVoice voice : bar) {
-						drawVoice(systemIndex, staffIndex, barIndex, voiceIndex, voice, bar.getTimeSignature().getMetric(), xBarPosition, xWidth);
+						drawVoice(systemIndex, staffIndex, barIndex, voiceIndex, voice, bar.getTimeSignature().getMetric(), xBarPosition, xWidth, bar.isMultiVoiceBar());
 						voiceIndex++;
 					}
 					xBarPosition = xBarPosition + xWidth;
@@ -251,19 +284,6 @@ public class ScorePresenter {
 			offset += Score.CLEF_WIDTH;
 		}
 		//
-		// handle time signature
-		//
-		if (bar.hasExplicitTimeSignature() || firstBarInTotal) {
-			if (debug) {
-				canvas.drawLine(xBarPosition + offset, yTop - layout.getSystemSpace(), xBarPosition + offset + Score.TIMESIGNATURE_WIDTH - 2, yTop - layout.getSystemSpace(), "green");
-			}
-			TimeSignature timeSignature = bar.getTimeSignature();
-			boolean alternative = selection.contains(bar.getTimeSignatureEvent());
-			canvas.drawString(timeSignature.getNumerator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13, "left", alternative);
-			canvas.drawString(timeSignature.getDenominator(), "timeSignature", xBarPosition + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13 + layout.getLineHeight() * 2, "left", alternative);
-			offset += Score.TIMESIGNATURE_WIDTH;
-		}
-		//
 		// handle key
 		//
 		if (bar.hasExplicitKey() || firstBarInStaff) {
@@ -272,6 +292,7 @@ public class ScorePresenter {
 			int clef = bar.getClef();
 			int key = bar.getKey();
 			int count = 0;
+			boolean alternative = selection.contains(bar.getKeyEvent());
 			if (bar.hasExplicitKey()) {
 				int signsToBeRemoved = bar.getSignsToBeRemoved(); // <0 means "b", >0 means "#" have to be removed!
 				if (signsToBeRemoved > 0) { // remove sharps
@@ -279,7 +300,7 @@ public class ScorePresenter {
 						if (i >= key) {
 							int x = (int) ((count++ * 6));
 							int y = ((Score.sharpTab[i] + Score.signShift[clef]) * 3 - 12);
-							canvas.drawImage("nat", xBarPosition + offset + x, yTop + y, false);
+							canvas.drawImage("nat", xBarPosition + offset + x, yTop + y, alternative);
 						}
 					}
 				} else if (signsToBeRemoved < 0) { // remove flats
@@ -287,7 +308,7 @@ public class ScorePresenter {
 						if (-i <= key) {
 							int x = (int) ((count++ * 6));
 							int y = ((Score.flatTab[i] + Score.signShift[clef]) * 3 - 12);
-							canvas.drawImage("nat", xBarPosition + offset + x, yTop + y, false);
+							canvas.drawImage("nat", xBarPosition + offset + x, yTop + y, alternative);
 						}
 					}
 				}
@@ -296,7 +317,6 @@ public class ScorePresenter {
 			if (debug) {
 				canvas.drawLine(xBarPosition + offset, yTop - layout.getSystemSpace(), xBarPosition + offset + Math.abs(bar.getKey()) * Score.KEY_WIDTH, yTop - layout.getSystemSpace(), "green");
 			}
-			boolean alternative = selection.contains(bar.getKeyEvent());
 			for (int i = 0; i < Math.abs(key); i++) {
 				int x = (int) ((i * 6));
 				if (key > 0) { // sharps
@@ -307,8 +327,20 @@ public class ScorePresenter {
 					canvas.drawImage("flat", xBarPosition + offset + x, yTop + y, alternative);
 				}
 			}
-			
 			offset += Math.abs(bar.getKey()) * Score.KEY_WIDTH + 2;
+		}
+		//
+		// handle time signature
+		//
+		if (bar.hasExplicitTimeSignature() || firstBarInTotal) {
+			if (debug) {
+				canvas.drawLine(xBarPosition + offset, yTop - layout.getSystemSpace(), xBarPosition + offset + Score.TIMESIGNATURE_WIDTH - 2, yTop - layout.getSystemSpace(), "green");
+			}
+			TimeSignature timeSignature = bar.getTimeSignature();
+			boolean alternative = selection.contains(bar.getTimeSignatureEvent());
+			canvas.drawString(timeSignature.getNumerator(), "timeSignature", xBarPosition + 3 + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13, "left", alternative);
+			canvas.drawString(timeSignature.getDenominator(), "timeSignature", xBarPosition + 3 + offset + (int) (0.5 * Score.TIMESIGNATURE_WIDTH) - 6, yTop + 13 + layout.getLineHeight() * 2, "left", alternative);
+			// offset += Score.TIMESIGNATURE_WIDTH;
 		}
 		// SPACING:
 		// offset += 12;
@@ -424,7 +456,8 @@ public class ScorePresenter {
 				// system cursor
 				// canvas.drawLine(xBarPosition + offset + relCursor, ySystemTop, xBarPosition + offset + relCursor, ySystemBottom);
 				// staff cursor
-				canvas.drawLine(xBarPosition + offset + relCursor, yTop, xBarPosition + offset + relCursor, yTop + 4 * layout.getLineHeight());
+				canvas.drawLine(xBarPosition + offset + relCursor, yTop - 4,
+						xBarPosition + offset + relCursor, yTop + 4 * layout.getLineHeight() + 4);
 			}
 		}
 		//
@@ -476,20 +509,67 @@ public class ScorePresenter {
 					}
 				}
 			} else if (selection.getSelectionType() == SelectionType.POSITION) {
+				// Arrow for Symbol Events
 				if (mouseStaff == staffIndex) {
-					// position selection - draws just a line at one y-position
-					if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition() && bar.getStartPosition() <= mouseRightPosition && mouseRightPosition < bar.getEndPosition()) {
-						// if all happens within one bar
-						drawMouseRangePositionIndicator(xBarPosition + offset + relMouseLeftPosition, yTop, xBarPosition + offset + relMouseRightPosition);
-					} else if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition()) {
-						// left:
-						drawMouseRangeLeftPositionIndicator(xBarPosition + offset + relMouseLeftPosition, yTop, xBarPosition + offset + xWidth);
-					} else if (bar.getStartPosition() <= mouseRightPosition && mouseRightPosition < bar.getEndPosition()) {
-						// right:
-						drawMouseRangeRightPositionIndicator(xBarPosition, yTop, xBarPosition + offset + relMouseRightPosition);
-					} else if (bar.getStartPosition() > mouseLeftPosition && bar.getEndPosition() <= mouseRightPosition) {
-						// complete bar:
-						drawMouseRangeCenterPositionIndicator(xBarPosition, yTop, xBarPosition + offset + xWidth);
+					if (selection.getSelectionSubType() == CwnSelection.SelectionSubType.WITHIN_STAFF) {
+						// BOW UP, BOW DOWN
+						int y = yTop - layout.getSystemSpace() + selection.getPointer().getRelativeY() + 3;
+						int mouseDeltaY = selection.getPointer().getDeltaY();
+
+						// position selection - draws just a line at one y-position
+						if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition() && bar.getStartPosition() <= mouseRightPosition && mouseRightPosition < bar.getEndPosition()) {
+							// if all happens within one bar
+							drawMouseRangePositionIndicator(xBarPosition + offset + relMouseLeftPosition, y, y + mouseDeltaY, xBarPosition + offset + relMouseRightPosition);
+						} else if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition()) {
+							// left:
+							drawMouseRangeLeftPositionIndicator(xBarPosition + offset + relMouseLeftPosition, y, y + (int) (mouseDeltaY * 0.5), xBarPosition + offset + xWidth);
+						} else if (bar.getStartPosition() <= mouseRightPosition && mouseRightPosition < bar.getEndPosition()) {
+							// right:
+							drawMouseRangeRightPositionIndicator(xBarPosition, y + (int) (mouseDeltaY * 0.5), y + mouseDeltaY, xBarPosition + offset + relMouseRightPosition);
+						} else if (bar.getStartPosition() > mouseLeftPosition && bar.getEndPosition() <= mouseRightPosition) {
+							// complete bar:
+							drawMouseRangeCenterPositionIndicator(xBarPosition, y + (int) (mouseDeltaY * 0.5), xBarPosition + offset + xWidth);
+						}
+					} else if (selection.getSelectionSubType() == CwnSelection.SelectionSubType.ABOVE_STAFF) {
+						// ABOVE STAFF
+						int y = yTop-10;
+						if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition() && bar.getStartPosition() <= mouseRightPosition && mouseRightPosition < bar.getEndPosition()) {
+							// if all happens within one bar
+							drawMouseRangePositionIndicator(xBarPosition + offset + relMouseLeftPosition, y, y, xBarPosition + offset + relMouseRightPosition);
+						} else if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition()) {
+							// left:
+							drawMouseRangeLeftPositionIndicator(xBarPosition + offset + relMouseLeftPosition, y, y, xBarPosition + offset + xWidth);
+						} else if (bar.getStartPosition() <= mouseRightPosition && mouseRightPosition < bar.getEndPosition()) {
+							// right:
+							drawMouseRangeRightPositionIndicator(xBarPosition, y, y, xBarPosition + offset + relMouseRightPosition);
+						} else if (bar.getStartPosition() > mouseLeftPosition && bar.getEndPosition() <= mouseRightPosition) {
+							// complete bar:
+							drawMouseRangeCenterPositionIndicator(xBarPosition, y, xBarPosition + offset + xWidth);
+						}
+					} else if (selection.getSelectionSubType() == CwnSelection.SelectionSubType.BELOW_STAFF_RANGE) {
+						// BELOW STAFF
+						int y = yTop+4*layout.getLineHeight()+10;
+						if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition() && bar.getStartPosition() <= mouseRightPosition && mouseRightPosition < bar.getEndPosition()) {
+							// if all happens within one bar
+							drawMouseRangePositionIndicator(xBarPosition + offset + relMouseLeftPosition, y, y, xBarPosition + offset + relMouseRightPosition);
+						} else if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition()) {
+							// left:
+							drawMouseRangeLeftPositionIndicator(xBarPosition + offset + relMouseLeftPosition, y, y, xBarPosition + offset + xWidth);
+						} else if (bar.getStartPosition() <= mouseRightPosition && mouseRightPosition < bar.getEndPosition()) {
+							// right:
+							drawMouseRangeRightPositionIndicator(xBarPosition, y, y, xBarPosition + offset + relMouseRightPosition);
+						} else if (bar.getStartPosition() > mouseLeftPosition && bar.getEndPosition() <= mouseRightPosition) {
+							// complete bar:
+							drawMouseRangeCenterPositionIndicator(xBarPosition, y, xBarPosition + offset + xWidth);
+						}
+					} else if (selection.getSelectionSubType() == CwnSelection.SelectionSubType.BELOW_STAFF_POINT) {
+						// BELOW STAFF POINT
+						int y = yTop+4*layout.getLineHeight()+10;
+						if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition()) {
+							int x = xBarPosition + offset + relMouseLeftPosition;
+							canvas.drawLine(x-2, y-2, x+2, y+2, "red");
+							canvas.drawLine(x-2, y+2, x+2, y-2, "red");
+						}
 					}
 				}
 			}
@@ -501,13 +581,15 @@ public class ScorePresenter {
 		for (CwnSymbolEvent event : bar.getSymbols()) {
 			int xStart = (int) ((event.getPosition() - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
 			int xEnd = (int) ((event.getPosition() + event.getDuration() - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
-			int y = yTop - layout.getSystemSpace() + event.getVerticalOffset();
+			int y = yTop - layout.getSystemSpace() ;//+ event.getVerticalOffset();
 			boolean alternative = selection.contains(event);
+			int eventParameter = event.getParameter();
+			int eventVerticalOffset = event.getVerticalOffset();
 			if (event.isCrescendo()) {
 				//
 				// Crescendo
 				//
-				y += layout.getStaffHeight() - 4;
+				y += layout.getStaffHeight() - 4 + eventVerticalOffset;
 				if (alternative) {
 					canvas.drawLine(xBarPosition + offset + xStart, y, xBarPosition + offset + xEnd, y - 4, "red");
 					canvas.drawLine(xBarPosition + offset + xStart, y, xBarPosition + offset + xEnd, y + 4, "red");
@@ -523,7 +605,7 @@ public class ScorePresenter {
 				//
 				// Decrescendo
 				//
-				y += layout.getStaffHeight() - 4;
+				y += layout.getStaffHeight() - 4 + eventVerticalOffset;
 				if (alternative) {
 					canvas.drawLine(xBarPosition + offset + xStart, y - 4, xBarPosition + offset + xEnd, y, "red");
 					canvas.drawLine(xBarPosition + offset + xStart, y + 4, xBarPosition + offset + xEnd, y, "red");
@@ -541,27 +623,42 @@ public class ScorePresenter {
 				//
 				int xoffset = 4;
 				int yoffset = 10;
-				int yAdd = 15;
-				int delta = event.getParameter();
-				canvas.drawArc(xBarPosition + offset + xStart + xoffset, y+yAdd, xBarPosition + offset + xEnd + xoffset, y +yAdd - delta, 1, yoffset, alternative);
+				int yAdd = 0;
+				// System.out.println("=> " + vOffset + ", " + delta);
+				// canvas.drawArc(xBarPosition + offset + xStart + xoffset, y+yAdd, xBarPosition + offset + xEnd + xoffset, y +yAdd - delta, 1, yoffset, alternative);
+				canvas.drawArc(xBarPosition + offset + xStart + xoffset,
+						y+yAdd+eventVerticalOffset,
+						xBarPosition + offset + xEnd + xoffset,
+						y +yAdd + eventVerticalOffset + eventParameter,
+						1, yoffset, alternative);
 			} else if (event.isBowDown()) {
 				//
 				// Bowdown
 				//
 				int xoffset = 4;
-				int yoffset = -10;
-				int yAdd = -30 - layout.getLineHeight()*5;
-				int delta = event.getParameter();
-				canvas.drawArc(xBarPosition + offset + xStart + xoffset, y-yAdd, xBarPosition + offset + xEnd + xoffset, y -yAdd - delta, -1, yoffset, alternative);
+				int yoffset = +10;
+				int yAdd = 0;//-30 - layout.getLineHeight()*5;
+				// canvas.drawArc(xBarPosition + offset + xStart + xoffset, y-yAdd, xBarPosition + offset + xEnd + xoffset, y -yAdd - delta, -1, yoffset, alternative);
+				canvas.drawArc(xBarPosition + offset + xStart + xoffset,
+						y+yAdd+eventVerticalOffset,
+						xBarPosition + offset + xEnd + xoffset,
+						y +yAdd + eventVerticalOffset + eventParameter,
+						-1, yoffset, alternative);
 			} else if (event.isOctave()) {
-				canvas.drawImage(event.getSymbolName(), xBarPosition + offset + xStart, y - 5, alternative);
+				if (event.getSymbolName().equals("o"+CwnSymbolEvent.SYMBOL_8VA)) canvas.drawString("8va", "nole", xBarPosition + offset + xStart -2, y+6, "left", alternative);
+				if (event.getSymbolName().equals("o"+CwnSymbolEvent.SYMBOL_15VA)) canvas.drawString("15va", "nole", xBarPosition + offset + xStart -2, y+6, "left", alternative);
 				canvas.drawLine(xBarPosition + offset + xStart + 16, y, xBarPosition + offset + xEnd, y, alternative);
+				canvas.drawLine(xBarPosition + offset + xEnd, y, xBarPosition + offset + xEnd, y+4, alternative);
 			} else if (event.isCase()) {
-				canvas.drawImage(event.getSymbolName(), xBarPosition + offset + xStart, y - 5, alternative);
-				canvas.drawLine(xBarPosition + offset + xStart + 16, y, xBarPosition + offset + xWidth, y, alternative);
+				if (event.getSymbolName().equals(CwnSymbolEvent.SYMBOL_CASE1)) canvas.drawString("1.", "nole", xBarPosition + offset + xStart -2, y+16, "left", alternative);
+				if (event.getSymbolName().equals(CwnSymbolEvent.SYMBOL_CASE2)) canvas.drawString("2.", "nole", xBarPosition + offset + xStart -2, y+16, "left", alternative);
+				// canvas.drawLine(xBarPosition + offset + xStart - 4, y, xBarPosition + offset + xWidth, y, alternative);
+				// canvas.drawLine(xBarPosition + offset + xStart - 4, y, xBarPosition + offset + xStart - 4, y + 16, alternative);
+				canvas.drawLine(xBarPosition + offset - 4, y, xBarPosition + offset + xEnd, y, alternative);
+				canvas.drawLine(xBarPosition + offset - 4, y, xBarPosition + offset - 4, y + 16, alternative);
 			} else {
-				y += layout.getStaffHeight() - 10;
-				canvas.drawImage(event.getSymbolName(), xBarPosition + offset + xStart, y, alternative);
+				y += layout.getStaffHeight() - 10 + eventVerticalOffset;
+				canvas.drawImage(event.getSymbolName(), xBarPosition + offset + xStart + eventParameter, y, alternative);
 			}
 		}
 		//
@@ -605,26 +702,26 @@ public class ScorePresenter {
 		}
 	}
 	
-	private void drawMouseRangePositionIndicator(int xLeft, int yTop, int xRight) {
-		canvas.drawLine(xLeft, yTop - 10, xRight, yTop - 10, "red"); // line
-		canvas.drawLine(xLeft - 2, yTop - 12, xLeft - 1, yTop - 12 + 5); // start box
-		canvas.drawLine(xRight, yTop - 10, xRight - 4, yTop - 13); // end (arrow)
-		canvas.drawLine(xRight, yTop - 10, xRight - 4, yTop - 7); // end (arrow)
+	private void drawMouseRangePositionIndicator(int xLeft, int yTop, int yBottom, int xRight) {
+		canvas.drawLine(xLeft, yTop, xRight, yBottom, "red"); // line
+		canvas.drawLine(xLeft - 2, yTop - 2, xLeft - 2, yTop - 2 + 5); // start box
+		canvas.drawLine(xRight, yBottom, xRight - 3, yBottom - 3); // end (arrow)
+		canvas.drawLine(xRight, yBottom, xRight - 3, yBottom + 3); // end (arrow)
 	}
 	
-	private void drawMouseRangeLeftPositionIndicator(int xLeft, int yTop, int xRight) {
-		canvas.drawLine(xLeft, yTop - 10, xRight + 1, yTop - 10, "red"); // line
-		canvas.drawLine(xLeft - 2, yTop - 12, xLeft - 1, yTop - 12 + 5); // start box
+	private void drawMouseRangeLeftPositionIndicator(int xLeft, int yTop, int yBottom, int xRight) {
+		canvas.drawLine(xLeft, yTop, xRight + 1, yBottom, "red"); // line
+		canvas.drawLine(xLeft - 2, yTop - 2, xLeft - 1, yTop - 2 + 5); // start box
 	}
 	
-	private void drawMouseRangeRightPositionIndicator(int xLeft, int yTop, int xRight) {
-		canvas.drawLine(xLeft, yTop - 10, xRight, yTop - 10, "red"); // line
-		canvas.drawLine(xRight, yTop - 10, xRight - 4, yTop - 13); // end (arrow)
-		canvas.drawLine(xRight, yTop - 10, xRight - 4, yTop - 7); // end (arrow)
+	private void drawMouseRangeRightPositionIndicator(int xLeft, int yTop, int yBottom, int xRight) {
+		canvas.drawLine(xLeft, yTop, xRight, yBottom, "red"); // line
+		canvas.drawLine(xRight, yBottom, xRight - 3, yBottom - 3); // end (arrow)
+		canvas.drawLine(xRight, yBottom, xRight - 3, yBottom + 3); // end (arrow)
 	}
 	
 	private void drawMouseRangeCenterPositionIndicator(int xLeft, int yTop, int xRight) {
-		canvas.drawLine(xLeft, yTop - 10, xRight + 1, yTop - 10, "red"); // line
+		canvas.drawLine(xLeft, yTop, xRight + 1, yTop, "red"); // line
 	}
 	
 	private void drawLeftMouseRangeIndicator(int xLeft, int yTop, int xRight, int yBottom) {
@@ -639,15 +736,16 @@ public class ScorePresenter {
 		canvas.drawLine(xLeft, yBottom + 10, xRight - 5, yBottom + 11, "red");
 	}
 	
-	private void drawVoice(int systemIndex, int staffIndex, int barIndex, int voiceIndex, ScoreVoice voice, Metric metric, double xBarPosition, double xWidth) {
+	private void drawVoice(int systemIndex, int staffIndex, int barIndex, int voiceIndex, ScoreVoice voice, Metric metric, double xBarPosition, double xWidth, boolean multiVoiceBar) {
 		int yTop = layout.getBorder() + layout.getTitleHeight() + (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight();
 		int yBase = yTop + layout.getSystemSpace() + 1;
 		for (CharacterGroup characterGroup : voice.getCharacterGroups()) {
 			//
 			// duration character group "characterGroup"
 			//
-			double characterGroupRelativePosition = round(characterGroup.getRelativePosition() / metric.duration());
-			double characterGroupRelativeDuration = round(characterGroup.getRelativeDuration() / metric.duration());
+			double characterGroupRelativePosition = round(characterGroup.getRelativePosition() );/// metric.duration());
+			double characterGroupRelativeDuration = round(characterGroup.getRelativeDuration() );/// metric.duration());
+
 			int characterGroupStartPosition = (int) (xBarPosition + characterGroupRelativePosition * xWidth);
 			if (debug) {
 				int characterGroupEndPosition = (int) (characterGroupStartPosition + characterGroupRelativeDuration * xWidth - 3);
@@ -733,7 +831,7 @@ public class ScorePresenter {
 						if (scoreObject.isRest()) {
 							drawRest((ScoreRest) scoreObject, xPosition, yBase - voice.getVoiceLocation() * 6, xWidth);
 						} else if (scoreObject.isChord()) {
-							drawChord((ScoreChord) scoreObject, xPosition, yBase, beamGroupSize, xWidth);
+							drawChord((ScoreChord) scoreObject, xPosition, yBase, beamGroupSize, xWidth, multiVoiceBar);
 							drawMarks(xPosition, yTop, (ScoreChord) scoreObject);
 						} else {
 							throw new RuntimeException("unexpected scoreObject type: " + scoreObject);
@@ -797,6 +895,7 @@ public class ScorePresenter {
 							scoreObject = scoreObjectArray[a];
 							// flags
 							int numberOfFlags = scoreObject.getNumberOfFlags();
+
 							int previousNumberOfFlags = (a > 0 ? scoreObjectArray[a - 1].getNumberOfFlags() : 0);
 							int nextNumberOfFlags = (a < len - 1 ? scoreObjectArray[a + 1].getNumberOfFlags() : 0);
 							// x
@@ -891,7 +990,7 @@ public class ScorePresenter {
 		}
 	}
 	
-	private void drawChord(ScoreChord chord, int xPosition, int yBase, int beamGroupSize, double xWidth) {
+	private void drawChord(ScoreChord chord, int xPosition, int yBase, int beamGroupSize, double xWidth, boolean multivoice) {
 		String lyrics = "";
 		int velocity = 0;
 		boolean hasEndTie = false;
@@ -901,6 +1000,8 @@ public class ScorePresenter {
 		if (chord.size() > 1) {
 			int yNoteBottom = yBase + chord.getMinimumNote().getY() * 3 - 42;
 			int yNoteTop = yBase + chord.getMaximumNote().getY() * 3 - 42;
+			int base = chord.getDurationBase();
+			int dots = chord.getNumberOfDots();
 			for (ScoreNote note : chord.getObjectSet()) {
 				alternative = selection.contains(note.getCwnNoteEvent());
 				hasEndTie = note.hasEndTie();
@@ -909,11 +1010,11 @@ public class ScorePresenter {
 				int yNote = yBase + note.getY() * 3 - 42;
 				int xShift = note.getHorizontalShift();
 				// draw
-				drawHead(xPosition + xShift, yNote, note);
+				drawHead(xPosition + xShift, yNote, note, base, dots);
 				drawHelpLines(xPosition + xShift, yBase, yNote, note);
 				// tie?
 				if (note.hasStartTie()) {
-					drawArc(note, xPosition, yNote, xWidth - 4, alternative);
+					drawArc(note, xPosition, yNote, yNote,xWidth - 14, alternative, multivoice);
 				}
 				if (note.getCwnNoteEvent().hasAccents()) {
 					accentList.addAll(note.getCwnNoteEvent().getAccentList());
@@ -935,11 +1036,13 @@ public class ScorePresenter {
 			lyrics += note.getLyrics();
 			velocity = note.getCwnNoteEvent().getVelocity();
 			int yNote = yBase + note.getY() * 3 - 42;
-			drawHead(xPosition, yNote, note);
+			int base = note.getDurationBase();
+			int dots = note.getNumberOfDots();
+			drawHead(xPosition, yNote, note, base, dots);
 			drawHelpLines(xPosition, yBase, yNote, note);
 			// tie?
 			if (note.hasStartTie()) {
-				drawArc(note, xPosition, yNote, xWidth - 4, alternative);
+				drawArc(note, xPosition, yNote, yNote, xWidth - 14, alternative, multivoice);
 			}
 			if (beamGroupSize == 1) {
 				drawStem(xPosition, yNote, yNote, note);
@@ -962,16 +1065,17 @@ public class ScorePresenter {
 				canvas.drawLine(xPosition + 3, yBase + vCenter + 4, xPosition + 3, yBase + vCenter + 4 - (int) (velocity * (15.0 / 127.0)));
 				canvas.drawLine(xPosition + 4, yBase + vCenter + 4, xPosition + 4, yBase + vCenter + 4 - (int) (velocity * (15.0 / 127.0)));
 			}
-		}
-		if (accentPosition > 0 && accentPosition < Integer.MAX_VALUE) {
-			for (CwnAccent accent : accentList) {
-				if (accent.getName().equals(CwnAccent.ACCENT_FERMATA) || accent.getName().equals(CwnAccent.ACCENT_SHORTFERMATA) || accent.getName().equals(CwnAccent.ACCENT_LONGFERMATA)) {
-					accentPosition = Math.min(yBase - 14, accentPosition);
+			//}
+			if (accentPosition > 0 && accentPosition < Integer.MAX_VALUE) {
+				for (CwnAccent accent : accentList) {
+					if (accent.getName().equals(CwnAccent.ACCENT_FERMATA) || accent.getName().equals(CwnAccent.ACCENT_SHORTFERMATA) || accent.getName().equals(CwnAccent.ACCENT_LONGFERMATA)) {
+						accentPosition = Math.min(yBase - 14, accentPosition);
+					}
+					canvas.drawImage(accent.getName(), xPosition - 2, accentPosition - 2, false);
 				}
-				canvas.drawImage(accent.getName(), xPosition - 2, accentPosition - 2, false);
 			}
+			// canvas.drawLine(xPosition, yBase + vCenter, xPosition + 20, yBase + vCenter);
 		}
-		// canvas.drawLine(xPosition, yBase + vCenter, xPosition + 20, yBase + vCenter);
 	}
 
 	private void drawMarks(int xPosition, int yBase, ScoreChord chord) {
@@ -981,16 +1085,30 @@ public class ScorePresenter {
 		}
 	}
 
-	private void drawArc(ScoreNote note, int xPosition, int yNote, double xWidth, boolean alternative) {
+	private void drawArc(ScoreNote note, int xPosition, int yNote1, int yNote2, double xWidth, boolean alternative, boolean multivoice) {
 		// int x = xPosition + 7;
 		// int y = yNote + 3 + note.getStemDirection() * 6;
 		// int dur = (int) (note.getRelativeDuration() * xWidth);
 		// canvas.drawLine(x, y, x + dur, y);
 		int x = xPosition + 7;
-		int y = yNote + 3 + note.getStemDirection() * 6;
-		int dur = (int) (note.getRelativeDuration() * xWidth);
+		int y1 = yNote1 + 3 - note.getStemDirection() * 6;
+		int y2 = yNote2 + 3 - note.getStemDirection() * 6;
+		int dur = (int) (note.getRelativeDuration() * xWidth) + 6;
 		// canvas.drawArc(x, y, x + dur, note.getStemDirection(), alternative);
-		canvas.drawArc(x, y, x + dur, y, -note.getStemDirection(), 0, alternative);
+		int direction;
+		if (multivoice) {
+			direction = note.getVoice()==1 ? -1 : +1;
+			y2 = y2-5;
+			y1 = y1-5;
+			x = x + 2;
+		} else {
+			direction = -note.getStemDirection();
+			if (direction>0) {
+				y1 -= 6;
+				y2 -= 6;
+			}
+		}
+		canvas.drawArc(x, y1, x + dur, y2, direction, 0, alternative);
 	}
 	
 	private void drawHelpLines(int xPosition, int yBase, int yPosition, ScoreNote note) {
@@ -1010,9 +1128,7 @@ public class ScorePresenter {
 		}
 	}
 	
-	private void drawHead(int xPosition, int yPosition, ScoreNote note) {
-		int base = note.getDurationBase();
-		int dots = note.getNumberOfDots();
+	private void drawHead(int xPosition, int yPosition, ScoreNote note, int base, int dots) {
 		int sign = note.getSign();
 		String name = "head" + base;
 		boolean alternative = selection.contains(note.getCwnNoteEvent());

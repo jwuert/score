@@ -34,7 +34,7 @@ public class ParallelsMarkup implements Markup {
         List<String> markList = new ArrayList<>();
         if (prevPitch1 != 0 && prevPitch2 != 0 && pitch1 != 0 && pitch2 != 0) {
             int deltaNote = Math.abs(pitch1 - pitch2);
-            if (deltaNote == 0 || deltaNote == 7 || deltaNote == 12 || deltaNote == 19 || deltaNote == 24) {
+            if (deltaNote == 0 || deltaNote == 7 || deltaNote == 12 || deltaNote == 19 || deltaNote == 24 || deltaNote == 31 || deltaNote == 36) {
                 int slope1 = pitch1 - prevPitch1;
                 int slope2 = pitch2 - prevPitch2;
                 if (slope1 * slope2 > 0) {

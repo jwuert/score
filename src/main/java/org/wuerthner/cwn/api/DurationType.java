@@ -13,8 +13,9 @@ public class DurationType {
 	public final static DurationType SEXTUPLET = new DurationType(6, 0, 6, 5);
 	
 	public final static DurationType[] TUPLETS = { REGULAR, DUPLET, TRIPLET, QUADRUPLET, QUINTUPLET, SEXTUPLET };
-	
+
 	public final static DurationType DOTTED = new DurationType(1, 1, 2, 3);
+	// public final static DurationType HALFDOTTED = new DurationType(1, 0, 4, 5);
 	public final static DurationType BIDOTTED = new DurationType(1, 2, 4, 7);
 	public final static DurationType TRIDOTTED = new DurationType(1, 3, 8, 15);
 	
@@ -35,6 +36,7 @@ public class DurationType {
 		List<DurationType> durationTypeList = new ArrayList<>();
 		durationTypeList.add(durationTypeCharacter);
 		durationTypeList.add(new DurationType(durationTypeCharacter, DOTTED));
+		// durationTypeList.add(new DurationType(durationTypeCharacter, HALFDOTTED));
 		durationTypeList.add(new DurationType(durationTypeCharacter, BIDOTTED));
 		durationTypeList.add(new DurationType(durationTypeCharacter, TRIDOTTED));
 		return durationTypeList;

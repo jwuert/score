@@ -34,10 +34,11 @@ public class ScoreNote extends AbstractScoreObject {
 		this.cwnNoteEvent = originalNote.cwnNoteEvent;
 		this.isSplitNote = originalNote.isSplitNote;
 		this.stemDirection = originalNote.stemDirection;
-		this.clef = scoreBar.getClef();
+		this.clef = originalNote.getClef();
 		this.reducedDuration = true;
 		this.horizontalShift = false;
 		this.isUngrouped = false;
+		this.sign = originalNote.getSign();
 	}
 	
 	// Constructor for tests without CwnNoteEvent!
@@ -53,7 +54,7 @@ public class ScoreNote extends AbstractScoreObject {
 	}
 	
 	// Constructor for tests
-	ScoreNote(ScoreBar scoreBar, CwnNoteEvent cwnNoteEvent) {
+	public ScoreNote(ScoreBar scoreBar, CwnNoteEvent cwnNoteEvent) {
 		super(scoreBar, cwnNoteEvent.getPosition(), cwnNoteEvent.getDuration(), DurationType.REGULAR);
 		this.cwnNoteEvent = Optional.of(cwnNoteEvent);
 		this.isSplitNote = false;

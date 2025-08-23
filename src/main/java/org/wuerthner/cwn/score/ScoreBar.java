@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.wuerthner.cwn.api.CwnBarEvent;
 import org.wuerthner.cwn.api.CwnClefEvent;
@@ -177,11 +178,15 @@ public class ScoreBar implements Iterable<ScoreVoice> {
 	public List<CwnTempoEvent> getTempi() {
 		return tempoList;
 	}
-	
+
 	public List<CwnSymbolEvent> getSymbols() {
 		return symbolList;
 	}
-	
+
+	public List<CwnSymbolEvent> getSymbols(int voice) {
+		return symbolList.stream().filter(symbol -> symbol.getVoice()==voice).collect(Collectors.toList());
+	}
+
 	public CwnBarEvent getBarEvent() {
 		return barEvent;
 	}

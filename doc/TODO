@@ -1,4 +1,12 @@
 1. Vorzeichen (#/b), Versatz bei dicht plazierten Noten (z.B. f+g)
 2. Voice-abhängiger horizontaler Versatz: Voice 3+4 => +3 pixel, Voice 5+6 => +6 pixel
-3. Piano Staff einführen
-4. die Metrum Berechnung als double ändern in: Resolution * character (aller n'olen), z.B: wenn res=1/16th, und Triolen auftreten, dann barLength=16*3=48
+3. die Metrum Berechnung als double ändern in: Resolution * character (aller n'olen), z.B: wenn res=1/16th, und Triolen auftreten, dann barLength=16*3=48
+4. In QuantizedDuration gibt es eine Liste von factors: 1.0, 1.25, 1.375. Die Werte >1 beschreiben die Zusammensetzungen von durations zu einer Note, die der Algorithmus
+   als Triole darstellen würde, wenn sie nicht berücksichtigt würden. Z.B. 1.25 (eine ganze + eine viertel; oder eine halbe + eine achtel). Ebenso 1.375
+   (eine ganze + eine viertel + eine achtel). In ScoreVoice wird entsprechend in addNote() am Ende ein cutoff ermittelt, der den "Rest" zum eigentlichen Notenwert
+   als Note fabriziert. Z.B. für 1.25 (halbe + achtel) wird die halbe (1.0) dargestellt und dann die achtel (cutoff: 0.25) hinzugefügt.
+   Achtung: Für 1.375 funktioniert das nur, weil der cutoff (viertel+achtel) als punktierte viertel dargestellt werden kann! Eigentlich müsste man hier einen
+   iterativen oder rekursiven Prozess anstoßen, der in beliebig kleine Details geht. Daher ist vorherst 1.3125 nicht Teil dieses Arrays:
+   1.3125 = 1.0 + 0.25 + 0.0625, z.B. halbe + achtel + 32stel ließe sich nicht punktiert darstellen, sondern nur als drei Noten. Momentan würde die 32stel einfach
+   nicht angezeigt und das Notenbild zerstören...
+

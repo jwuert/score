@@ -1,31 +1,31 @@
 package org.wuerthner.cwn;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import org.wuerthner.cwn.api.Trias;
 import org.wuerthner.cwn.api.exception.InvalidPositionException;
+
+import static org.junit.Assert.*;
 
 public class TriasTest {
 	@Test
 	public void testTrias() {
 		Trias t = new Trias(" 7 . 9 . 47 ");
-		assertTrue(t.bar == 6);
-		assertTrue(t.beat == 8);
-		assertTrue(t.tick == 47);
+		assertEquals(6, t.bar);
+		assertEquals(8, t.beat);
+		assertEquals(47, t.tick);
 		t = new Trias("2.1.0");
-		assertTrue(t.bar == 1);
-		assertTrue(t.beat == 0);
-		assertTrue(t.tick == 0);
+		assertEquals(1, t.bar);
+		assertEquals(0, t.beat);
+		assertEquals(0, t.tick);
 	}
 	
 	@Test
 	public void testMalformedPosition() {
 		try {
-			new Trias("1.3");
-			assertTrue(false);
+			new Trias("1.3.4.5");
+			fail();
 		} catch (InvalidPositionException e) {
-			assertTrue(e.getMessage().equals("Malformed position: 1.3"));
+			assertEquals("Malformed position: 1.3.4.5", e.getMessage());
 		}
 	}
 	
@@ -33,9 +33,9 @@ public class TriasTest {
 	public void testInvalidBar() {
 		try {
 			new Trias("0.0.0");
-			assertTrue(false);
+			fail();
 		} catch (InvalidPositionException e) {
-			assertTrue(e.getMessage().equals("Invalid bar: -1"));
+			assertEquals("Invalid bar: -1", e.getMessage());
 		}
 	}
 	
@@ -43,9 +43,9 @@ public class TriasTest {
 	public void testInvalidBeat() {
 		try {
 			new Trias("1.0.0");
-			assertTrue(false);
+			fail();
 		} catch (InvalidPositionException e) {
-			assertTrue(e.getMessage().equals("Invalid beat: -1"));
+			assertEquals("Invalid beat: -1", e.getMessage());
 		}
 	}
 }

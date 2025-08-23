@@ -89,6 +89,16 @@ public class ScoreStaff implements Iterable<ScoreBar> {
 	public void addBar(ScoreBar scoreBar) {
 		barList.add(scoreBar);
 	}
+
+	public void removeLastBar() {
+		if (barList.size()>0) {
+			ScoreBar lastBar = barList.get(barList.size() - 1);
+			if (lastBar.isMultiVoiceBar() || lastBar.getVoice(0).getScoreObjectSet().stream().filter(so -> !so.isRest()).count()>0) {
+				throw new RuntimeException("Cannot remove bar with notes!");
+			}
+			barList.remove(barList.size() - 1);
+		}
+	}
 	
 	@Override
 	public String toString() {

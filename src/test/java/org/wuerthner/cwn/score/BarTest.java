@@ -124,4 +124,68 @@ public class BarTest {
 			System.out.println(i + "\t" + pos);
 		}
 	}
+
+	@Test
+	public void testRests() {
+		CwnFactory factory = new SampleFactory();
+		SimpleTimeSignature ts1 = new SimpleTimeSignature("6/8");
+		CwnTimeSignatureEvent timeSignatureEvent1 = factory.createTimeSignatureEvent(0, ts1);
+		List<CwnTrack> trackList = new ArrayList<>();
+		CwnTrack track = factory.createTrack(PPQ);
+		track.addEvent(timeSignatureEvent1);
+		track.addEvent(factory.createKeyEvent(0, 0));
+		track.addEvent(factory.createClefEvent(0, 0));
+		trackList.add(track);
+
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 32, 1,4, 0,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				new ArrayList<>(), 0); // 4 bars
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
+		ScoreSystem system = scoreBuilder.getSystem(0);
+		ScoreStaff staff = system.get(0);
+		ScoreBar bar = staff.getBar(0);
+		ScoreVoice voice = bar.getVoice(0);
+		System.out.println(voice.size());
+		for (ScoreObject so : voice.getScoreObjectSet()) {
+			System.out.println(so + ", " + so.getDurationType() + ", " + so.getDurationBase());
+			System.out.println("     " + (PPQ * 4.0 / (DurationType.DOTTED.getFactor() * 1152)));
+		}
+	}
+
+	@Test
+	public void testTriplet34() {
+		CwnFactory factory = new SampleFactory();
+		SimpleTimeSignature ts1 = new SimpleTimeSignature("3/4");
+		CwnTimeSignatureEvent timeSignatureEvent1 = factory.createTimeSignatureEvent(0, ts1);
+		List<CwnTrack> trackList = new ArrayList<>();
+		CwnTrack track = factory.createTrack(PPQ);
+		track.addEvent(timeSignatureEvent1);
+		track.addEvent(factory.createKeyEvent(0, 0));
+		track.addEvent(factory.createClefEvent(0, 0));
+		track.addEvent(factory.createNoteEvent(0, D8T, 78, 0, 0, 0));
+		track.addEvent(factory.createNoteEvent(D8T, D8T, 78, 0, 0, 0));
+		track.addEvent(factory.createNoteEvent(D8T*2, D8T, 78, 0, 0, 0));
+		trackList.add(track);
+
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 32, 1,4, 0,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				new ArrayList<>(), 0); // 4 bars
+		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
+		ScoreSystem system = scoreBuilder.getSystem(0);
+		ScoreStaff staff = system.get(0);
+		ScoreBar bar = staff.getBar(0);
+		ScoreVoice voice = bar.getVoice(0);
+
+		System.out.println("---");
+		for (ScoreObject so : voice.getScoreObjectSet()) {
+			System.out.println(so + ", " + so.getDurationType() + ", " + so.getDurationBase());
+			// System.out.println("     " + (PPQ * 4.0 / (DurationType.DOTTED.getFactor() * 1152)));
+		}
+		System.out.println("---");
+		for (CharacterGroup g : voice.getCharacterGroups()) {
+			System.out.println(g);
+			System.out.println(g.getCharacter() + ", " + g.getFullCharacter());
+
+		}
+	}
 }

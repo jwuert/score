@@ -1,5 +1,6 @@
 title: test 6/8
 flag:	allowDottedRests
+flag:   mergeRestsInEmptyBars
 size:	2
 #
 input:	1.1.0	time signature 6/8

@@ -44,7 +44,8 @@ public class ScoreTestSuite {
 	public final static String TEST_SHOW = "show";
 	
 	public final static Map<String, Integer> flagMap = Collections
-			.unmodifiableMap(Stream.of(entry("none", Score.NONE), entry("splitRests", Score.SPLIT_RESTS), entry("allowDottedRests", Score.ALLOW_DOTTED_RESTS)).collect(entriesToMap()));
+			.unmodifiableMap(Stream.of(entry("none", Score.NONE), entry("splitRests", Score.SPLIT_RESTS), entry("allowDottedRests", Score.ALLOW_DOTTED_RESTS),
+										entry("mergeRestsInEmptyBars", Score.MERGE_RESTS_IN_EMPTY_BARS)).collect(entriesToMap()));
 	
 	public final static Map<Integer, String> flagMapInverted = flagMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 	

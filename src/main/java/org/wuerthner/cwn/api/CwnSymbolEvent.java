@@ -40,6 +40,8 @@ public interface CwnSymbolEvent extends CwnEvent {
 	public int getVerticalOffset();
 	
 	public int getParameter();
+
+	public int getVoice();
 	
 	public boolean isCrescendo();
 	

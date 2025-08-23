@@ -18,9 +18,7 @@ import org.wuerthner.cwn.api.ScoreParameter;
 import org.wuerthner.cwn.api.TimeSignature;
 import org.wuerthner.cwn.sample.SampleFactory;
 import org.wuerthner.cwn.sample.SampleScoreLayout;
-import org.wuerthner.cwn.score.Score;
-import org.wuerthner.cwn.score.ScoreBuilder;
-import org.wuerthner.cwn.score.ScorePrinter;
+import org.wuerthner.cwn.score.*;
 import org.wuerthner.cwn.timesignature.SimpleTimeSignature;
 
 public class PrintTest {
@@ -86,7 +84,54 @@ public class PrintTest {
 			e.printStackTrace();
 		}
 	}
-	
+
+	@Test
+	public void testPrint2() {
+		SampleFactory factory = new SampleFactory();
+		TimeSignature timeSignature = new SimpleTimeSignature("4/4");
+		// Track 1
+		CwnTrack track1 = factory.createTrack(PPQ);
+		track1.addEvent(factory.createTimeSignatureEvent(0, timeSignature));
+		track1.addEvent(factory.createKeyEvent(0, 0));
+		track1.addEvent(factory.createClefEvent(0, 0));
+		track1.addEvent(factory.createNoteEvent(D8, D8, 12, 0, 80, 0));
+		track1.addEvent(factory.createNoteEvent(D4, D8, 48, 0, 80, 0));
+		track1.addEvent(factory.createNoteEvent(D4, D4, 62, 0, 80, 0));
+		track1.addEvent(factory.createNoteEvent(D4*4, D2, 60, 0, 80, 0));
+		List<CwnTrack> trackList = new ArrayList<>();
+		trackList.add(track1);
+		ScorePrinter scorePrinter = new ScorePrinter();
+		int groupLevel = 2;
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D32, groupLevel, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				new ArrayList<>(), 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
+		String lyString = scorePrinter.print(title, subtitle, composer, true, scoreParameter, trackList, scoreParameter.endPosition);
+		System.out.println(lyString);
+	}
+
+	@Test
+	public void testChord() {
+		SampleFactory factory = new SampleFactory();
+		CwnTrack track1 = factory.createTrack(PPQ);
+		TimeSignature timeSignature = new SimpleTimeSignature("4/4");
+		track1.addEvent(factory.createTimeSignatureEvent(0, timeSignature));
+		track1.addEvent(factory.createKeyEvent(0, 0));
+		track1.addEvent(factory.createClefEvent(0, 0));
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D32, 2, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS,
+				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
+				new ArrayList<>(), 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
+		ScoreBar sb = new ScoreBar(0, track1, scoreParameter);
+		List<ScoreObject> list = new ArrayList<>();
+//
+		list.add(new ScoreNote(sb, factory.createNoteEvent(D4, D4, 62, 0, 80, 0)));
+		list.add(new ScoreNote(sb, factory.createNoteEvent(D4, D8, 60, 0, 0, 80)));
+		ScoreChord sc = new ScoreChord(sb, list);
+
+		System.out.println("---");
+		System.out.println(sc);
+
+	}
+
 	private File createOutputFile(String name, String ext) throws IOException {
 		File file = File.createTempFile("test", name + "." + ext);
 		return file;

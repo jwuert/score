@@ -12,6 +12,10 @@ public interface CwnPointer {
     public void setRegion(Region region);
     public int getStaffIndex();
     public void setStaffIndex(int index);
+    public void setRelativeY(int y);
+    public int getRelativeY();
+    public void setDeltaY(int y);
+    public int getDeltaY();
     default int getY(int clef) {
         int pitch = getPitch();
         int ypos = 0;
