@@ -9,7 +9,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "release-branch-1.3-SNAPSHOT" ]
+    branches: [ "master" ]
 
 jobs:
   build-and-publish:
