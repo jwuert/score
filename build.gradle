@@ -48,7 +48,7 @@ publishing {
 			allowInsecureProtocol = true;
    */
 			name = "GitHubPackages"
-			url = uri("https://maven.pkg.github.com/jwuert/sport")
+			url = uri("https://maven.pkg.github.com/jwuert/ambitus")
 			credentials {
 				username = System.getenv("GITHUB_ACTOR")  
 				password = System.getenv("GITHUB_TOKEN")
