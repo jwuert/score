@@ -8,6 +8,17 @@ plugins {
 group 'org.wuerthner.score'
 version '1.3.0-SNAPSHOT'
 
+jar {
+    manifest {
+        attributes(
+            'Implementation-Title': 'Score',
+            'Implementation-Version': version,
+            'Implementation-Vendor': 'Jan Wuerthner',
+            'License': 'GNU LGPL v3'
+        )
+    }
+}
+
 repositories {
 	mavenLocal()
 	mavenCentral()
