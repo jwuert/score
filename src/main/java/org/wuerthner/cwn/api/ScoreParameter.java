@@ -7,6 +7,7 @@ import org.wuerthner.cwn.score.Score;
 public class ScoreParameter {
 	public long startPosition = 0;
 	public long endPosition;
+	public long caret;
 	public int resolutionInTicks;
 	public int ppq;
 	public int flags;
@@ -18,15 +19,15 @@ public class ScoreParameter {
 	public int barOffset;
 	public String filename;
 	
-	private ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset) {
+	private ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset, long caret) {
 		this(ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
 				Arrays.asList(DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET),
-				new ArrayList<>(), barOffset);
+				new ArrayList<>(), barOffset, caret);
 		// Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED }));
 	}
 	
 	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList,
-						  List<Markup.Type> markup, int barOffset) {
+						  List<Markup.Type> markup, int barOffset, long caret) {
 		// this.startPosition = startPosition;
 		this.endPosition = ppq * 1500L * 4; // 500 4/4 bars
 		this.ppq = ppq;
@@ -37,6 +38,7 @@ public class ScoreParameter {
 		this.durationTypeList = durationTypeList;
 		this.markup = markup;
 		this.barOffset = barOffset;
+		this.caret = caret;
 	}
 	
 
@@ -73,6 +75,10 @@ public class ScoreParameter {
 	public int getBarOffset() { return barOffset; }
 
 	public void setBarOffset(int barOffset) { this.barOffset = barOffset; }
+
+	public long getCaret() { return caret; }
+
+	public void setCaret(long caret) { this.caret = caret; }
 
 	public int getPPQ() { return ppq; }
 
