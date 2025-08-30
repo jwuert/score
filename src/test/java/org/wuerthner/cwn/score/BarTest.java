@@ -43,7 +43,7 @@ public class BarTest {
 		
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 32, 1,4, Score.NONE,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0); // 4 bars
+				new ArrayList<>(), 0, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -86,7 +86,7 @@ public class BarTest {
 		
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 32, 1,4, Score.SPLIT_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0);// 4, Score.SPLIT_RESTS, 0); // 1 bar
+				new ArrayList<>(), 0, 0);// 4, Score.SPLIT_RESTS, 0); // 1 bar
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -108,7 +108,7 @@ public class BarTest {
 		int flags = 0;
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0);
+				new ArrayList<>(), 0, 0);
 				// STRETCH_FACTOR, flags, 0);
 		Metric metric = MetricTools.createRegularMetrics("4/4+3/8");
 		metric = MetricTools.cloneMetrics(metric, 5, DurationType.TRIPLET);
@@ -139,7 +139,7 @@ public class BarTest {
 
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 32, 1,4, 0,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0); // 4 bars
+				new ArrayList<>(), 0, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		ScoreSystem system = scoreBuilder.getSystem(0);
 		ScoreStaff staff = system.get(0);
@@ -169,7 +169,7 @@ public class BarTest {
 
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 32, 1,4, 0,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0); // 4 bars
+				new ArrayList<>(), 0, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		ScoreSystem system = scoreBuilder.getSystem(0);
 		ScoreStaff staff = system.get(0);
