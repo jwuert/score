@@ -91,7 +91,7 @@ public class ScoreTestSuite {
 		long startPosition = 0;
 		long endPosition = PositionTools.getPosition(cwnTrack, new Trias(size, 0, 0));
 		List<DurationType> durationTypeList = DurationType.getDurationTypeList(character);
-		ScoreParameter scoreParameter = new ScoreParameter(PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, durationTypeList, new ArrayList<>(), 0);
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, durationTypeList, new ArrayList<>(), 0, 0);
 		return scoreParameter;
 	}
 	

@@ -59,7 +59,7 @@ public class GroupTest {
 		trackList.add(track);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1,4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+				new ArrayList<>(), 0, 0); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		assertEquals("[1.0]", ts1.getMetric().getFlatDurationList(0).toString());
 		assertEquals("[0.5, 0.5]", ts1.getMetric().getFlatDurationList(1).toString());

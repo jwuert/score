@@ -32,7 +32,7 @@ public class MidiTest {
         ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 8, 1,4,0,
                 Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
                 new ArrayList<>(),
-                4);
+                4, 0);
         CwnTrack track = factory.createTrack(PPQ);
         track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
         track.addEvent(factory.createKeyEvent(0, 0));
