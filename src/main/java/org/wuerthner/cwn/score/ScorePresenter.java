@@ -451,8 +451,8 @@ public class ScorePresenter {
 		//
 		if (selection.hasCursor()) {
 			long absCursor = selection.getCursorPosition();
-			int relCursor = (int) ((absCursor - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
 			if (bar.getStartPosition() <= absCursor && absCursor < bar.getEndPosition()) {
+				int relCursor = (int) ((absCursor - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
 				// system cursor
 				// canvas.drawLine(xBarPosition + offset + relCursor, ySystemTop, xBarPosition + offset + relCursor, ySystemBottom);
 				// staff cursor
@@ -460,6 +460,32 @@ public class ScorePresenter {
 						xBarPosition + offset + relCursor, yTop + 4 * layout.getLineHeight() + 4);
 			}
 		}
+		//
+		// draw caret (if not first bar)
+		//
+		long absCaret = scoreBuilder.getScoreParameter().getCaret();
+		if (!firstBarInTotal) {
+			if (bar.getStartPosition() <= absCaret && absCaret < bar.getEndPosition()) {
+				int relCursor = (int) ((absCaret - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
+				// canvas.drawString("* " + firstBarInStaff + ", " + firstBarInTotal + ", " + barIndex, "lyrics", xBarPosition + offset + relCursor, yTop-50, "left");
+				// caret
+				int x = xBarPosition + offset + relCursor - 6;
+				int y1 = ySystemTop - 12;
+				int y2 = ySystemBottom + 12;
+				if (staffIndex == 0) {
+					canvas.drawLine(x, y1, x - 2, y1 - 2);
+					canvas.drawLine(x, y1 - 1, x - 2, y1 - 2);
+					canvas.drawLine(x, y1, x + 2, y1 - 2);
+					canvas.drawLine(x, y1 - 1, x + 2, y1 - 2);
+					canvas.drawLine(x, y1, x, y2);
+					canvas.drawLine(x, y2, x - 2, y2 + 2);
+					canvas.drawLine(x, y2 + 1, x - 2, y2 + 2);
+					canvas.drawLine(x, y2, x + 2, y2 + 2);
+					canvas.drawLine(x, y2 + 1, x + 2, y2 + 2);
+				}
+			}
+		}
+
 		//
 		// draw grid
 		//
@@ -473,6 +499,7 @@ public class ScorePresenter {
 				// canvas.drawString("+"+trias.beat,"Arial",xBarPosition + offset + relPosition, yTop-5,"red");
 			}
 		}
+
 		//
 		// draw mouse frame
 		//
@@ -484,6 +511,7 @@ public class ScorePresenter {
 			int relMouseRightPosition = (int) ((mouseRightPosition - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
 			if (selection.getSelectionType() == SelectionType.NOTE) {
 				// note selection - draws left and right borders
+				// TODO: CHANGE SELECTION XXXXX
 				if (bar.getStartPosition() <= mouseLeftPosition && mouseLeftPosition < bar.getEndPosition()) {
 					// left:
 					if (mouseStaff < 0) {
