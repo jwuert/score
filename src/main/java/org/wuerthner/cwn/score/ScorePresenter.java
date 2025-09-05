@@ -464,7 +464,7 @@ public class ScorePresenter {
 		// draw caret (if not first bar)
 		//
 		long absCaret = scoreBuilder.getScoreParameter().getCaret();
-		if (!firstBarInTotal) {
+		if (absCaret>0 && !selection.hasCursor()) {
 			if (bar.getStartPosition() <= absCaret && absCaret < bar.getEndPosition()) {
 				int relCursor = (int) ((absCaret - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
 				// canvas.drawString("* " + firstBarInStaff + ", " + firstBarInTotal + ", " + barIndex, "lyrics", xBarPosition + offset + relCursor, yTop-50, "left");
