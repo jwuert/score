@@ -32,6 +32,9 @@ public class SampleTrack implements CwnTrack {
 		return false;
 	}
 
+    @Override
+    public boolean getVisible() { return true; }
+
 	@Override
 	public int getChannel() {
 		return 0;

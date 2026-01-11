@@ -19,7 +19,7 @@ public class ScoreSystem implements Iterable<ScoreStaff> {
 	
 	public ScoreSystem(List<CwnTrack> trackList, ScoreParameter scoreParameter) {
 		for (CwnTrack track : trackList) {
-			if (!track.getMute()) {
+			if (track.getVisible()) {
 				ScoreStaff staff = new ScoreStaff(track, scoreParameter);
 				staffList.add(staff);
 			}

@@ -28,6 +28,8 @@ public interface CwnTrack {
 
 	public boolean getMute();
 
+    public boolean getVisible();
+
 	public int getChannel();
 
 	public int getInstrument();
