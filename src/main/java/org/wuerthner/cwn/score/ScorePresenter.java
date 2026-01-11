@@ -183,7 +183,11 @@ public class ScorePresenter {
 		int x2 = layout.getWidth() - layout.getBorder();
 		int yTop = layout.getBorder() + layout.getTitleHeight() + layout.getSystemSpace() + (staffIndex + systemIndex * scoreBuilder.getNumberOfTracks()) * layout.getStaffHeight();
 		// System.out.println("!! " + scoreBuilder.getTrackList().size() + " ? " + staffIndex);
-		boolean mute = scoreBuilder.getTrackList().get(staffIndex).getMute();
+		// boolean visible = scoreBuilder.getTrackList().get(staffIndex).getVisible();
+        // boolean mute = scoreBuilder.getTrackList().get(staffIndex).getMute();
+        boolean mute =staff.getTrack().getMute();
+
+        canvas.drawString("M: " + mute + ", " + staff.getTrack().getMute(), "track",50,50,"left");
 
 		if (staff.getTrack().getPiano()) {
 			// PIANO STAFF
@@ -213,9 +217,9 @@ public class ScorePresenter {
 			}
 
 			if (scoreBuilder.getScoreParameter().markup.contains(Markup.Type.ATTRIBUTES)) {
-				int channel = scoreBuilder.getTrackList().get(staffIndex).getChannel();
-				int instrument = scoreBuilder.getTrackList().get(staffIndex).getInstrument();
-				int volume = scoreBuilder.getTrackList().get(staffIndex).getVolume();
+				int channel = staff.getTrack().getChannel(); // scoreBuilder.getTrackList().get(staffIndex).getChannel();
+				int instrument = staff.getTrack().getInstrument(); // scoreBuilder.getTrackList().get(staffIndex).getInstrument();
+				int volume = staff.getTrack().getVolume(); // scoreBuilder.getTrackList().get(staffIndex).getVolume();
 				if (volume<0 || volume>10) volume = 10;
 				String channelSelection = CwnTrack.CHANNELS[channel];
 				String instrumentSelection = CwnTrack.MIDI_INSTRUMENTS[instrument];
@@ -229,8 +233,8 @@ public class ScorePresenter {
 				ScoreBar bar = staff.getBar(0);
 				QuantizedPosition qp = new QuantizedPosition(bar, 0, 1);
 				QuantizedDuration qd = new QuantizedDuration(scoreBuilder.getScoreParameter(), 0);
-				CwnNoteEvent highest = scoreBuilder.getTrackList().get(staffIndex).getHighestNote();
-				CwnNoteEvent lowest = scoreBuilder.getTrackList().get(staffIndex).getLowestNote();
+				CwnNoteEvent highest = staff.getTrack().getHighestNote(); // scoreBuilder.getTrackList().get(staffIndex).getHighestNote();
+				CwnNoteEvent lowest = staff.getTrack().getLowestNote(); // scoreBuilder.getTrackList().get(staffIndex).getLowestNote();
 				if (highest!=null && lowest != null) {
 					ScoreNote hNote = new ScoreNote(bar, highest, qp, qd, 0, false);
 					ScoreNote lNote = new ScoreNote(bar, lowest, qp, qd, 0, false);
