@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -34,7 +35,7 @@ public class RelativePositionAndDurationTest {
 		trackList.add(track);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D4 / 16, 1, 4,Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); // 4,Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+				new ArrayList<>(), 0, 0, new HashMap<>()); // 4,Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		for (ScoreSystem sys : scoreBuilder) {
 			for (ScoreStaff staff : sys) {
@@ -62,7 +63,7 @@ public class RelativePositionAndDurationTest {
 		int resolutionInTicks = D4 / 8;
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, resolutionInTicks, 1, 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+				new ArrayList<>(), 0, 0, new HashMap<>()); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
 		long barStartPosition = PositionTools.getPosition(track, new Trias("3.1.0"));
 		ScoreBar scoreBar = new ScoreBar(barStartPosition, track, scoreParameter);
 		QuantizedPosition positionInBar = new QuantizedPosition(scoreBar, cwnNoteEvent.getPosition(), ts1.getMetric());

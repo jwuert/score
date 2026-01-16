@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class NoteTest {
 		CwnFactory factory = new SampleFactory();
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 8, 1,4, 0,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); // 4, 0, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>()); // 4, 0, 0);
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -55,7 +56,7 @@ public class NoteTest {
 		CwnFactory factory = new SampleFactory();
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 8, 1,4, 0,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); // 4, 0, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>()); // 4, 0, 0);
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));

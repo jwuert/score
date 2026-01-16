@@ -8,10 +8,7 @@ import org.wuerthner.cwn.sample.SampleScoreLayout;
 import org.wuerthner.cwn.sample.SampleTrack;
 import org.wuerthner.cwn.timesignature.SimpleTimeSignature;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,7 +19,7 @@ public class DurationTest {
     public void testDuration() {
         ScoreParameter scoreParameter = new ScoreParameter(960, 240, 1,4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
                 Arrays.asList(DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET),
-                new ArrayList<>(), 0, 0);
+                new ArrayList<>(), 0, 0, new HashMap<>());
         QuantizedDuration qdur = new QuantizedDuration(scoreParameter, 1200);
         int[] md;
 
@@ -51,7 +48,7 @@ public class DurationTest {
     public void testPosition() {
         ScoreParameter scoreParameter = new ScoreParameter(960, 240, 1,4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
                 Arrays.asList(DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET),
-                new ArrayList<>(), 0, 0);
+                new ArrayList<>(), 0, 0, new HashMap<>());
         CwnFactory factory = new SampleFactory();
         SimpleTimeSignature ts1 = new SimpleTimeSignature("4/4");
         CwnTimeSignatureEvent timeSignatureEvent1 = factory.createTimeSignatureEvent(0, ts1);
@@ -85,7 +82,7 @@ public class DurationTest {
         trackList.add(track);
         ScoreParameter scoreParameter = new ScoreParameter(960, 240, 1,4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
                 Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-                new ArrayList<>(), 0, 0); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+                new ArrayList<>(), 0, 0, new HashMap<>()); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
         ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
         Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
         ScoreVoice voice = barIterator.next().iterator().next();

@@ -48,7 +48,7 @@ public class TestScore {
 		CwnFactory factory = new SampleFactory();
 		ScoreParameter scoreParameter = new ScoreParameter(960, 480, 1,4, 0,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>());
 		CwnTrack track = factory.createTrack(960);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -80,7 +80,7 @@ public class TestScore {
 		CwnFactory factory = new SampleFactory();
 		ScoreParameter scoreParameter = new ScoreParameter(960, 240, 1,4, 0,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>());
 		CwnTrack track = factory.createTrack(960);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -112,7 +112,7 @@ public class TestScore {
 		CwnFactory factory = new SampleFactory();
 		ScoreParameter scoreParameter = new ScoreParameter(960, 240, 1,4, 0,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>());
 		CwnTrack track = factory.createTrack(960);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));

@@ -1,12 +1,6 @@
 package org.wuerthner.cwn.score;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -91,7 +85,7 @@ public class ScoreTestSuite {
 		long startPosition = 0;
 		long endPosition = PositionTools.getPosition(cwnTrack, new Trias(size, 0, 0));
 		List<DurationType> durationTypeList = DurationType.getDurationTypeList(character);
-		ScoreParameter scoreParameter = new ScoreParameter(PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, durationTypeList, new ArrayList<>(), 0, 0);
+		ScoreParameter scoreParameter = new ScoreParameter(PPQ, RESOLUTION, METRIC_LEVEL, STRETCH_FACTOR, flags, durationTypeList, new ArrayList<>(), 0, 0, new HashMap<>());
 		return scoreParameter;
 	}
 	
