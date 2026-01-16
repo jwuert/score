@@ -18,16 +18,17 @@ public class ScoreParameter {
 	public Map<Long,List<String>> markupMap = new HashMap<>();
 	public int barOffset;
 	public String filename;
+    public Map<Long,String> rangeMap = new HashMap<>();
 	
-	private ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset, long caret) {
+	private ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, int barOffset, long caret, Map<Long,String> rangeMap) {
 		this(ppq, resolutionInTicks, metricLevel, stretchFactor, flags,
 				Arrays.asList(DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET),
-				new ArrayList<>(), barOffset, caret);
+				new ArrayList<>(), barOffset, caret,rangeMap);
 		// Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED }));
 	}
 	
 	public ScoreParameter(int ppq, int resolutionInTicks, int metricLevel, int stretchFactor, int flags, List<DurationType> durationTypeList,
-						  List<Markup.Type> markup, int barOffset, long caret) {
+						  List<Markup.Type> markup, int barOffset, long caret, Map<Long,String> rangeMap) {
 		// this.startPosition = startPosition;
 		this.endPosition = ppq * 1500L * 4; // 500 4/4 bars
 		this.ppq = ppq;
@@ -39,6 +40,7 @@ public class ScoreParameter {
 		this.markup = markup;
 		this.barOffset = barOffset;
 		this.caret = caret;
+        this.rangeMap = rangeMap;
 	}
 	
 
@@ -79,6 +81,10 @@ public class ScoreParameter {
 	public long getCaret() { return caret; }
 
 	public void setCaret(long caret) { this.caret = caret; }
+
+    public Map<Long,String> getRangeMap() { return rangeMap; }
+
+    public void setRangeMap(Map<Long,String> rangeMap) { this.rangeMap = rangeMap; }
 
 	public int getPPQ() { return ppq; }
 

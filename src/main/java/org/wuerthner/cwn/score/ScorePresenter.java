@@ -39,8 +39,8 @@ public class ScorePresenter {
 	
 	public void present(String title, String subtitle, String composer, int barOffset) {
 		canvas.open();
-		canvas.drawString(title, "title", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() - 30, "center");
-		canvas.drawString(subtitle, "subtitle", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() + 0, "center");
+		canvas.drawString(title, "title", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() - 40, "center");
+		canvas.drawString(subtitle, "subtitle", (int) (layout.getWidth() * 0.5), layout.getTitleHeight() - 10, "center");
 		canvas.drawString(composer, "track", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 10, "right");
 		if (scoreBuilder.getScoreParameter().getFilename() != null) {
 			canvas.drawString(scoreBuilder.getScoreParameter().getFilename(), "barNumber", (int) (layout.getWidth() - 30), layout.getTitleHeight() + 20, "right");
@@ -187,9 +187,7 @@ public class ScorePresenter {
         // boolean mute = scoreBuilder.getTrackList().get(staffIndex).getMute();
         boolean mute =staff.getTrack().getMute();
 
-        canvas.drawString("M: " + mute + ", " + staff.getTrack().getMute(), "track",50,50,"left");
-
-		if (staff.getTrack().getPiano()) {
+        if (staff.getTrack().getPiano()) {
 			// PIANO STAFF
 			pianoStaffNo++;
 			if (pianoStaffNo == 1) {
@@ -424,6 +422,20 @@ public class ScorePresenter {
 				canvas.drawString(event.getLabel(), "lyrics", x, y, "left", alternative);
 			}
 		}
+
+        //
+        // handle bookmarks
+        //
+        if (staffIndex==0) {
+            for (Map.Entry<Long, String> entry : scoreBuilder.getScoreParameter().rangeMap.entrySet()) {
+                if (bar.getStartPosition() <= entry.getKey() && entry.getKey() < bar.getEndPosition()) {
+                    int xStart = (int) ((entry.getKey() - bar.getStartPosition()) * xWidth * 1.0 / bar.getDuration());
+                    int x = xBarPosition + (xStart == 0 ? 0 : offset + xStart);
+                    int y = yTop - layout.getSystemSpace() - 10;
+                    canvas.drawString(entry.getValue(), "rangeName", x, y, "left", false);
+                }
+            }
+        }
 
 		//
 		// draw pointer
