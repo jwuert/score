@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -64,7 +65,7 @@ public class PrintTest {
 		int groupLevel = 2;
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D32, groupLevel, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>()); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
 		String lyString = scorePrinter.print(title, subtitle, composer, false, scoreParameter, trackList, scoreParameter.endPosition);
 		String fileBase = Long.toString(System.nanoTime());
 		try {
@@ -104,7 +105,7 @@ public class PrintTest {
 		int groupLevel = 2;
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D32, groupLevel, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>()); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
 		String lyString = scorePrinter.print(title, subtitle, composer, true, scoreParameter, trackList, scoreParameter.endPosition);
 		System.out.println(lyString);
 	}
@@ -119,7 +120,7 @@ public class PrintTest {
 		track1.addEvent(factory.createClefEvent(0, 0));
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D32, 2, STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>()); //STRETCH_FACTOR, Score.ALLOW_DOTTED_RESTS | Score.SPLIT_RESTS, 0);
 		ScoreBar sb = new ScoreBar(0, track1, scoreParameter);
 		List<ScoreObject> list = new ArrayList<>();
 //

@@ -3,10 +3,7 @@ package org.wuerthner.cwn.track;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.junit.Test;
 import org.wuerthner.cwn.api.*;
@@ -397,7 +394,7 @@ public class TrackTest {
 
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, 960 / 16, 1, 1, 1,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); // 4 bars
+				new ArrayList<>(), 0, 0, new HashMap<>()); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout());
 		assertEquals(10, scoreBuilder.getNumberOfShownBars());
 	}

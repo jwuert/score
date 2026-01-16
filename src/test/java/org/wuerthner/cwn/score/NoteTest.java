@@ -2,10 +2,7 @@ package org.wuerthner.cwn.score;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.junit.Test;
 import org.wuerthner.cwn.api.*;
@@ -33,7 +30,7 @@ public class NoteTest {
 		CwnNoteEvent noteEvent3 = factory.createNoteEvent(D2, D2, 82, 0, 0, 0);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 8, 1,4, 0,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0);
+				new ArrayList<>(), 0, 0, new HashMap<>());
 		CwnTrack track = factory.createTrack(PPQ);
 		track.addEvent(factory.createTimeSignatureEvent(0, new SimpleTimeSignature("4/4")));
 		track.addEvent(factory.createKeyEvent(0, 0));
@@ -62,7 +59,7 @@ public class NoteTest {
 		trackList.add(track);
 		ScoreParameter scoreParameter = new ScoreParameter(PPQ, D1 / 16, 1,4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS,
 				Arrays.asList(new DurationType[] { DurationType.REGULAR, DurationType.DOTTED, DurationType.BIDOTTED, DurationType.TRIPLET, DurationType.QUINTUPLET }),
-				new ArrayList<>(), 0, 0); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
+				new ArrayList<>(), 0, 0, new HashMap<>()); // 4, Score.SPLIT_RESTS | Score.ALLOW_DOTTED_RESTS, 0); // 4 bars
 		ScoreBuilder scoreBuilder = new ScoreBuilder(new TrackContainer(trackList, 0), scoreParameter, new SampleScoreLayout(), 1);
 		Iterator<ScoreBar> barIterator = scoreBuilder.iterator().next().iterator().next().iterator();
 		ScoreVoice voice = barIterator.next().iterator().next();
